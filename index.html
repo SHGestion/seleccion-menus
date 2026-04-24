@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selección de Menús — SH Gestión</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f4f8; color: #1a2332; min-height: 100vh; padding: 16px;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  .card {
+    background: #fff; border-radius: 12px; padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px;
+  }
+  h1 { font-size: 1.5rem; color: #0a4d8c; margin-bottom: 4px; }
+  h2 { font-size: 1.1rem; margin-bottom: 12px; color: #1a2332; }
+  .subtitle { color: #64748b; font-size: 0.9rem; margin-bottom: 16px; }
+  .logo { font-weight: 700; color: #0a4d8c; font-size: 1.1rem; margin-bottom: 4px; }
+  label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+  input[type="text"], input[type="password"] {
+    width: 100%; padding: 12px; border: 1px solid #cbd5e1;
+    border-radius: 8px; font-size: 1rem; margin-bottom: 12px;
+  }
+  input:focus { outline: none; border-color: #0a4d8c; }
+  button {
+    background: #0a4d8c; color: #fff; border: none; padding: 12px 20px;
+    border-radius: 8px; font-size: 1rem; font-weight: 600;
+    cursor: pointer; width: 100%;
+  }
+  button:hover { background: #083a6b; }
+  button:disabled { background: #94a3b8; cursor: not-allowed; }
+  .btn-secundario { background: #e2e8f0; color: #1a2332; }
+  .btn-secundario:hover { background: #cbd5e1; }
+  .dia-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+  .dia-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .dia-fecha { font-weight: 700; color: #0a4d8c; font-size: 1rem; }
+  .dia-nombre { color: #64748b; font-size: 0.85rem; }
+  .alt-opcion {
+    display: flex; align-items: flex-start; padding: 10px;
+    border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .alt-opcion:hover { border-color: #0a4d8c; background: #f8fafc; }
+  .alt-opcion.seleccionada { border-color: #0a4d8c; background: #e6f0fa; }
+  .alt-radio {
+    width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%;
+    margin-right: 10px; flex-shrink: 0; position: relative; margin-top: 2px;
+  }
+  .alt-opcion.seleccionada .alt-radio { border-color: #0a4d8c; }
+  .alt-opcion.seleccionada .alt-radio::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 12px; height: 12px; background: #0a4d8c; border-radius: 50%;
+  }
+  .alt-info { flex: 1; }
+  .alt-codigo {
+    display: inline-block; font-size: 0.7rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px; margin-right: 6px;
+  }
+  .alt-A { background: #fef3c7; color: #92400e; }
+  .alt-B { background: #dbeafe; color: #1e40af; }
+  .alt-C { background: #d1fae5; color: #065f46; }
+  .alt-desc { font-size: 0.95rem; color: #1a2332; margin-top: 4px; }
+  .mensaje { padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem; }
+  .error { background: #fee2e2; color: #991b1b; }
+  .ok { background: #d1fae5; color: #065f46; }
+  .info { background: #dbeafe; color: #1e40af; }
+  .resumen { display: flex; justify-content: space-between; font-size: 0.9rem; color: #64748b; }
+  .hidden { display: none; }
+  .header-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px;
+  }
+  .user-info { font-size: 0.85rem; color: #64748b; }
+  .loader {
+    display: inline-block; width: 20px; height: 20px;
+    border: 3px solid #e2e8f0; border-top-color: #0a4d8c;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .bloqueado { opacity: 0.5; pointer-events: none; }
+  .bloqueado-badge {
+    display: inline-block; font-size: 0.7rem; padding: 2px 6px;
+    background: #fee2e2; color: #991b1b; border-radius: 4px; margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- LOGIN -->
+  <div id="pantalla-login" class="card">
+    <div class="logo">SH Gestión y Servicios</div>
+    <h1>Selección de Menús</h1>
+    <p class="subtitle">Ingresa tu RUT y PIN para elegir tus menús del mes.</p>
+    <label for="rut">RUT</label>
+    <input type="text" id="rut" placeholder="12345678-9" autocomplete="username">
+    <label for="pin">PIN</label>
+    <input type="password" id="pin" placeholder="4 dígitos" maxlength="4" inputmode="numeric" autocomplete="current-password">
+    <div id="msg-login"></div>
+    <button id="btn-login">Ingresar</button>
+  </div>
+
+  <!-- APP -->
+  <div id="pantalla-app" class="hidden">
+    <div class="card">
+      <div class="header-bar">
+        <div>
+          <div class="logo">SH Gestión</div>
+          <div class="user-info" id="user-info"></div>
+        </div>
+        <button class="btn-secundario" style="width:auto; padding:8px 14px;" id="btn-logout">Salir</button>
+      </div>
+      <h2>Menús del mes <span id="mes-label"></span></h2>
+      <p class="subtitle">Selecciona tu opción para cada día. Puedes modificar hasta 24h antes.</p>
+      <div id="msg-app"></div>
+      <div class="resumen">
+        <span>Elegidos: <strong id="cnt-elegidos">0</strong></span>
+        <span>Faltan: <strong id="cnt-faltan">0</strong></span>
+      </div>
+    </div>
+
+    <div id="lista-dias"></div>
+  </div>
+
+</div>
+
+<script>
+// =================== CONFIG ===================
+const API_URL = 'https://script.google.com/macros/s/AKfycbzjbdUoHmtMx7uLA_UA1N9GKICFND4YcJO4HUpuJnPx0g9YWuILgCCwMRg1a3Tcfb85bg/exec';
+// ==============================================
+
+let comensalActual = null;
+let menusCache = [];
+let seleccionesCache = {};
+
+const $ = (id) => document.getElementById(id);
+
+// LOGIN
+$('btn-login').addEventListener('click', async () => {
+  const rut = $('rut').value.trim();
+  const pin = $('pin').value.trim();
+  if (!rut || !pin) {
+    mostrarMsg('msg-login', 'Ingresa RUT y PIN', 'error');
+    return;
+  }
+  $('btn-login').disabled = true;
+  $('btn-login').innerHTML = '<span class="loader"></span>';
+  try {
+    const r = await apiCall({ accion: 'login', rut, pin });
+    if (!r.ok) {
+      mostrarMsg('msg-login', r.error || 'Error al ingresar', 'error');
+      return;
+    }
+    comensalActual = r.comensal;
+    sessionStorage.setItem('comensal', JSON.stringify(comensalActual));
+    await entrarApp();
+  } catch (e) {
+    mostrarMsg('msg-login', 'Error de conexión: ' + e.message, 'error');
+  } finally {
+    $('btn-login').disabled = false;
+    $('btn-login').innerHTML = 'Ingresar';
+  }
+});
+
+$('btn-logout').addEventListener('click', () => {
+  sessionStorage.removeItem('comensal');
+  comensalActual = null;
+  $('pantalla-app').classList.add('hidden');
+  $('pantalla-login').classList.remove('hidden');
+  $('rut').value = '';
+  $('pin').value = '';
+});
+
+$('pin').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') $('btn-login').click();
+});
+
+// Recuperar sesión
+window.addEventListener('load', () => {
+  const s = sessionStorage.getItem('comensal');
+  if (s) {
+    try {
+      comensalActual = JSON.parse(s);
+      entrarApp();
+    } catch (e) { sessionStorage.removeItem('comensal'); }
+  }
+});
+
+async function entrarApp() {
+  $('pantalla-login').classList.add('hidden');
+  $('pantalla-app').classList.remove('hidden');
+  $('user-info').textContent = `${comensalActual.nombre} — ${comensalActual.area || ''}`;
+  await cargarMenusYSelecciones();
+}
+
+async function cargarMenusYSelecciones() {
+  try {
+    mostrarMsg('msg-app', 'Cargando menús...', 'info');
+    const [rMenus, rSel] = await Promise.all([
+      apiCall({ accion: 'getMenus' }),
+      apiCall({ accion: 'getSelecciones', rut: comensalActual.rut })
+    ]);
+    if (!rMenus.ok) { mostrarMsg('msg-app', 'No se pudieron cargar los menús', 'error'); return; }
+    menusCache = rMenus.menus || [];
+    seleccionesCache = (rSel && rSel.ok) ? (rSel.selecciones || {}) : {};
+    $('mes-label').textContent = rMenus.mes || '';
+    renderDias();
+    limpiarMsg('msg-app');
+  } catch (e) {
+    mostrarMsg('msg-app', 'Error: ' + e.message, 'error');
+  }
+}
+
+function renderDias() {
+  const cont = $('lista-dias');
+  cont.innerHTML = '';
+  let elegidos = 0;
+  const total = menusCache.length;
+
+  menusCache.forEach(dia => {
+    const bloqueado = !puedeModificar(dia.fecha);
+    const seleccion = seleccionesCache[dia.fecha];
+    if (seleccion) elegidos++;
+
+    const card = document.createElement('div');
+    card.className = 'card dia-card' + (bloqueado ? ' bloqueado' : '');
+    card.innerHTML = `
+      <div class="dia-header">
+        <div>
+          <div class="dia-fecha">${formatFecha(dia.fecha)}</div>
+          <div class="dia-nombre">${dia.diaSemana}${bloqueado ? '<span class="bloqueado-badge">cerrado</span>' : ''}</div>
+        </div>
+      </div>
+      <div class="alternativas"></div>
+    `;
+    const altCont = card.querySelector('.alternativas');
+    dia.alternativas.forEach(alt => {
+      const esSel = seleccion && seleccion.alternativa === alt.codigo;
+      const op = document.createElement('div');
+      op.className = 'alt-opcion' + (esSel ? ' seleccionada' : '');
+      op.innerHTML = `
+        <div class="alt-radio"></div>
+        <div class="alt-info">
+          <span class="alt-codigo alt-${alt.codigo}">${alt.codigo} · ${alt.tipo}</span>
+          <div class="alt-desc">${alt.descripcion}</div>
+        </div>
+      `;
+      if (!bloqueado) {
+        op.addEventListener('click', () => elegir(dia.fecha, alt));
+      }
+      altCont.appendChild(op);
+    });
+    cont.appendChild(card);
+  });
+
+  $('cnt-elegidos').textContent = elegidos;
+  $('cnt-faltan').textContent = total - elegidos;
+}
+
+async function elegir(fecha, alt) {
+  try {
+    const r = await apiCall({
+      accion: 'guardarSeleccion',
+      rut: comensalActual.rut,
+      fecha,
+      alternativa: alt.codigo,
+      descripcion: alt.descripcion
+    });
+    if (!r.ok) { mostrarMsg('msg-app', r.error || 'Error al guardar', 'error'); return; }
+    seleccionesCache[fecha] = {
+      alternativa: alt.codigo,
+      descripcion: alt.descripcion,
+      timestamp: new Date().toISOString()
+    };
+    renderDias();
+    mostrarMsg('msg-app', `✓ ${formatFecha(fecha)}: ${alt.descripcion}`, 'ok');
+    setTimeout(() => limpiarMsg('msg-app'), 2500);
+  } catch (e) {
+    mostrarMsg('msg-app', 'Error: ' + e.message, 'error');
+  }
+}
+
+function puedeModificar(fechaStr) {
+  const fechaMenu = new Date(fechaStr + 'T12:00:00');
+  const diffHoras = (fechaMenu - new Date()) / (1000 * 60 * 60);
+  return diffHoras >= 24;
+}
+
+function formatFecha(fechaStr) {
+  const [y, m, d] = fechaStr.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function mostrarMsg(id, texto, tipo) {
+  $(id).innerHTML = `<div class="mensaje ${tipo}">${texto}</div>`;
+}
+function limpiarMsg(id) { $(id).innerHTML = ''; }
+
+async function apiCall(payload) {
+  // Apps Script no soporta preflight CORS con Content-Type: application/json
+  // Usamos text/plain para evitar preflight y enviamos el payload como texto JSON
+  const r = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  return await r.json();
+}
+</script>
+
+</body>
+</html>

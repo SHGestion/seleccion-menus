@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Reportes de Selección de Menús</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f4f8; color: #1a2332; padding: 20px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px; }
+  h1 { color: #0a4d8c; margin-bottom: 4px; }
+  h2 { color: #0a4d8c; font-size: 1.2rem; margin-bottom: 12px; }
+  .subtitle { color: #64748b; font-size: 0.9rem; margin-bottom: 16px; }
+  label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+  input[type="text"], input[type="password"], input[type="month"] {
+    width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;
+    font-size: 1rem; margin-bottom: 12px;
+  }
+  button {
+    background: #0a4d8c; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-weight: 600; cursor: pointer; margin-right: 8px;
+  }
+  button:hover { background: #083a6b; }
+  button.verde { background: #065f46; }
+  button.verde:hover { background: #044a37; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+  .tab { padding: 10px 18px; cursor: pointer; border-bottom: 3px solid transparent; color: #64748b; font-weight: 600; }
+  .tab.activo { color: #0a4d8c; border-bottom-color: #0a4d8c; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th { background: #e6f0fa; color: #0a4d8c; padding: 10px; text-align: left; font-size: 0.85rem; }
+  td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+  tr:hover td { background: #f8fafc; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
+  .badge-A { background: #fef3c7; color: #92400e; }
+  .badge-B { background: #dbeafe; color: #1e40af; }
+  .badge-C { background: #d1fae5; color: #065f46; }
+  .mensaje { padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+  .error { background: #fee2e2; color: #991b1b; }
+  .ok { background: #d1fae5; color: #065f46; }
+  .hidden { display: none; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat { background: #e6f0fa; padding: 14px; border-radius: 8px; text-align: center; }
+  .stat-num { font-size: 1.8rem; font-weight: 700; color: #0a4d8c; }
+  .stat-label { font-size: 0.8rem; color: #64748b; text-transform: uppercase; }
+  .toolbar { display: flex; gap: 8px; margin-bottom: 12px; align-items: end; flex-wrap: wrap; }
+  .toolbar > div { flex: 1; min-width: 140px; }
+  .barra-progreso { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+  .barra-progreso-fill { height: 100%; background: #0a4d8c; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div id="login-admin" class="card">
+    <h1>Admin — SH Gestión</h1>
+    <p class="subtitle">Panel de reportes de selección de menús</p>
+    <label>Token de administrador</label>
+    <input type="password" id="token" placeholder="Pega tu token">
+    <div id="msg-login"></div>
+    <button id="btn-entrar">Entrar</button>
+  </div>
+
+  <div id="app-admin" class="hidden">
+    <div class="card">
+      <h1>Reportes de Selección de Menús</h1>
+      <div class="tabs">
+        <div class="tab activo" data-tab="diario">Consolidado Diario</div>
+        <div class="tab" data-tab="participacion">Participación</div>
+        <div class="tab" data-tab="comensal">Por Comensal</div>
+      </div>
+
+      <div id="tab-diario" class="tab-content">
+        <div class="toolbar">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="mes-diario">
+          </div>
+          <button id="btn-diario">Cargar reporte</button>
+          <button class="verde" id="btn-export-diario">Exportar CSV</button>
+        </div>
+        <div id="diario-stats"></div>
+        <div id="diario-tabla"></div>
+      </div>
+
+      <div id="tab-participacion" class="tab-content hidden">
+        <div class="toolbar">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="mes-part">
+          </div>
+          <button id="btn-part">Cargar reporte</button>
+          <button class="verde" id="btn-export-part">Exportar CSV</button>
+        </div>
+        <div id="part-stats"></div>
+        <div id="part-tabla"></div>
+      </div>
+
+      <div id="tab-comensal" class="tab-content hidden">
+        <div class="toolbar">
+          <div>
+            <label>RUT del comensal</label>
+            <input type="text" id="rut-comensal" placeholder="12345678-9">
+          </div>
+          <button id="btn-comensal">Buscar</button>
+        </div>
+        <div id="comensal-tabla"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzjbdUoHmtMx7uLA_UA1N9GKICFND4YcJO4HUpuJnPx0g9YWuILgCCwMRg1a3Tcfb85bg/exec';
+let TOKEN = '';
+
+const $ = (id) => document.getElementById(id);
+
+$('btn-entrar').addEventListener('click', () => {
+  const t = $('token').value.trim();
+  if (!t) return;
+  TOKEN = t;
+  sessionStorage.setItem('admin_token', t);
+  $('login-admin').classList.add('hidden');
+  $('app-admin').classList.remove('hidden');
+  const hoy = new Date();
+  const mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+  $('mes-diario').value = mesActual;
+  $('mes-part').value = mesActual;
+});
+
+window.addEventListener('load', () => {
+  const t = sessionStorage.getItem('admin_token');
+  if (t) { $('token').value = t; $('btn-entrar').click(); }
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('activo'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    tab.classList.add('activo');
+    $('tab-' + tab.dataset.tab).classList.remove('hidden');
+  });
+});
+
+$('btn-diario').addEventListener('click', async () => {
+  const mes = $('mes-diario').value;
+  const r = await apiCall({ accion: 'reporteDiario', admin_token: TOKEN, mes });
+  if (!r.ok) { alert(r.error); return; }
+  renderDiario(r.resumen, mes);
+});
+
+function renderDiario(resumen, mes) {
+  const fechas = Object.keys(resumen).sort();
+  let totalA=0, totalB=0, totalC=0, totalGlobal=0;
+  fechas.forEach(f => {
+    totalA += resumen[f].A || 0;
+    totalB += resumen[f].B || 0;
+    totalC += resumen[f].C || 0;
+    totalGlobal += resumen[f].total;
+  });
+
+  $('diario-stats').innerHTML = `
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-num">${totalGlobal}</div><div class="stat-label">Total selecciones</div></div>
+      <div class="stat"><div class="stat-num">${totalA}</div><div class="stat-label">Alternativa A</div></div>
+      <div class="stat"><div class="stat-num">${totalB}</div><div class="stat-label">Alternativa B</div></div>
+      <div class="stat"><div class="stat-num">${totalC}</div><div class="stat-label">Hipocalórico</div></div>
+    </div>
+  `;
+
+  let html = '<table><thead><tr><th>Fecha</th><th>A</th><th>B</th><th>C (Hipo)</th><th>Total</th></tr></thead><tbody>';
+  fechas.forEach(f => {
+    const d = resumen[f];
+    html += `<tr><td>${formatFecha(f)}</td><td><span class="badge badge-A">${d.A||0}</span></td><td><span class="badge badge-B">${d.B||0}</span></td><td><span class="badge badge-C">${d.C||0}</span></td><td><strong>${d.total}</strong></td></tr>`;
+  });
+  html += '</tbody></table>';
+  $('diario-tabla').innerHTML = html;
+  window._diarioData = { fechas, resumen, mes };
+}
+
+$('btn-export-diario').addEventListener('click', () => {
+  if (!window._diarioData) return alert('Primero carga el reporte');
+  const { fechas, resumen, mes } = window._diarioData;
+  let csv = 'Fecha,Alt_A,Alt_B,Alt_C_Hipo,Total\n';
+  fechas.forEach(f => {
+    const d = resumen[f];
+    csv += `${f},${d.A||0},${d.B||0},${d.C||0},${d.total}\n`;
+  });
+  descargarCSV(csv, `consolidado_diario_${mes}.csv`);
+});
+
+$('btn-part').addEventListener('click', async () => {
+  const mes = $('mes-part').value;
+  const r = await apiCall({ accion: 'reporteParticipacion', admin_token: TOKEN, mes });
+  if (!r.ok) { alert(r.error); return; }
+  renderPart(r);
+});
+
+function renderPart(r) {
+  const d = r.detalle;
+  const total = d.length;
+  const completos = d.filter(x => x.elegidos === r.totalDias).length;
+  const sinElegir = d.filter(x => x.elegidos === 0).length;
+  const promedio = total > 0 ? Math.round(d.reduce((s,x)=>s+x.porcentaje,0)/total) : 0;
+
+  $('part-stats').innerHTML = `
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-num">${total}</div><div class="stat-label">Comensales activos</div></div>
+      <div class="stat"><div class="stat-num">${completos}</div><div class="stat-label">Completos</div></div>
+      <div class="stat"><div class="stat-num">${sinElegir}</div><div class="stat-label">Sin elegir</div></div>
+      <div class="stat"><div class="stat-num">${promedio}%</div><div class="stat-label">Participación promedio</div></div>
+    </div>
+  `;
+
+  let html = '<table><thead><tr><th>RUT</th><th>Nombre</th><th>Área</th><th>Elegidos</th><th>Faltan</th><th>%</th></tr></thead><tbody>';
+  d.sort((a,b) => a.porcentaje - b.porcentaje);
+  d.forEach(x => {
+    html += `<tr>
+      <td>${x.rut}</td><td>${x.nombre}</td><td>${x.area||''}</td>
+      <td>${x.elegidos}/${r.totalDias}</td>
+      <td>${x.faltantes}</td>
+      <td style="width:140px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="barra-progreso" style="flex:1;"><div class="barra-progreso-fill" style="width:${x.porcentaje}%"></div></div>
+          <span style="font-size:0.8rem;">${x.porcentaje}%</span>
+        </div>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  $('part-tabla').innerHTML = html;
+  window._partData = r;
+}
+
+$('btn-export-part').addEventListener('click', () => {
+  if (!window._partData) return alert('Primero carga el reporte');
+  let csv = 'RUT,Nombre,Area,Elegidos,Faltantes,Porcentaje\n';
+  window._partData.detalle.forEach(x => {
+    csv += `${x.rut},"${x.nombre}","${x.area||''}",${x.elegidos},${x.faltantes},${x.porcentaje}\n`;
+  });
+  descargarCSV(csv, `participacion_${window._partData.mes}.csv`);
+});
+
+$('btn-comensal').addEventListener('click', async () => {
+  const rut = $('rut-comensal').value.trim();
+  if (!rut) return;
+  const r = await apiCall({ accion: 'reportePorComensal', admin_token: TOKEN, rut });
+  if (!r.ok) { alert(r.error); return; }
+  let html = `<h2>Histórico de ${r.rut}</h2>`;
+  if (r.historico.length === 0) { html += '<p>Sin selecciones registradas.</p>'; }
+  else {
+    html += '<table><thead><tr><th>Fecha</th><th>Alt.</th><th>Menú</th><th>Registrado</th></tr></thead><tbody>';
+    r.historico.forEach(h => {
+      html += `<tr><td>${formatFecha(h.fecha)}</td><td><span class="badge badge-${h.alternativa}">${h.alternativa}</span></td><td>${h.descripcion}</td><td style="font-size:0.8rem; color:#64748b;">${h.timestamp}</td></tr>`;
+    });
+    html += '</tbody></table>';
+  }
+  $('comensal-tabla').innerHTML = html;
+});
+
+async function apiCall(payload) {
+  const r = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  return await r.json();
+}
+
+function formatFecha(f) {
+  const [y,m,d] = f.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function descargarCSV(contenido, nombre) {
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + contenido], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nombre; a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
