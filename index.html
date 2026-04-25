@@ -20,11 +20,11 @@
   .subtitle { color: #64748b; font-size: 0.9rem; margin-bottom: 16px; }
   .logo { font-weight: 700; color: #0a4d8c; font-size: 1.1rem; margin-bottom: 4px; }
   label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
-  input[type="text"], input[type="password"] {
+  input[type="text"], input[type="password"], select {
     width: 100%; padding: 12px; border: 1px solid #cbd5e1;
-    border-radius: 8px; font-size: 1rem; margin-bottom: 12px;
+    border-radius: 8px; font-size: 1rem; margin-bottom: 12px; background: #fff;
   }
-  input:focus { outline: none; border-color: #0a4d8c; }
+  input:focus, select:focus { outline: none; border-color: #0a4d8c; }
   button {
     background: #0a4d8c; color: #fff; border: none; padding: 12px 20px;
     border-radius: 8px; font-size: 1rem; font-weight: 600;
@@ -32,16 +32,48 @@
   }
   button:hover { background: #083a6b; }
   button:disabled { background: #94a3b8; cursor: not-allowed; }
-  .btn-secundario { background: #e2e8f0; color: #1a2332; }
-  .btn-secundario:hover { background: #cbd5e1; }
-  .dia-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+  button.btn-secundario { background: #e2e8f0; color: #1a2332; }
+  button.btn-secundario:hover { background: #cbd5e1; }
+  button.btn-rojo { background: #b91c1c; }
+  button.btn-rojo:hover { background: #991b1b; }
+  button.btn-pequeno { padding: 8px 14px; font-size: 0.85rem; width: auto; }
+
+  /* Día - estados */
+  .dia-card {
+    border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;
+    margin-bottom: 12px; background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.2s;
+  }
+  .dia-card.guardado {
+    border-color: #10b981; background: #f0fdf4;
+  }
+  .dia-card.cancelado {
+    border-color: #cbd5e1; background: #f1f5f9;
+  }
+  .dia-card.bloqueado {
+    opacity: 0.6;
+  }
+
   .dia-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .dia-fecha-cont { display: flex; align-items: center; gap: 8px; }
   .dia-fecha { font-weight: 700; color: #0a4d8c; font-size: 1rem; }
-  .dia-nombre { color: #64748b; font-size: 0.85rem; }
+  .dia-card.guardado .dia-fecha { color: #065f46; }
+  .dia-card.cancelado .dia-fecha { color: #475569; text-decoration: line-through; }
+  .dia-nombre { color: #64748b; font-size: 0.85rem; margin-left: 8px; }
+  .estado-icon {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 700; color: #fff;
+  }
+  .estado-icon.ok { background: #10b981; }
+  .estado-icon.x { background: #94a3b8; }
+
+  /* Alternativas */
   .alt-opcion {
     display: flex; align-items: flex-start; padding: 10px;
     border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px;
-    cursor: pointer; transition: all 0.15s;
+    cursor: pointer; transition: all 0.15s; background: #fff;
   }
   .alt-opcion:hover { border-color: #0a4d8c; background: #f8fafc; }
   .alt-opcion.seleccionada { border-color: #0a4d8c; background: #e6f0fa; }
@@ -63,28 +95,88 @@
   .alt-B { background: #dbeafe; color: #1e40af; }
   .alt-C { background: #d1fae5; color: #065f46; }
   .alt-desc { font-size: 0.95rem; color: #1a2332; margin-top: 4px; }
+
+  /* Vista colapsada (guardado o cancelado) */
+  .vista-colapsada {
+    padding: 8px 4px;
+  }
+  .vista-colapsada .alt-codigo { margin-bottom: 6px; }
+  .vista-colapsada .alt-desc { font-size: 1rem; font-weight: 500; }
+  .motivo-cancelacion {
+    color: #475569; font-size: 0.9rem; margin-top: 4px;
+  }
+  .motivo-cancelacion strong { color: #1e293b; }
+
+  /* Botones de acción dentro del día */
+  .dia-acciones {
+    display: flex; gap: 8px; margin-top: 12px;
+    padding-top: 12px; border-top: 1px solid #e2e8f0;
+  }
+  .dia-card.cancelado .dia-acciones { border-top-color: #cbd5e1; }
+
+  /* Mensajes */
   .mensaje { padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem; }
   .error { background: #fee2e2; color: #991b1b; }
   .ok { background: #d1fae5; color: #065f46; }
   .info { background: #dbeafe; color: #1e40af; }
-  .resumen { display: flex; justify-content: space-between; font-size: 0.9rem; color: #64748b; }
-  .hidden { display: none; }
+
+  /* Resumen */
+  .resumen {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  .resumen-item { padding: 8px; background: #f1f5f9; border-radius: 6px; }
+  .resumen-item .num { font-size: 1.4rem; font-weight: 700; display: block; }
+  .resumen-item.elegidos .num { color: #10b981; }
+  .resumen-item.cancelados .num { color: #b91c1c; }
+  .resumen-item.faltan .num { color: #f59e0b; }
+
+  /* Header */
   .header-bar {
     display: flex; justify-content: space-between; align-items: center;
     padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px;
   }
   .user-info { font-size: 0.85rem; color: #64748b; }
+
+  /* Loader */
   .loader {
     display: inline-block; width: 20px; height: 20px;
     border: 3px solid #e2e8f0; border-top-color: #0a4d8c;
     border-radius: 50%; animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .bloqueado { opacity: 0.5; pointer-events: none; }
+
+  /* Badge cerrado */
   .bloqueado-badge {
     display: inline-block; font-size: 0.7rem; padding: 2px 6px;
-    background: #fee2e2; color: #991b1b; border-radius: 4px; margin-left: 6px;
+    background: #fee2e2; color: #991b1b; border-radius: 4px;
+    margin-left: 6px; font-weight: 700;
   }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 16px;
+  }
+  .modal {
+    background: #fff; border-radius: 12px; padding: 24px;
+    max-width: 420px; width: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  .modal h3 {
+    color: #0a4d8c; font-size: 1.2rem; margin-bottom: 8px;
+  }
+  .modal p { color: #64748b; font-size: 0.9rem; margin-bottom: 16px; }
+  .modal-acciones {
+    display: flex; gap: 8px; margin-top: 16px;
+  }
+  .modal-acciones button { flex: 1; }
+
+  .hidden { display: none; }
 </style>
 </head>
 <body>
@@ -112,18 +204,49 @@
           <div class="logo">SH Gestión</div>
           <div class="user-info" id="user-info"></div>
         </div>
-        <button class="btn-secundario" style="width:auto; padding:8px 14px;" id="btn-logout">Salir</button>
+        <button class="btn-secundario btn-pequeno" id="btn-logout">Salir</button>
       </div>
       <h2>Menús del mes <span id="mes-label"></span></h2>
-      <p class="subtitle">Selecciona tu opción para cada día. Puedes modificar hasta 24h antes.</p>
+      <p class="subtitle">Tu opción se guarda automáticamente al hacer clic. Puedes cambiar o cancelar hasta 24h antes.</p>
       <div id="msg-app"></div>
       <div class="resumen">
-        <span>Elegidos: <strong id="cnt-elegidos">0</strong></span>
-        <span>Faltan: <strong id="cnt-faltan">0</strong></span>
+        <div class="resumen-item elegidos">
+          <span class="num" id="cnt-elegidos">0</span>
+          Elegidos
+        </div>
+        <div class="resumen-item cancelados">
+          <span class="num" id="cnt-cancelados">0</span>
+          Cancelados
+        </div>
+        <div class="resumen-item faltan">
+          <span class="num" id="cnt-faltan">0</span>
+          Pendientes
+        </div>
       </div>
     </div>
 
     <div id="lista-dias"></div>
+  </div>
+
+  <!-- MODAL CANCELACIÓN -->
+  <div id="modal-cancelar" class="modal-overlay hidden">
+    <div class="modal">
+      <h3>¿Cancelar el menú?</h3>
+      <p id="modal-fecha-texto"></p>
+      <label for="modal-motivo">Motivo de cancelación</label>
+      <select id="modal-motivo">
+        <option value="">Selecciona un motivo...</option>
+        <option value="Viaje">Viaje</option>
+        <option value="Licencia médica">Licencia médica</option>
+        <option value="Permiso">Permiso</option>
+        <option value="Otro">Otro</option>
+      </select>
+      <input type="text" id="modal-motivo-otro" placeholder="Describe el motivo" class="hidden">
+      <div class="modal-acciones">
+        <button class="btn-secundario" id="btn-modal-cerrar">Volver</button>
+        <button class="btn-rojo" id="btn-modal-confirmar">Confirmar cancelación</button>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -136,10 +259,12 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzjbdUoHmtMx7uLA_UA1N9G
 let comensalActual = null;
 let menusCache = [];
 let seleccionesCache = {};
+let diasExpandidos = {};   // { 'YYYY-MM-DD': true } → días que el usuario abrió manualmente
+let modalFechaActual = null;
 
 const $ = (id) => document.getElementById(id);
 
-// LOGIN
+// =================== LOGIN ===================
 $('btn-login').addEventListener('click', async () => {
   const rut = $('rut').value.trim();
   const pin = $('pin').value.trim();
@@ -169,6 +294,7 @@ $('btn-login').addEventListener('click', async () => {
 $('btn-logout').addEventListener('click', () => {
   sessionStorage.removeItem('comensal');
   comensalActual = null;
+  diasExpandidos = {};
   $('pantalla-app').classList.add('hidden');
   $('pantalla-login').classList.remove('hidden');
   $('rut').value = '';
@@ -179,7 +305,6 @@ $('pin').addEventListener('keypress', (e) => {
   if (e.key === 'Enter') $('btn-login').click();
 });
 
-// Recuperar sesión
 window.addEventListener('load', () => {
   const s = sessionStorage.getItem('comensal');
   if (s) {
@@ -215,51 +340,187 @@ async function cargarMenusYSelecciones() {
   }
 }
 
+// =================== RENDER ===================
+
 function renderDias() {
   const cont = $('lista-dias');
   cont.innerHTML = '';
-  let elegidos = 0;
+  let elegidos = 0, cancelados = 0;
   const total = menusCache.length;
 
   menusCache.forEach(dia => {
-    const bloqueado = !puedeModificar(dia.fecha);
     const seleccion = seleccionesCache[dia.fecha];
-    if (seleccion) elegidos++;
+    const bloqueado = !puedeModificar(dia.fecha);
+    const esCancelado = seleccion && seleccion.estado === 'CANCELADO';
+    const esElegido = seleccion && seleccion.estado === 'ACTIVO';
 
-    const card = document.createElement('div');
-    card.className = 'card dia-card' + (bloqueado ? ' bloqueado' : '');
-    card.innerHTML = `
-      <div class="dia-header">
-        <div>
-          <div class="dia-fecha">${formatFecha(dia.fecha)}</div>
-          <div class="dia-nombre">${dia.diaSemana}${bloqueado ? '<span class="bloqueado-badge">cerrado</span>' : ''}</div>
-        </div>
-      </div>
-      <div class="alternativas"></div>
-    `;
-    const altCont = card.querySelector('.alternativas');
-    dia.alternativas.forEach(alt => {
-      const esSel = seleccion && seleccion.alternativa === alt.codigo;
-      const op = document.createElement('div');
-      op.className = 'alt-opcion' + (esSel ? ' seleccionada' : '');
-      op.innerHTML = `
-        <div class="alt-radio"></div>
-        <div class="alt-info">
-          <span class="alt-codigo alt-${alt.codigo}">${alt.codigo} · ${alt.tipo}</span>
-          <div class="alt-desc">${alt.descripcion}</div>
-        </div>
-      `;
-      if (!bloqueado) {
-        op.addEventListener('click', () => elegir(dia.fecha, alt));
-      }
-      altCont.appendChild(op);
-    });
+    if (esElegido) elegidos++;
+    if (esCancelado) cancelados++;
+
+    let card;
+    if (bloqueado) {
+      card = renderDiaBloqueado(dia, seleccion);
+    } else if (esCancelado) {
+      card = renderDiaCancelado(dia, seleccion);
+    } else if (esElegido && !diasExpandidos[dia.fecha]) {
+      card = renderDiaGuardado(dia, seleccion);
+    } else {
+      card = renderDiaPendiente(dia, seleccion);
+    }
     cont.appendChild(card);
   });
 
   $('cnt-elegidos').textContent = elegidos;
-  $('cnt-faltan').textContent = total - elegidos;
+  $('cnt-cancelados').textContent = cancelados;
+  $('cnt-faltan').textContent = total - elegidos - cancelados;
 }
+
+// Vista 1: pendiente o expandido para cambiar
+function renderDiaPendiente(dia, seleccion) {
+  const card = document.createElement('div');
+  card.className = 'card dia-card';
+
+  card.innerHTML = `
+    <div class="dia-header">
+      <div class="dia-fecha-cont">
+        <span class="dia-fecha">${formatFecha(dia.fecha)}</span>
+        <span class="dia-nombre">${dia.diaSemana}</span>
+      </div>
+    </div>
+    <div class="alternativas"></div>
+    ${diasExpandidos[dia.fecha] ? `<div class="dia-acciones">
+      <button class="btn-secundario btn-pequeno" data-cancelar-cambio="${dia.fecha}">Cancelar cambio</button>
+    </div>` : ''}
+  `;
+
+  const altCont = card.querySelector('.alternativas');
+  dia.alternativas.forEach(alt => {
+    const esSel = seleccion && seleccion.alternativa === alt.codigo && seleccion.estado === 'ACTIVO';
+    const op = document.createElement('div');
+    op.className = 'alt-opcion' + (esSel ? ' seleccionada' : '');
+    op.innerHTML = `
+      <div class="alt-radio"></div>
+      <div class="alt-info">
+        <span class="alt-codigo alt-${alt.codigo}">${alt.codigo} · ${alt.tipo}</span>
+        <div class="alt-desc">${alt.descripcion}</div>
+      </div>
+    `;
+    op.addEventListener('click', () => elegir(dia.fecha, alt));
+    altCont.appendChild(op);
+  });
+
+  // Botón cancelar cambio
+  const btnCancelarCambio = card.querySelector('[data-cancelar-cambio]');
+  if (btnCancelarCambio) {
+    btnCancelarCambio.addEventListener('click', () => {
+      delete diasExpandidos[dia.fecha];
+      renderDias();
+    });
+  }
+
+  return card;
+}
+
+// Vista 2: guardado y colapsado
+function renderDiaGuardado(dia, seleccion) {
+  const card = document.createElement('div');
+  card.className = 'card dia-card guardado';
+
+  const alt = dia.alternativas.find(a => a.codigo === seleccion.alternativa) || {
+    codigo: seleccion.alternativa, tipo: '', descripcion: seleccion.descripcion
+  };
+
+  card.innerHTML = `
+    <div class="dia-header">
+      <div class="dia-fecha-cont">
+        <span class="estado-icon ok">✓</span>
+        <span class="dia-fecha">${formatFecha(dia.fecha)}</span>
+        <span class="dia-nombre">${dia.diaSemana}</span>
+      </div>
+    </div>
+    <div class="vista-colapsada">
+      <span class="alt-codigo alt-${alt.codigo}">${alt.codigo} · ${alt.tipo}</span>
+      <div class="alt-desc">${alt.descripcion}</div>
+    </div>
+    <div class="dia-acciones">
+      <button class="btn-secundario btn-pequeno" data-cambiar="${dia.fecha}">Cambiar</button>
+      <button class="btn-rojo btn-pequeno" data-cancelar="${dia.fecha}">Cancelar pedido</button>
+    </div>
+  `;
+
+  card.querySelector('[data-cambiar]').addEventListener('click', () => {
+    diasExpandidos[dia.fecha] = true;
+    renderDias();
+  });
+  card.querySelector('[data-cancelar]').addEventListener('click', () => {
+    abrirModalCancelar(dia.fecha);
+  });
+
+  return card;
+}
+
+// Vista 3: cancelado (sin reverso)
+function renderDiaCancelado(dia, seleccion) {
+  const card = document.createElement('div');
+  card.className = 'card dia-card cancelado';
+
+  card.innerHTML = `
+    <div class="dia-header">
+      <div class="dia-fecha-cont">
+        <span class="estado-icon x">✕</span>
+        <span class="dia-fecha">${formatFecha(dia.fecha)}</span>
+        <span class="dia-nombre">${dia.diaSemana}</span>
+      </div>
+    </div>
+    <div class="vista-colapsada">
+      <div class="motivo-cancelacion"><strong>Cancelado</strong></div>
+      <div class="motivo-cancelacion">Motivo: ${seleccion.motivo || 'No especificado'}</div>
+    </div>
+  `;
+
+  return card;
+}
+
+// Vista 4: bloqueado (menos de 24h)
+function renderDiaBloqueado(dia, seleccion) {
+  const card = document.createElement('div');
+  card.className = 'card dia-card bloqueado';
+
+  let contenido = '';
+  if (seleccion && seleccion.estado === 'CANCELADO') {
+    contenido = `<div class="vista-colapsada">
+      <div class="motivo-cancelacion"><strong>Cancelado</strong></div>
+      <div class="motivo-cancelacion">Motivo: ${seleccion.motivo || 'No especificado'}</div>
+    </div>`;
+  } else if (seleccion && seleccion.estado === 'ACTIVO') {
+    const alt = dia.alternativas.find(a => a.codigo === seleccion.alternativa) || {
+      codigo: seleccion.alternativa, tipo: '', descripcion: seleccion.descripcion
+    };
+    contenido = `<div class="vista-colapsada">
+      <span class="alt-codigo alt-${alt.codigo}">${alt.codigo} · ${alt.tipo}</span>
+      <div class="alt-desc">${alt.descripcion}</div>
+    </div>`;
+  } else {
+    contenido = `<div class="vista-colapsada">
+      <div class="motivo-cancelacion">No elegido</div>
+    </div>`;
+  }
+
+  card.innerHTML = `
+    <div class="dia-header">
+      <div class="dia-fecha-cont">
+        <span class="dia-fecha">${formatFecha(dia.fecha)}</span>
+        <span class="dia-nombre">${dia.diaSemana}</span>
+        <span class="bloqueado-badge">cerrado</span>
+      </div>
+    </div>
+    ${contenido}
+  `;
+
+  return card;
+}
+
+// =================== ACCIONES ===================
 
 async function elegir(fecha, alt) {
   try {
@@ -274,8 +535,11 @@ async function elegir(fecha, alt) {
     seleccionesCache[fecha] = {
       alternativa: alt.codigo,
       descripcion: alt.descripcion,
+      estado: 'ACTIVO',
+      motivo: '',
       timestamp: new Date().toISOString()
     };
+    delete diasExpandidos[fecha]; // colapsar el día tras guardar
     renderDias();
     mostrarMsg('msg-app', `✓ ${formatFecha(fecha)}: ${alt.descripcion}`, 'ok');
     setTimeout(() => limpiarMsg('msg-app'), 2500);
@@ -283,6 +547,80 @@ async function elegir(fecha, alt) {
     mostrarMsg('msg-app', 'Error: ' + e.message, 'error');
   }
 }
+
+// =================== MODAL CANCELACIÓN ===================
+
+function abrirModalCancelar(fecha) {
+  modalFechaActual = fecha;
+  $('modal-fecha-texto').textContent = `Estás a punto de cancelar el menú del ${formatFecha(fecha)}.`;
+  $('modal-motivo').value = '';
+  $('modal-motivo-otro').value = '';
+  $('modal-motivo-otro').classList.add('hidden');
+  $('modal-cancelar').classList.remove('hidden');
+}
+
+$('modal-motivo').addEventListener('change', () => {
+  const v = $('modal-motivo').value;
+  if (v === 'Otro') {
+    $('modal-motivo-otro').classList.remove('hidden');
+    $('modal-motivo-otro').focus();
+  } else {
+    $('modal-motivo-otro').classList.add('hidden');
+  }
+});
+
+$('btn-modal-cerrar').addEventListener('click', () => {
+  $('modal-cancelar').classList.add('hidden');
+  modalFechaActual = null;
+});
+
+$('btn-modal-confirmar').addEventListener('click', async () => {
+  let motivo = $('modal-motivo').value;
+  if (!motivo) {
+    alert('Selecciona un motivo de cancelación');
+    return;
+  }
+  if (motivo === 'Otro') {
+    const otro = $('modal-motivo-otro').value.trim();
+    if (!otro) {
+      alert('Describe el motivo');
+      $('modal-motivo-otro').focus();
+      return;
+    }
+    motivo = 'Otro: ' + otro;
+  }
+
+  const fecha = modalFechaActual;
+  $('btn-modal-confirmar').disabled = true;
+  $('btn-modal-confirmar').innerHTML = '<span class="loader"></span>';
+  try {
+    const r = await apiCall({
+      accion: 'cancelarSeleccion',
+      rut: comensalActual.rut,
+      fecha,
+      motivo
+    });
+    if (!r.ok) { alert(r.error || 'Error al cancelar'); return; }
+    seleccionesCache[fecha] = {
+      alternativa: '', descripcion: '',
+      estado: 'CANCELADO',
+      motivo: motivo,
+      timestamp: new Date().toISOString()
+    };
+    $('modal-cancelar').classList.add('hidden');
+    modalFechaActual = null;
+    renderDias();
+    mostrarMsg('msg-app', `✕ ${formatFecha(fecha)}: cancelado`, 'ok');
+    setTimeout(() => limpiarMsg('msg-app'), 2500);
+  } catch (e) {
+    alert('Error: ' + e.message);
+  } finally {
+    $('btn-modal-confirmar').disabled = false;
+    $('btn-modal-confirmar').innerHTML = 'Confirmar cancelación';
+  }
+});
+
+// =================== UTILS ===================
 
 function puedeModificar(fechaStr) {
   const fechaMenu = new Date(fechaStr + 'T12:00:00');
@@ -301,8 +639,6 @@ function mostrarMsg(id, texto, tipo) {
 function limpiarMsg(id) { $(id).innerHTML = ''; }
 
 async function apiCall(payload) {
-  // Apps Script no soporta preflight CORS con Content-Type: application/json
-  // Usamos text/plain para evitar preflight y enviamos el payload como texto JSON
   const r = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
