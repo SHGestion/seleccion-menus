@@ -10,15 +10,16 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: #f0f4f8; color: #1a2332; padding: 20px;
   }
-  .container { max-width: 1100px; margin: 0 auto; }
+  .container { max-width: 1200px; margin: 0 auto; }
   .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px; }
   h1 { color: #0a4d8c; margin-bottom: 4px; }
   h2 { color: #0a4d8c; font-size: 1.2rem; margin-bottom: 12px; }
+  h3 { color: #1a2332; font-size: 1.05rem; margin-bottom: 10px; margin-top: 16px; }
   .subtitle { color: #64748b; font-size: 0.9rem; margin-bottom: 16px; }
   label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
-  input[type="text"], input[type="password"], input[type="month"] {
+  input[type="text"], input[type="password"], input[type="month"], select {
     width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;
-    font-size: 1rem; margin-bottom: 12px;
+    font-size: 1rem; margin-bottom: 12px; background: #fff;
   }
   button {
     background: #0a4d8c; color: #fff; border: none; padding: 10px 18px;
@@ -27,35 +28,54 @@
   button:hover { background: #083a6b; }
   button.verde { background: #065f46; }
   button.verde:hover { background: #044a37; }
-  .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+  button.gris { background: #64748b; }
+  button.gris:hover { background: #475569; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; }
   .tab { padding: 10px 18px; cursor: pointer; border-bottom: 3px solid transparent; color: #64748b; font-weight: 600; }
   .tab.activo { color: #0a4d8c; border-bottom-color: #0a4d8c; }
   table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-  th { background: #e6f0fa; color: #0a4d8c; padding: 10px; text-align: left; font-size: 0.85rem; }
-  td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+  th { background: #e6f0fa; color: #0a4d8c; padding: 10px; text-align: left; font-size: 0.85rem; font-weight: 700; }
+  td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; vertical-align: top; }
   tr:hover td { background: #f8fafc; }
+  tr.fila-cancelado td { color: #94a3b8; }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
   .badge-A { background: #fef3c7; color: #92400e; }
   .badge-B { background: #dbeafe; color: #1e40af; }
   .badge-C { background: #d1fae5; color: #065f46; }
+  .badge-cancel { background: #fee2e2; color: #991b1b; }
   .mensaje { padding: 12px; border-radius: 8px; margin-bottom: 12px; }
   .error { background: #fee2e2; color: #991b1b; }
   .ok { background: #d1fae5; color: #065f46; }
   .hidden { display: none; }
-  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
   .stat { background: #e6f0fa; padding: 14px; border-radius: 8px; text-align: center; }
-  .stat-num { font-size: 1.8rem; font-weight: 700; color: #0a4d8c; }
-  .stat-label { font-size: 0.8rem; color: #64748b; text-transform: uppercase; }
+  .stat-num { font-size: 1.8rem; font-weight: 700; color: #0a4d8c; display: block; }
+  .stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat.verde .stat-num { color: #065f46; }
+  .stat.rojo .stat-num { color: #b91c1c; }
+  .stat.naranja .stat-num { color: #c2410c; }
   .toolbar { display: flex; gap: 8px; margin-bottom: 12px; align-items: end; flex-wrap: wrap; }
   .toolbar > div { flex: 1; min-width: 140px; }
+  .toolbar > div.no-flex { flex: 0; }
   .barra-progreso { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
   .barra-progreso-fill { height: 100%; background: #0a4d8c; }
+  .detalle-row { background: #f8fafc; padding: 8px 12px; font-size: 0.85rem; }
+  .header-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px; }
+  .estado-tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+  .estado-activo { background: #d1fae5; color: #065f46; }
+  .estado-cancelado { background: #fee2e2; color: #991b1b; }
+  .destacado { background: #fef3c7; padding: 2px 6px; border-radius: 3px; font-weight: 700; color: #92400e; }
+  details { margin-top: 8px; }
+  details summary { cursor: pointer; padding: 6px 10px; background: #f1f5f9; border-radius: 6px; font-size: 0.85rem; font-weight: 600; color: #475569; }
+  details summary:hover { background: #e2e8f0; }
+  details[open] summary { margin-bottom: 8px; }
 </style>
 </head>
 <body>
 
 <div class="container">
 
+  <!-- LOGIN -->
   <div id="login-admin" class="card">
     <h1>Admin — SH Gestión</h1>
     <p class="subtitle">Panel de reportes de selección de menús</p>
@@ -65,15 +85,24 @@
     <button id="btn-entrar">Entrar</button>
   </div>
 
+  <!-- APP -->
   <div id="app-admin" class="hidden">
     <div class="card">
-      <h1>Reportes de Selección de Menús</h1>
+      <div class="header-bar">
+        <div>
+          <h1>Reportes — Selección de Menús</h1>
+          <div class="subtitle">SH Gestión y Servicios · Compas Marine</div>
+        </div>
+        <button class="gris" id="btn-salir">Salir</button>
+      </div>
       <div class="tabs">
         <div class="tab activo" data-tab="diario">Consolidado Diario</div>
         <div class="tab" data-tab="participacion">Participación</div>
+        <div class="tab" data-tab="cancelaciones">Cancelaciones</div>
         <div class="tab" data-tab="comensal">Por Comensal</div>
       </div>
 
+      <!-- TAB DIARIO -->
       <div id="tab-diario" class="tab-content">
         <div class="toolbar">
           <div>
@@ -87,6 +116,7 @@
         <div id="diario-tabla"></div>
       </div>
 
+      <!-- TAB PARTICIPACIÓN -->
       <div id="tab-participacion" class="tab-content hidden">
         <div class="toolbar">
           <div>
@@ -100,6 +130,21 @@
         <div id="part-tabla"></div>
       </div>
 
+      <!-- TAB CANCELACIONES -->
+      <div id="tab-cancelaciones" class="tab-content hidden">
+        <div class="toolbar">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="mes-canc">
+          </div>
+          <button id="btn-canc">Cargar reporte</button>
+          <button class="verde" id="btn-export-canc">Exportar CSV</button>
+        </div>
+        <div id="canc-stats"></div>
+        <div id="canc-tabla"></div>
+      </div>
+
+      <!-- TAB POR COMENSAL -->
       <div id="tab-comensal" class="tab-content hidden">
         <div class="toolbar">
           <div>
@@ -121,6 +166,7 @@ let TOKEN = '';
 
 const $ = (id) => document.getElementById(id);
 
+// =================== LOGIN ===================
 $('btn-entrar').addEventListener('click', () => {
   const t = $('token').value.trim();
   if (!t) return;
@@ -132,6 +178,15 @@ $('btn-entrar').addEventListener('click', () => {
   const mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
   $('mes-diario').value = mesActual;
   $('mes-part').value = mesActual;
+  $('mes-canc').value = mesActual;
+});
+
+$('btn-salir').addEventListener('click', () => {
+  sessionStorage.removeItem('admin_token');
+  TOKEN = '';
+  $('app-admin').classList.add('hidden');
+  $('login-admin').classList.remove('hidden');
+  $('token').value = '';
 });
 
 window.addEventListener('load', () => {
@@ -139,6 +194,7 @@ window.addEventListener('load', () => {
   if (t) { $('token').value = t; $('btn-entrar').click(); }
 });
 
+// =================== TABS ===================
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('activo'));
@@ -148,8 +204,10 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
+// =================== DIARIO ===================
 $('btn-diario').addEventListener('click', async () => {
   const mes = $('mes-diario').value;
+  if (!mes) return alert('Selecciona un mes');
   const r = await apiCall({ accion: 'reporteDiario', admin_token: TOKEN, mes });
   if (!r.ok) { alert(r.error); return; }
   renderDiario(r.resumen, mes);
@@ -157,46 +215,105 @@ $('btn-diario').addEventListener('click', async () => {
 
 function renderDiario(resumen, mes) {
   const fechas = Object.keys(resumen).sort();
-  let totalA=0, totalB=0, totalC=0, totalGlobal=0;
+  let totalA=0, totalB=0, totalC=0, totalCanc=0, totalRaciones=0;
   fechas.forEach(f => {
     totalA += resumen[f].A || 0;
     totalB += resumen[f].B || 0;
     totalC += resumen[f].C || 0;
-    totalGlobal += resumen[f].total;
+    totalCanc += resumen[f].cancelados || 0;
+    totalRaciones += resumen[f].total_raciones || 0;
   });
 
   $('diario-stats').innerHTML = `
     <div class="stat-grid">
-      <div class="stat"><div class="stat-num">${totalGlobal}</div><div class="stat-label">Total selecciones</div></div>
-      <div class="stat"><div class="stat-num">${totalA}</div><div class="stat-label">Alternativa A</div></div>
-      <div class="stat"><div class="stat-num">${totalB}</div><div class="stat-label">Alternativa B</div></div>
-      <div class="stat"><div class="stat-num">${totalC}</div><div class="stat-label">Hipocalórico</div></div>
+      <div class="stat verde"><span class="stat-num">${totalRaciones}</span><span class="stat-label">Total raciones</span></div>
+      <div class="stat"><span class="stat-num">${totalA}</span><span class="stat-label">Alt. A</span></div>
+      <div class="stat"><span class="stat-num">${totalB}</span><span class="stat-label">Alt. B</span></div>
+      <div class="stat"><span class="stat-num">${totalC}</span><span class="stat-label">Hipocalórico</span></div>
+      <div class="stat rojo"><span class="stat-num">${totalCanc}</span><span class="stat-label">Cancelados</span></div>
     </div>
   `;
 
-  let html = '<table><thead><tr><th>Fecha</th><th>A</th><th>B</th><th>C (Hipo)</th><th>Total</th></tr></thead><tbody>';
+  let html = `
+    <h3>Detalle diario</h3>
+    <p class="subtitle">Cantidad de raciones a preparar por día. Los cancelados no cuentan como ración.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>A</th>
+          <th>B</th>
+          <th>C (Hipo)</th>
+          <th>Cancelados</th>
+          <th class="destacado-col">Total Raciones</th>
+          <th>Detalle</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
   fechas.forEach(f => {
     const d = resumen[f];
-    html += `<tr><td>${formatFecha(f)}</td><td><span class="badge badge-A">${d.A||0}</span></td><td><span class="badge badge-B">${d.B||0}</span></td><td><span class="badge badge-C">${d.C||0}</span></td><td><strong>${d.total}</strong></td></tr>`;
+    const detalleId = `det-${f}`;
+    html += `
+      <tr>
+        <td><strong>${formatFecha(f)}</strong></td>
+        <td><span class="badge badge-A">${d.A||0}</span></td>
+        <td><span class="badge badge-B">${d.B||0}</span></td>
+        <td><span class="badge badge-C">${d.C||0}</span></td>
+        <td><span class="badge badge-cancel">${d.cancelados||0}</span></td>
+        <td><span class="destacado">${d.total_raciones||0}</span></td>
+        <td><button class="btn-pequeno gris" style="padding:4px 10px; font-size:0.75rem;" onclick="document.getElementById('${detalleId}').classList.toggle('hidden')">Ver</button></td>
+      </tr>
+      <tr id="${detalleId}" class="hidden">
+        <td colspan="7">
+          ${renderDetalleDia(d.detalle)}
+        </td>
+      </tr>
+    `;
   });
   html += '</tbody></table>';
   $('diario-tabla').innerHTML = html;
   window._diarioData = { fechas, resumen, mes };
 }
 
+function renderDetalleDia(detalle) {
+  if (!detalle || detalle.length === 0) return '<em>Sin selecciones</em>';
+  const activos = detalle.filter(d => d.estado === 'ACTIVO');
+  const cancelados = detalle.filter(d => d.estado === 'CANCELADO');
+
+  let html = '<div class="detalle-row">';
+  if (activos.length > 0) {
+    html += '<strong>Comerán:</strong><br>';
+    activos.forEach(d => {
+      html += `· ${d.nombre} (${d.area || 's/a'}) — <span class="badge badge-${d.alt}">${d.alt}</span> ${d.desc}<br>`;
+    });
+  }
+  if (cancelados.length > 0) {
+    html += activos.length > 0 ? '<br>' : '';
+    html += '<strong>Cancelaron:</strong><br>';
+    cancelados.forEach(d => {
+      html += `· ${d.nombre} (${d.area || 's/a'}) — <em>${d.motivo}</em><br>`;
+    });
+  }
+  html += '</div>';
+  return html;
+}
+
 $('btn-export-diario').addEventListener('click', () => {
   if (!window._diarioData) return alert('Primero carga el reporte');
   const { fechas, resumen, mes } = window._diarioData;
-  let csv = 'Fecha,Alt_A,Alt_B,Alt_C_Hipo,Total\n';
+  let csv = 'Fecha,Alt_A,Alt_B,Alt_C_Hipo,Cancelados,Total_Raciones\n';
   fechas.forEach(f => {
     const d = resumen[f];
-    csv += `${f},${d.A||0},${d.B||0},${d.C||0},${d.total}\n`;
+    csv += `${f},${d.A||0},${d.B||0},${d.C||0},${d.cancelados||0},${d.total_raciones||0}\n`;
   });
   descargarCSV(csv, `consolidado_diario_${mes}.csv`);
 });
 
+// =================== PARTICIPACIÓN ===================
 $('btn-part').addEventListener('click', async () => {
   const mes = $('mes-part').value;
+  if (!mes) return alert('Selecciona un mes');
   const r = await apiCall({ accion: 'reporteParticipacion', admin_token: TOKEN, mes });
   if (!r.ok) { alert(r.error); return; }
   renderPart(r);
@@ -205,30 +322,38 @@ $('btn-part').addEventListener('click', async () => {
 function renderPart(r) {
   const d = r.detalle;
   const total = d.length;
-  const completos = d.filter(x => x.elegidos === r.totalDias).length;
-  const sinElegir = d.filter(x => x.elegidos === 0).length;
+  const completos = d.filter(x => x.decididos === r.totalDias).length;
+  const sinDecidir = d.filter(x => x.decididos === 0).length;
   const promedio = total > 0 ? Math.round(d.reduce((s,x)=>s+x.porcentaje,0)/total) : 0;
 
   $('part-stats').innerHTML = `
     <div class="stat-grid">
-      <div class="stat"><div class="stat-num">${total}</div><div class="stat-label">Comensales activos</div></div>
-      <div class="stat"><div class="stat-num">${completos}</div><div class="stat-label">Completos</div></div>
-      <div class="stat"><div class="stat-num">${sinElegir}</div><div class="stat-label">Sin elegir</div></div>
-      <div class="stat"><div class="stat-num">${promedio}%</div><div class="stat-label">Participación promedio</div></div>
+      <div class="stat"><span class="stat-num">${total}</span><span class="stat-label">Comensales activos</span></div>
+      <div class="stat verde"><span class="stat-num">${completos}</span><span class="stat-label">Completos</span></div>
+      <div class="stat naranja"><span class="stat-num">${sinDecidir}</span><span class="stat-label">Sin decidir</span></div>
+      <div class="stat"><span class="stat-num">${promedio}%</span><span class="stat-label">Participación</span></div>
     </div>
   `;
 
-  let html = '<table><thead><tr><th>RUT</th><th>Nombre</th><th>Área</th><th>Elegidos</th><th>Faltan</th><th>%</th></tr></thead><tbody>';
+  let html = `
+    <h3>Detalle por comensal</h3>
+    <p class="subtitle">Decididos = elegidos + cancelados. Pendientes = días aún no respondidos.</p>
+    <table><thead><tr>
+      <th>RUT</th><th>Nombre</th><th>Área</th>
+      <th>Elegidos</th><th>Cancelados</th><th>Pendientes</th><th style="width:140px;">Avance</th>
+    </tr></thead><tbody>
+  `;
   d.sort((a,b) => a.porcentaje - b.porcentaje);
   d.forEach(x => {
     html += `<tr>
       <td>${x.rut}</td><td>${x.nombre}</td><td>${x.area||''}</td>
-      <td>${x.elegidos}/${r.totalDias}</td>
-      <td>${x.faltantes}</td>
-      <td style="width:140px;">
+      <td><span class="badge badge-A">${x.activos}</span></td>
+      <td><span class="badge badge-cancel">${x.cancelados}</span></td>
+      <td>${x.faltantes}/${r.totalDias}</td>
+      <td>
         <div style="display:flex; align-items:center; gap:8px;">
           <div class="barra-progreso" style="flex:1;"><div class="barra-progreso-fill" style="width:${x.porcentaje}%"></div></div>
-          <span style="font-size:0.8rem;">${x.porcentaje}%</span>
+          <span style="font-size:0.8rem; min-width:36px; text-align:right;">${x.porcentaje}%</span>
         </div>
       </td>
     </tr>`;
@@ -240,30 +365,132 @@ function renderPart(r) {
 
 $('btn-export-part').addEventListener('click', () => {
   if (!window._partData) return alert('Primero carga el reporte');
-  let csv = 'RUT,Nombre,Area,Elegidos,Faltantes,Porcentaje\n';
+  let csv = 'RUT,Nombre,Area,Elegidos,Cancelados,Decididos,Pendientes,Total_Dias,Porcentaje\n';
   window._partData.detalle.forEach(x => {
-    csv += `${x.rut},"${x.nombre}","${x.area||''}",${x.elegidos},${x.faltantes},${x.porcentaje}\n`;
+    csv += `${x.rut},"${x.nombre}","${x.area||''}",${x.activos},${x.cancelados},${x.decididos},${x.faltantes},${window._partData.totalDias},${x.porcentaje}\n`;
   });
   descargarCSV(csv, `participacion_${window._partData.mes}.csv`);
 });
 
+// =================== CANCELACIONES ===================
+$('btn-canc').addEventListener('click', async () => {
+  const mes = $('mes-canc').value;
+  if (!mes) return alert('Selecciona un mes');
+  const r = await apiCall({ accion: 'reporteDiario', admin_token: TOKEN, mes });
+  if (!r.ok) { alert(r.error); return; }
+  renderCanc(r.resumen, mes);
+});
+
+function renderCanc(resumen, mes) {
+  // Extraer todas las cancelaciones de todos los días
+  const todas = [];
+  Object.keys(resumen).sort().forEach(fecha => {
+    (resumen[fecha].detalle || []).forEach(d => {
+      if (d.estado === 'CANCELADO') {
+        todas.push({ fecha: fecha, ...d });
+      }
+    });
+  });
+
+  // Agrupar por motivo
+  const porMotivo = {};
+  todas.forEach(c => {
+    const motivoBase = c.motivo.startsWith('Otro:') ? 'Otro' : (c.motivo || 'Sin motivo');
+    porMotivo[motivoBase] = (porMotivo[motivoBase] || 0) + 1;
+  });
+
+  // Stats
+  const totalCanc = todas.length;
+  const motivos = Object.keys(porMotivo).sort((a,b)=>porMotivo[b]-porMotivo[a]);
+
+  let statsHtml = `<div class="stat-grid">
+    <div class="stat rojo"><span class="stat-num">${totalCanc}</span><span class="stat-label">Total cancelaciones</span></div>`;
+  motivos.forEach(m => {
+    statsHtml += `<div class="stat"><span class="stat-num">${porMotivo[m]}</span><span class="stat-label">${m}</span></div>`;
+  });
+  statsHtml += '</div>';
+  $('canc-stats').innerHTML = statsHtml;
+
+  if (todas.length === 0) {
+    $('canc-tabla').innerHTML = '<p>No hay cancelaciones registradas en este mes.</p>';
+    return;
+  }
+
+  let html = `
+    <h3>Detalle de cancelaciones</h3>
+    <table><thead><tr>
+      <th>Fecha</th><th>RUT</th><th>Nombre</th><th>Área</th><th>Motivo</th>
+    </tr></thead><tbody>
+  `;
+  todas.forEach(c => {
+    html += `<tr>
+      <td>${formatFecha(c.fecha)}</td>
+      <td>${c.rut}</td>
+      <td>${c.nombre}</td>
+      <td>${c.area||''}</td>
+      <td><span class="badge badge-cancel">${c.motivo}</span></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  $('canc-tabla').innerHTML = html;
+  window._cancData = { todas, mes };
+}
+
+$('btn-export-canc').addEventListener('click', () => {
+  if (!window._cancData) return alert('Primero carga el reporte');
+  let csv = 'Fecha,RUT,Nombre,Area,Motivo\n';
+  window._cancData.todas.forEach(c => {
+    csv += `${c.fecha},${c.rut},"${c.nombre}","${c.area||''}","${c.motivo}"\n`;
+  });
+  descargarCSV(csv, `cancelaciones_${window._cancData.mes}.csv`);
+});
+
+// =================== POR COMENSAL ===================
 $('btn-comensal').addEventListener('click', async () => {
   const rut = $('rut-comensal').value.trim();
   if (!rut) return;
   const r = await apiCall({ accion: 'reportePorComensal', admin_token: TOKEN, rut });
   if (!r.ok) { alert(r.error); return; }
-  let html = `<h2>Histórico de ${r.rut}</h2>`;
-  if (r.historico.length === 0) { html += '<p>Sin selecciones registradas.</p>'; }
-  else {
-    html += '<table><thead><tr><th>Fecha</th><th>Alt.</th><th>Menú</th><th>Registrado</th></tr></thead><tbody>';
+  let html = `<h3>Histórico de ${r.rut}</h3>`;
+  if (r.historico.length === 0) {
+    html += '<p>Sin selecciones registradas.</p>';
+  } else {
+    const activos = r.historico.filter(h => (h.estado||'ACTIVO') === 'ACTIVO').length;
+    const cancelados = r.historico.filter(h => h.estado === 'CANCELADO').length;
+    html += `
+      <div class="stat-grid">
+        <div class="stat verde"><span class="stat-num">${activos}</span><span class="stat-label">Elegidos</span></div>
+        <div class="stat rojo"><span class="stat-num">${cancelados}</span><span class="stat-label">Cancelados</span></div>
+        <div class="stat"><span class="stat-num">${r.historico.length}</span><span class="stat-label">Total registros</span></div>
+      </div>
+      <table><thead><tr>
+        <th>Fecha</th><th>Estado</th><th>Alt.</th><th>Menú / Motivo</th><th>Registrado</th>
+      </tr></thead><tbody>
+    `;
     r.historico.forEach(h => {
-      html += `<tr><td>${formatFecha(h.fecha)}</td><td><span class="badge badge-${h.alternativa}">${h.alternativa}</span></td><td>${h.descripcion}</td><td style="font-size:0.8rem; color:#64748b;">${h.timestamp}</td></tr>`;
+      const estado = h.estado || 'ACTIVO';
+      const estadoTag = estado === 'CANCELADO' ?
+        '<span class="estado-tag estado-cancelado">CANCELADO</span>' :
+        '<span class="estado-tag estado-activo">ACTIVO</span>';
+      const filaClass = estado === 'CANCELADO' ? 'fila-cancelado' : '';
+      const altCol = h.alternativa ?
+        `<span class="badge badge-${h.alternativa}">${h.alternativa}</span>` : '—';
+      const detCol = estado === 'CANCELADO' ?
+        `<em>Motivo: ${h.motivo}</em>` : h.descripcion;
+      html += `<tr class="${filaClass}">
+        <td>${formatFecha(h.fecha)}</td>
+        <td>${estadoTag}</td>
+        <td>${altCol}</td>
+        <td>${detCol}</td>
+        <td style="font-size:0.8rem; color:#64748b;">${h.timestamp}</td>
+      </tr>`;
     });
     html += '</tbody></table>';
   }
   $('comensal-tabla').innerHTML = html;
 });
 
+// =================== UTILS ===================
 async function apiCall(payload) {
   const r = await fetch(API_URL, {
     method: 'POST',
