@@ -9,6 +9,7 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: #F0FDF4; color: #1F2937; min-height: 100vh; padding: 16px;
+    padding-bottom: 120px;
   }
   .container { max-width: 720px; margin: 0 auto; }
   .card {
@@ -18,32 +19,27 @@
   h1 { font-size: 1.7rem; color: #2D6A4F; margin-bottom: 4px; font-weight: 700; }
   h2 { font-size: 1.15rem; margin-bottom: 12px; color: #1F2937; }
   .subtitle { color: #6B7280; font-size: 0.9rem; margin-bottom: 16px; }
-  .logo {
-    font-weight: 800; color: #2D6A4F; font-size: 1.4rem;
-    letter-spacing: -0.5px;
-  }
+  .logo { font-weight: 800; color: #2D6A4F; font-size: 1.4rem; letter-spacing: -0.5px; }
   .logo-tag { color: #95D5B2; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
 
   label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; color: #374151; }
   input[type="text"], input[type="password"], select {
     width: 100%; padding: 12px; border: 1px solid #D1D5DB;
     border-radius: 10px; font-size: 1rem; margin-bottom: 14px; background: #fff;
-    transition: border-color 0.2s;
   }
-  input:focus, select:focus { outline: none; border-color: #2D6A4F; }
+  input:focus { outline: none; border-color: #2D6A4F; }
 
   button {
     background: #2D6A4F; color: #fff; border: none; padding: 13px 20px;
     border-radius: 10px; font-size: 1rem; font-weight: 600;
     cursor: pointer; width: 100%; transition: background 0.15s;
   }
-  button:hover { background: #1B4332; }
-  button:disabled { background: #9CA3AF; cursor: not-allowed; }
+  button:hover:not(:disabled) { background: #1B4332; }
+  button:disabled { background: #9CA3AF; cursor: not-allowed; opacity: 0.7; }
   button.btn-secundario { background: #E5E7EB; color: #1F2937; }
-  button.btn-secundario:hover { background: #D1D5DB; }
+  button.btn-secundario:hover:not(:disabled) { background: #D1D5DB; }
   button.btn-pequeno { padding: 8px 14px; font-size: 0.85rem; width: auto; }
 
-  /* Banner semana */
   .banner-semana {
     background: linear-gradient(135deg, #2D6A4F 0%, #40916C 100%);
     color: white; padding: 20px; border-radius: 14px; margin-bottom: 16px;
@@ -53,13 +49,12 @@
   .banner-semana .cierre { font-size: 0.85rem; margin-top: 6px; opacity: 0.85; }
   .banner-semana.cerrado { background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%); }
 
-  /* Card de día */
   .dia-card {
     background: #fff; border: 1px solid #E5E7EB; border-radius: 12px;
     padding: 16px; margin-bottom: 12px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.03);
   }
-  .dia-card.cerrado { opacity: 0.75; background: #FAFAFA; }
+  .dia-card.cerrado, .dia-card.solo-lectura { opacity: 0.9; background: #FAFAFA; }
   .dia-header {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #F3F4F6;
@@ -68,7 +63,6 @@
   .dia-fecha { font-weight: 700; color: #2D6A4F; font-size: 1.05rem; }
   .dia-nombre { color: #6B7280; font-size: 0.85rem; }
 
-  /* Opciones */
   .opcion {
     display: flex; align-items: flex-start; padding: 12px;
     border: 2px solid #E5E7EB; border-radius: 10px; margin-bottom: 10px;
@@ -79,7 +73,7 @@
     border-color: #2D6A4F; background: #F0FDF4;
     box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
   }
-  .opcion.bloqueado { cursor: default; opacity: 0.85; }
+  .opcion.bloqueado { cursor: default; }
   .opcion-radio {
     width: 22px; height: 22px; border: 2px solid #D1D5DB; border-radius: 50%;
     margin-right: 12px; flex-shrink: 0; position: relative; margin-top: 2px;
@@ -100,33 +94,25 @@
   .opcion-HIPO { background: #DCFCE7; color: #166534; }
   .opcion-desc { font-size: 0.95rem; color: #1F2937; line-height: 1.4; }
 
-  /* Mensajes */
-  .mensaje { padding: 12px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 0.9rem; }
+  .mensaje { padding: 12px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 0.9rem; white-space: pre-line; }
   .error { background: #FEE2E2; color: #991B1B; }
   .ok { background: #DCFCE7; color: #14532D; }
   .info { background: #DBEAFE; color: #1E40AF; }
   .warn { background: #FEF3C7; color: #92400E; }
 
-  /* Resumen */
-  .resumen {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
-    margin-top: 14px;
-  }
+  .resumen { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
   .resumen-item {
-    padding: 12px; background: #F0FDF4; border-radius: 10px;
-    text-align: center;
+    padding: 12px; background: #F0FDF4; border-radius: 10px; text-align: center;
   }
   .resumen-item .num { font-size: 1.6rem; font-weight: 700; color: #2D6A4F; display: block; }
   .resumen-item .label { font-size: 0.75rem; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; }
 
-  /* Header */
   .header-bar {
     display: flex; justify-content: space-between; align-items: center;
     padding-bottom: 14px; border-bottom: 1px solid #E5E7EB; margin-bottom: 16px;
   }
   .user-info { font-size: 0.85rem; color: #6B7280; margin-top: 2px; }
 
-  /* Loader */
   .loader {
     display: inline-block; width: 20px; height: 20px;
     border: 3px solid #E5E7EB; border-top-color: #2D6A4F;
@@ -134,37 +120,63 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Estado cerrado banner */
-  .estado-cerrado {
-    background: #FEF3C7; border: 1px solid #FCD34D; padding: 14px;
-    border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem;
-    color: #92400E;
-  }
-  .estado-cerrado strong { display: block; margin-bottom: 4px; }
-
-  /* No disponible */
-  .no-disponible {
-    text-align: center; padding: 40px 20px;
-  }
+  .no-disponible { text-align: center; padding: 40px 20px; }
   .no-disponible .icono { font-size: 3rem; margin-bottom: 16px; }
   .no-disponible h3 { color: #2D6A4F; margin-bottom: 8px; }
   .no-disponible p { color: #6B7280; }
 
   .hidden { display: none; }
 
-  /* Badge cerrado */
-  .badge-cerrado {
+  .badge-cerrado, .badge-enviado {
     display: inline-block; font-size: 0.7rem; padding: 3px 8px;
-    background: #FEE2E2; color: #991B1B; border-radius: 5px;
-    font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    border-radius: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
   }
+  .badge-cerrado { background: #FEE2E2; color: #991B1B; }
+  .badge-enviado { background: #DCFCE7; color: #166534; }
+
+  /* Barra fija de envío */
+  .barra-envio {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 1px solid #E5E7EB;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+    padding: 14px 16px; z-index: 100;
+  }
+  .barra-envio-cont {
+    max-width: 720px; margin: 0 auto;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .progreso-cont { flex: 1; min-width: 0; }
+  .progreso-texto {
+    font-size: 0.85rem; color: #4B5563; margin-bottom: 6px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .progreso-bar { width: 100%; height: 8px; background: #E5E7EB; border-radius: 4px; overflow: hidden; }
+  .progreso-fill { height: 100%; background: linear-gradient(90deg, #2D6A4F, #40916C); transition: width 0.3s ease; border-radius: 4px; }
+  .progreso-fill.completo { background: linear-gradient(90deg, #16A34A, #22C55E); }
+  .btn-enviar { width: auto; padding: 14px 24px; font-size: 0.95rem; white-space: nowrap; min-width: 150px; }
+  .btn-enviar.completo { background: #16A34A; box-shadow: 0 4px 12px rgba(22,163,74,0.3); }
+  .btn-enviar.completo:hover { background: #15803D; }
+
+  /* Banner pedido enviado */
+  .banner-enviado {
+    background: #DCFCE7; border: 1px solid #16A34A;
+    border-radius: 12px; padding: 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .banner-enviado .check {
+    width: 40px; height: 40px; background: #16A34A; color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700; flex-shrink: 0;
+  }
+  .banner-enviado-texto { flex: 1; }
+  .banner-enviado-titulo { font-weight: 700; color: #14532D; font-size: 1.05rem; margin-bottom: 2px; }
+  .banner-enviado-sub { font-size: 0.85rem; color: #166534; }
 </style>
 </head>
 <body>
 
 <div class="container">
 
-  <!-- LOGIN -->
   <div id="pantalla-login" class="card">
     <div class="logo">Tu Salad</div>
     <div class="logo-tag">Comida saludable a tu mesa</div>
@@ -178,7 +190,6 @@
     <button id="btn-login">Ingresar</button>
   </div>
 
-  <!-- APP -->
   <div id="pantalla-app" class="hidden">
     <div class="card">
       <div class="header-bar">
@@ -189,6 +200,7 @@
         <button class="btn-secundario btn-pequeno" id="btn-logout">Salir</button>
       </div>
       <div id="msg-app"></div>
+      <div id="banner-enviado-cont"></div>
       <div id="banner-semana"></div>
       <div id="resumen-cont"></div>
     </div>
@@ -198,17 +210,30 @@
 
 </div>
 
+<div id="barra-envio" class="barra-envio hidden">
+  <div class="barra-envio-cont">
+    <div class="progreso-cont">
+      <div class="progreso-texto" id="progreso-texto">0 de 5 días seleccionados</div>
+      <div class="progreso-bar">
+        <div class="progreso-fill" id="progreso-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <button class="btn-enviar" id="btn-enviar" disabled>Enviar pedido</button>
+  </div>
+</div>
+
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbwcpxl2K8FQ75qtaXgwX0Lt7T1Vw_X2OIUVHShQ5e_Ch44iVkgHsj_aX-TRWyqyvzwZdA/exec';
 
 let usuarioActual = null;
 let estadoCache = null;
 let menusCache = [];
-let seleccionesCache = {};
+let seleccionesGuardadas = {};
+let seleccionesLocales = {};
+let modoLectura = false;
 
 const $ = (id) => document.getElementById(id);
 
-// =================== LOGIN ===================
 $('btn-login').addEventListener('click', async () => {
   const nombre = $('nombre').value.trim();
   const clave = $('clave').value.trim();
@@ -240,6 +265,7 @@ $('btn-logout').addEventListener('click', () => {
   usuarioActual = null;
   $('pantalla-app').classList.add('hidden');
   $('pantalla-login').classList.remove('hidden');
+  $('barra-envio').classList.add('hidden');
   $('nombre').value = '';
   $('clave').value = '';
 });
@@ -272,14 +298,17 @@ async function cargarTodo() {
     if (!rEstado.ok) { mostrarMsg('msg-app', 'Error al cargar estado', 'error'); return; }
     estadoCache = rEstado;
 
-    // Cargar menús y selecciones de la semana objetivo en paralelo
     const [rMenus, rSel] = await Promise.all([
       apiCall({ accion: 'getMenus', semana: estadoCache.lunes_objetivo }),
       apiCall({ accion: 'getSelecciones', nombre: usuarioActual.nombre, semana: estadoCache.lunes_objetivo })
     ]);
 
     menusCache = rMenus.ok ? (rMenus.dias || []) : [];
-    seleccionesCache = (rSel && rSel.ok) ? (rSel.selecciones || {}) : {};
+    seleccionesGuardadas = (rSel && rSel.ok) ? (rSel.selecciones || {}) : {};
+    seleccionesLocales = JSON.parse(JSON.stringify(seleccionesGuardadas));
+
+    // Si ya hay un pedido completo (5 elecciones guardadas), arranca en modo lectura
+    modoLectura = tienePedidoCompleto();
 
     render();
     limpiarMsg('msg-app');
@@ -288,12 +317,51 @@ async function cargarTodo() {
   }
 }
 
-// =================== RENDER ===================
+function tienePedidoCompleto() {
+  if (!menusCache.length) return false;
+  return menusCache.every(d => seleccionesGuardadas[d.fecha]);
+}
+
+function contarSeleccionesLocales() {
+  let c = 0;
+  menusCache.forEach(d => { if (seleccionesLocales[d.fecha]) c++; });
+  return c;
+}
+
+function huboCambiosLocales() {
+  for (const fecha in seleccionesLocales) {
+    if (!seleccionesGuardadas[fecha]) return true;
+    if (seleccionesGuardadas[fecha].opcion !== seleccionesLocales[fecha].opcion) return true;
+  }
+  for (const fecha in seleccionesGuardadas) {
+    if (!seleccionesLocales[fecha]) return true;
+  }
+  return false;
+}
 
 function render() {
+  renderBannerEnviado();
   renderBanner();
   renderResumen();
   renderDias();
+  renderBarraEnvio();
+}
+
+function renderBannerEnviado() {
+  const cont = $('banner-enviado-cont');
+  if (modoLectura && tienePedidoCompleto() && estadoCache.abierto) {
+    cont.innerHTML = `
+      <div class="banner-enviado">
+        <div class="check">✓</div>
+        <div class="banner-enviado-texto">
+          <div class="banner-enviado-titulo">¡Pedido enviado!</div>
+          <div class="banner-enviado-sub">Tus elecciones están registradas. Puedes modificarlas hasta el cierre.</div>
+        </div>
+      </div>
+    `;
+  } else {
+    cont.innerHTML = '';
+  }
 }
 
 function renderBanner() {
@@ -303,18 +371,20 @@ function renderBanner() {
   viernes.setDate(viernes.getDate() + 4);
   const rangoTxt = `${formatFechaCorta(lunes)} al ${formatFechaCorta(viernes)}`;
 
-  const bannerHTML = estadoCache.abierto ?
-    `<div class="banner-semana">
-      <div class="titulo">Semana habilitada</div>
+  let claseExtra = '';
+  let titulo = 'Semana habilitada';
+  if (!estadoCache.abierto) {
+    claseExtra = 'cerrado';
+    titulo = 'Período cerrado';
+  }
+
+  $('banner-semana').innerHTML = `
+    <div class="banner-semana ${claseExtra}">
+      <div class="titulo">${titulo}</div>
       <div class="semana">${rangoTxt}</div>
-      <div class="cierre">⏰ Cierre: ${formatCierreCorto(estadoCache.fecha_cierre)}</div>
-    </div>` :
-    `<div class="banner-semana cerrado">
-      <div class="titulo">Período cerrado</div>
-      <div class="semana">${rangoTxt}</div>
-      <div class="cierre">Cerró el ${formatCierreCorto(estadoCache.fecha_cierre)}</div>
-    </div>`;
-  $('banner-semana').innerHTML = bannerHTML;
+      <div class="cierre">${estadoCache.abierto ? '⏰ Cierre' : 'Cerró el'}: ${formatCierreCorto(estadoCache.fecha_cierre)}</div>
+    </div>
+  `;
 }
 
 function renderResumen() {
@@ -322,10 +392,7 @@ function renderResumen() {
     $('resumen-cont').innerHTML = '';
     return;
   }
-  let elegidos = 0;
-  menusCache.forEach(d => {
-    if (seleccionesCache[d.fecha]) elegidos++;
-  });
+  const elegidos = contarSeleccionesLocales();
   const total = menusCache.length;
   $('resumen-cont').innerHTML = `
     <div class="resumen">
@@ -345,7 +412,6 @@ function renderDias() {
   const cont = $('lista-dias');
   cont.innerHTML = '';
 
-  // Caso 1: no hay menú publicado para la semana objetivo
   if (!estadoCache.menu_publicado || menusCache.length === 0) {
     cont.innerHTML = `
       <div class="card no-disponible">
@@ -357,21 +423,27 @@ function renderDias() {
     return;
   }
 
-  // Caso 2: hay menú publicado, renderizar los días
   menusCache.forEach(dia => {
-    const seleccion = seleccionesCache[dia.fecha];
-    const bloqueado = !estadoCache.abierto;
+    const seleccion = seleccionesLocales[dia.fecha];
+    const bloqueadoPorCierre = !estadoCache.abierto;
+    const bloqueadoPorLectura = modoLectura;
+    const bloqueado = bloqueadoPorCierre || bloqueadoPorLectura;
 
     const card = document.createElement('div');
-    card.className = 'card dia-card' + (bloqueado ? ' cerrado' : '');
+    let claseExtra = '';
+    if (bloqueadoPorCierre) claseExtra = 'cerrado';
+    else if (bloqueadoPorLectura) claseExtra = 'solo-lectura';
+    card.className = 'card dia-card ' + claseExtra;
 
-    let badgeCerrado = bloqueado ? '<span class="badge-cerrado">cerrado</span>' : '';
+    let badge = '';
+    if (bloqueadoPorCierre) badge = '<span class="badge-cerrado">cerrado</span>';
+    else if (bloqueadoPorLectura) badge = '<span class="badge-enviado">enviado</span>';
 
     card.innerHTML = `
       <div class="dia-header">
         <div class="dia-fecha-cont">
           <span class="dia-fecha">${formatFecha(dia.fecha)}</span>
-          <span class="dia-nombre">${dia.diaSemana} ${badgeCerrado}</span>
+          <span class="dia-nombre">${dia.diaSemana} ${badge}</span>
         </div>
       </div>
       <div class="opciones"></div>
@@ -386,6 +458,10 @@ function renderDias() {
     opciones.forEach(opt => {
       if (!opt.descripcion) return;
       const esSel = seleccion && seleccion.opcion === opt.codigo;
+
+      // En modo lectura, solo mostrar la opción seleccionada
+      if (bloqueadoPorLectura && !esSel) return;
+
       const div = document.createElement('div');
       div.className = 'opcion' + (esSel ? ' seleccionada' : '') + (bloqueado ? ' bloqueado' : '');
       div.innerHTML = `
@@ -396,7 +472,7 @@ function renderDias() {
         </div>
       `;
       if (!bloqueado) {
-        div.addEventListener('click', () => elegir(dia.fecha, opt));
+        div.addEventListener('click', () => elegirLocal(dia.fecha, opt));
       }
       optCont.appendChild(div);
     });
@@ -405,51 +481,132 @@ function renderDias() {
   });
 }
 
-// =================== ACCIONES ===================
+function renderBarraEnvio() {
+  const barra = $('barra-envio');
 
-async function elegir(fecha, opt) {
-  try {
-    const r = await apiCall({
-      accion: 'guardarSeleccion',
-      nombre: usuarioActual.nombre,
-      fecha: fecha,
-      opcion: opt.codigo,
-      descripcion: opt.descripcion
-    });
-    if (!r.ok) { mostrarMsg('msg-app', r.error || 'Error al guardar', 'error'); return; }
-    seleccionesCache[fecha] = {
-      opcion: opt.codigo,
-      descripcion: opt.descripcion,
-      timestamp: new Date().toISOString()
+  if (!estadoCache.menu_publicado || menusCache.length === 0 || !estadoCache.abierto) {
+    barra.classList.add('hidden');
+    return;
+  }
+
+  barra.classList.remove('hidden');
+  const total = menusCache.length;
+  const elegidos = contarSeleccionesLocales();
+  const completo = elegidos === total;
+  const hayCambios = huboCambiosLocales();
+
+  const fill = $('progreso-fill');
+  const texto = $('progreso-texto');
+  const btn = $('btn-enviar');
+
+  fill.style.width = ((elegidos / total) * 100) + '%';
+  fill.classList.toggle('completo', completo);
+
+  if (modoLectura) {
+    texto.textContent = '✓ Pedido enviado · 5 de 5 días';
+    btn.textContent = 'Modificar pedido';
+    btn.classList.remove('completo');
+    btn.disabled = false;
+    btn.onclick = () => {
+      modoLectura = false;
+      render();
     };
-    render();
-    mostrarMsg('msg-app', `✓ ${formatFecha(fecha)}: ${opt.label}`, 'ok');
-    setTimeout(() => limpiarMsg('msg-app'), 2500);
-  } catch (e) {
-    mostrarMsg('msg-app', 'Error: ' + e.message, 'error');
+  } else {
+    if (!completo) {
+      const faltan = total - elegidos;
+      texto.textContent = `${elegidos} de ${total} días · Faltan ${faltan} por elegir`;
+      btn.textContent = 'Enviar pedido';
+      btn.classList.remove('completo');
+      btn.disabled = true;
+      btn.onclick = null;
+    } else {
+      texto.textContent = `${elegidos} de ${total} días seleccionados`;
+      btn.textContent = hayCambios ? 'Enviar pedido' : 'Sin cambios';
+      btn.classList.toggle('completo', hayCambios);
+      btn.disabled = !hayCambios;
+      btn.onclick = hayCambios ? enviarPedido : null;
+    }
   }
 }
 
-// =================== UTILS ===================
+function elegirLocal(fecha, opt) {
+  // Solo cambia en memoria, no llama al backend
+  seleccionesLocales[fecha] = {
+    opcion: opt.codigo,
+    descripcion: opt.descripcion
+  };
+  render();
+}
+
+async function enviarPedido() {
+  const btn = $('btn-enviar');
+  btn.disabled = true;
+  const textoOriginal = btn.textContent;
+  btn.innerHTML = '<span class="loader"></span>';
+
+  try {
+    // Determinar qué cambios hay que enviar
+    const cambios = [];
+    for (const fecha in seleccionesLocales) {
+      const local = seleccionesLocales[fecha];
+      const guardada = seleccionesGuardadas[fecha];
+      if (!guardada || guardada.opcion !== local.opcion) {
+        cambios.push({ fecha, opcion: local.opcion, descripcion: local.descripcion });
+      }
+    }
+
+    if (cambios.length === 0) {
+      mostrarMsg('msg-app', 'No hay cambios para enviar', 'info');
+      setTimeout(() => limpiarMsg('msg-app'), 2000);
+      return;
+    }
+
+    // Enviar todos los cambios secuencialmente
+    let errores = [];
+    for (const c of cambios) {
+      const r = await apiCall({
+        accion: 'guardarSeleccion',
+        nombre: usuarioActual.nombre,
+        fecha: c.fecha,
+        opcion: c.opcion,
+        descripcion: c.descripcion
+      });
+      if (!r.ok) errores.push(`${c.fecha}: ${r.error}`);
+    }
+
+    if (errores.length > 0) {
+      mostrarMsg('msg-app', 'Algunos cambios fallaron:\n' + errores.join('\n'), 'error');
+    } else {
+      seleccionesGuardadas = JSON.parse(JSON.stringify(seleccionesLocales));
+      modoLectura = true;
+      render();
+      mostrarMsg('msg-app', '✓ ¡Pedido enviado correctamente!', 'ok');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => limpiarMsg('msg-app'), 3500);
+    }
+  } catch (e) {
+    mostrarMsg('msg-app', 'Error al enviar: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = textoOriginal;
+    render();
+  }
+}
 
 function formatFecha(fechaStr) {
   const [y, m, d] = fechaStr.split('-');
   return `${d}/${m}/${y}`;
 }
-
 function formatFechaCorta(date) {
   const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   return `${date.getDate()} ${meses[date.getMonth()]}`;
 }
-
 function formatCierreCorto(fechaStr) {
-  // 'YYYY-MM-DD HH:mm:ss'
   const parts = fechaStr.split(' ');
   const [y,m,d] = parts[0].split('-');
   const hora = parts[1] ? parts[1].substring(0,5) : '';
   return `${d}/${m} ${hora}`;
 }
-
 function mostrarMsg(id, texto, tipo) {
   $(id).innerHTML = `<div class="mensaje ${tipo}">${texto}</div>`;
 }
