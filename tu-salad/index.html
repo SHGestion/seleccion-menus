@@ -26,8 +26,20 @@
   input[type="text"], input[type="password"], select {
     width: 100%; padding: 12px; border: 1px solid #D1D5DB;
     border-radius: 10px; font-size: 1rem; margin-bottom: 14px; background: #fff;
+    font-family: inherit;
   }
-  input:focus { outline: none; border-color: #2D6A4F; }
+  input:focus, select:focus { outline: none; border-color: #2D6A4F; }
+
+  /* Estilo específico para el select de nombres */
+  #nombre-select {
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232D6A4F' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+  #nombre-select:disabled { background-color: #F3F4F6; cursor: wait; }
 
   button {
     background: #2D6A4F; color: #fff; border: none; padding: 13px 20px;
@@ -134,7 +146,6 @@
   .badge-cerrado { background: #FEE2E2; color: #991B1B; }
   .badge-enviado { background: #DCFCE7; color: #166534; }
 
-  /* Barra fija de envío */
   .barra-envio {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: #fff; border-top: 1px solid #E5E7EB;
@@ -157,7 +168,6 @@
   .btn-enviar.completo { background: #16A34A; box-shadow: 0 4px 12px rgba(22,163,74,0.3); }
   .btn-enviar.completo:hover { background: #15803D; }
 
-  /* Banner pedido enviado */
   .banner-enviado {
     background: #DCFCE7; border: 1px solid #16A34A;
     border-radius: 12px; padding: 16px; margin-bottom: 16px;
@@ -171,6 +181,12 @@
   .banner-enviado-texto { flex: 1; }
   .banner-enviado-titulo { font-weight: 700; color: #14532D; font-size: 1.05rem; margin-bottom: 2px; }
   .banner-enviado-sub { font-size: 0.85rem; color: #166534; }
+
+  .hint-info {
+    background: #F0FDF4; border-left: 3px solid #2D6A4F;
+    padding: 10px 14px; border-radius: 6px; font-size: 0.85rem;
+    color: #1F2937; margin-bottom: 14px;
+  }
 </style>
 </head>
 <body>
@@ -181,13 +197,18 @@
     <div class="logo">Tu Salad</div>
     <div class="logo-tag">Comida saludable a tu mesa</div>
     <h1 style="margin-top: 18px;">Selección semanal</h1>
-    <p class="subtitle">Ingresa con el nombre y clave que recibiste para elegir tus menús de la semana.</p>
-    <label for="nombre">Nombre</label>
-    <input type="text" id="nombre" placeholder="Tu nombre" autocomplete="username">
+    <p class="subtitle">Selecciona tu nombre e ingresa tu clave personal para elegir tus menús.</p>
+
+    <label for="nombre-select">Nombre</label>
+    <select id="nombre-select" disabled>
+      <option value="">Cargando nombres...</option>
+    </select>
+
     <label for="clave">Clave</label>
     <input type="password" id="clave" placeholder="Tu clave personal" autocomplete="current-password">
+
     <div id="msg-login"></div>
-    <button id="btn-login">Ingresar</button>
+    <button id="btn-login" disabled>Ingresar</button>
   </div>
 
   <div id="pantalla-app" class="hidden">
@@ -234,11 +255,55 @@ let modoLectura = false;
 
 const $ = (id) => document.getElementById(id);
 
+// =================== CARGA DE NOMBRES ===================
+
+async function cargarNombres() {
+  try {
+    const r = await apiCall({ accion: 'getNombresActivos' });
+    const select = $('nombre-select');
+    select.innerHTML = '';
+    if (r.ok && r.nombres && r.nombres.length > 0) {
+      // Opción placeholder
+      const ph = document.createElement('option');
+      ph.value = '';
+      ph.textContent = '— Selecciona tu nombre —';
+      ph.disabled = true;
+      ph.selected = true;
+      select.appendChild(ph);
+
+      r.nombres.forEach(n => {
+        const opt = document.createElement('option');
+        opt.value = n;
+        opt.textContent = n;
+        select.appendChild(opt);
+      });
+      select.disabled = false;
+      validarLogin();
+    } else {
+      select.innerHTML = '<option value="">No hay usuarios disponibles</option>';
+    }
+  } catch (e) {
+    $('nombre-select').innerHTML = '<option value="">Error al cargar</option>';
+    mostrarMsg('msg-login', 'No se pudieron cargar los nombres. Recarga la página.', 'error');
+  }
+}
+
+function validarLogin() {
+  const nombre = $('nombre-select').value;
+  const clave = $('clave').value.trim();
+  $('btn-login').disabled = !(nombre && clave);
+}
+
+$('nombre-select').addEventListener('change', validarLogin);
+$('clave').addEventListener('input', validarLogin);
+
+// =================== LOGIN ===================
+
 $('btn-login').addEventListener('click', async () => {
-  const nombre = $('nombre').value.trim();
+  const nombre = $('nombre-select').value;
   const clave = $('clave').value.trim();
   if (!nombre || !clave) {
-    mostrarMsg('msg-login', 'Ingresa tu nombre y clave', 'error');
+    mostrarMsg('msg-login', 'Selecciona tu nombre e ingresa tu clave', 'error');
     return;
   }
   $('btn-login').disabled = true;
@@ -257,6 +322,7 @@ $('btn-login').addEventListener('click', async () => {
   } finally {
     $('btn-login').disabled = false;
     $('btn-login').innerHTML = 'Ingresar';
+    validarLogin();
   }
 });
 
@@ -266,15 +332,19 @@ $('btn-logout').addEventListener('click', () => {
   $('pantalla-app').classList.add('hidden');
   $('pantalla-login').classList.remove('hidden');
   $('barra-envio').classList.add('hidden');
-  $('nombre').value = '';
   $('clave').value = '';
+  // Restablecer el select al placeholder
+  const select = $('nombre-select');
+  if (select.options.length > 0) select.selectedIndex = 0;
+  validarLogin();
 });
 
 $('clave').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') $('btn-login').click();
+  if (e.key === 'Enter' && !$('btn-login').disabled) $('btn-login').click();
 });
 
 window.addEventListener('load', () => {
+  cargarNombres();
   const s = sessionStorage.getItem('tusalad_user');
   if (s) {
     try {
@@ -307,7 +377,6 @@ async function cargarTodo() {
     seleccionesGuardadas = (rSel && rSel.ok) ? (rSel.selecciones || {}) : {};
     seleccionesLocales = JSON.parse(JSON.stringify(seleccionesGuardadas));
 
-    // Si ya hay un pedido completo (5 elecciones guardadas), arranca en modo lectura
     modoLectura = tienePedidoCompleto();
 
     render();
@@ -458,8 +527,6 @@ function renderDias() {
     opciones.forEach(opt => {
       if (!opt.descripcion) return;
       const esSel = seleccion && seleccion.opcion === opt.codigo;
-
-      // En modo lectura, solo mostrar la opción seleccionada
       if (bloqueadoPorLectura && !esSel) return;
 
       const div = document.createElement('div');
@@ -530,7 +597,6 @@ function renderBarraEnvio() {
 }
 
 function elegirLocal(fecha, opt) {
-  // Solo cambia en memoria, no llama al backend
   seleccionesLocales[fecha] = {
     opcion: opt.codigo,
     descripcion: opt.descripcion
@@ -545,7 +611,6 @@ async function enviarPedido() {
   btn.innerHTML = '<span class="loader"></span>';
 
   try {
-    // Determinar qué cambios hay que enviar
     const cambios = [];
     for (const fecha in seleccionesLocales) {
       const local = seleccionesLocales[fecha];
@@ -561,7 +626,6 @@ async function enviarPedido() {
       return;
     }
 
-    // Enviar todos los cambios secuencialmente
     let errores = [];
     for (const c of cambios) {
       const r = await apiCall({
