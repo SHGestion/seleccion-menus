@@ -3,72 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — Reportes de Selección de Menús</title>
+<title>Bitumix Austral — Panel Admin</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f0f4f8; color: #1a2332; padding: 20px;
+    background: #F5F5F5; color: #1A1A1A; padding: 20px;
   }
   .container { max-width: 1200px; margin: 0 auto; }
-  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px; }
-  h1 { color: #0a4d8c; margin-bottom: 4px; }
-  h2 { color: #0a4d8c; font-size: 1.2rem; margin-bottom: 12px; }
-  h3 { color: #1a2332; font-size: 1.05rem; margin-bottom: 10px; margin-top: 16px; }
-  .subtitle { color: #64748b; font-size: 0.9rem; margin-bottom: 16px; }
-  label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
-  input[type="text"], input[type="password"], input[type="month"], select {
-    width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;
-    font-size: 1rem; margin-bottom: 12px; background: #fff;
+  .card { background: #fff; border-radius: 14px; padding: 22px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 16px;
+    border: 1px solid #E5E5E5; }
+  h1 { color: #000; margin-bottom: 4px; font-weight: 800; }
+  h2 { color: #000; font-size: 1.2rem; margin-bottom: 12px; font-weight: 800; }
+  h3 { color: #1A1A1A; font-size: 1.05rem; margin-bottom: 10px; margin-top: 16px; font-weight: 800; }
+  .subtitle { color: #333; font-size: 0.9rem; margin-bottom: 16px; }
+
+  .brand-header { display: flex; align-items: center; gap: 12px; }
+  .brand-badge {
+    background: #FFCD11; color: #000;
+    width: 48px; height: 48px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 1.8rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   }
+  .brand-name { font-weight: 800; color: #000; font-size: 1.4rem; letter-spacing: -0.3px; line-height: 1; }
+  .brand-tag { color: #333; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+  .divider-yellow { height: 4px; background: #FFCD11; width: 60px; margin: 14px 0; border-radius: 2px; }
+
+  label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.9rem; color: #1A1A1A; }
+  input[type="text"], input[type="password"], input[type="date"], input[type="month"] {
+    width: 100%; padding: 10px; border: 1.5px solid #D1D5DB; border-radius: 8px;
+    font-size: 1rem; margin-bottom: 12px;
+  }
+  input:focus { outline: none; border-color: #000; box-shadow: 0 0 0 3px rgba(255,205,17,0.3); }
+
   button {
-    background: #0a4d8c; color: #fff; border: none; padding: 10px 18px;
-    border-radius: 8px; font-weight: 600; cursor: pointer; margin-right: 8px;
+    background: #FFCD11; color: #000; border: 2px solid #FFCD11;
+    padding: 10px 18px; border-radius: 8px; font-weight: 800; cursor: pointer;
+    margin-right: 8px; text-transform: uppercase; letter-spacing: 0.3px;
+    font-size: 0.85rem;
   }
-  button:hover { background: #083a6b; }
-  button.verde { background: #065f46; }
-  button.verde:hover { background: #044a37; }
-  button.gris { background: #64748b; }
-  button.gris:hover { background: #475569; }
-  .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; }
-  .tab { padding: 10px 18px; cursor: pointer; border-bottom: 3px solid transparent; color: #64748b; font-weight: 600; }
-  .tab.activo { color: #0a4d8c; border-bottom-color: #0a4d8c; }
+  button:hover { background: #E6B800; border-color: #E6B800; }
+  button.gris { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
+  button.gris:hover { background: #333; border-color: #333; }
+  button.oscuro { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
+  button.oscuro:hover { background: #333; border-color: #333; }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid #E5E7EB; flex-wrap: wrap; }
+  .tab {
+    padding: 12px 20px; cursor: pointer; border-bottom: 3px solid transparent;
+    color: #4A4A4A; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+    font-size: 0.85rem; margin-bottom: -2px;
+  }
+  .tab.activo { color: #000; border-bottom-color: #FFCD11; }
+
   table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-  th { background: #e6f0fa; color: #0a4d8c; padding: 10px; text-align: left; font-size: 0.85rem; font-weight: 700; }
-  td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; vertical-align: top; }
-  tr:hover td { background: #f8fafc; }
-  tr.fila-cancelado td { color: #94a3b8; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
-  .badge-A { background: #fef3c7; color: #92400e; }
-  .badge-B { background: #dbeafe; color: #1e40af; }
-  .badge-C { background: #d1fae5; color: #065f46; }
-  .badge-cancel { background: #fee2e2; color: #991b1b; }
-  .mensaje { padding: 12px; border-radius: 8px; margin-bottom: 12px; }
-  .error { background: #fee2e2; color: #991b1b; }
-  .ok { background: #d1fae5; color: #065f46; }
+  th { background: #1A1A1A; color: #FFCD11; padding: 12px; text-align: left; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 10px; border-bottom: 1px solid #F3F4F6; font-size: 0.9rem; vertical-align: middle; }
+  tr:hover td { background: #FFFEF5; }
+
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-MENU { background: #FFCD11; color: #000; }
+  .badge-HIPO { background: #E8F5E8; color: #166534; border: 1px solid #86EFAC; }
+  .badge-ACTIVO { background: #D1FAE5; color: #065F46; }
+  .badge-CANCELADO { background: #FEE2E2; color: #991B1B; }
+
   .hidden { display: none; }
-  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
-  .stat { background: #e6f0fa; padding: 14px; border-radius: 8px; text-align: center; }
-  .stat-num { font-size: 1.8rem; font-weight: 700; color: #0a4d8c; display: block; }
-  .stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-  .stat.verde .stat-num { color: #065f46; }
-  .stat.rojo .stat-num { color: #b91c1c; }
-  .stat.naranja .stat-num { color: #c2410c; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat {
+    background: #FAFAFA; padding: 16px; border-radius: 8px; text-align: center;
+    border: 1px solid #E5E5E5; border-top: 3px solid #FFCD11;
+  }
+  .stat-num { font-size: 2rem; font-weight: 800; color: #000; display: block; }
+  .stat-label { font-size: 0.7rem; color: #4A4A4A; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+  .stat.rojo { border-top-color: #DC2626; }
+  .stat.rojo .stat-num { color: #DC2626; }
+  .stat.verde { border-top-color: #16A34A; }
+  .stat.verde .stat-num { color: #16A34A; }
+  .stat.gris { border-top-color: #6B7280; }
+  .stat.gris .stat-num { color: #6B7280; }
+
   .toolbar { display: flex; gap: 8px; margin-bottom: 12px; align-items: end; flex-wrap: wrap; }
   .toolbar > div { flex: 1; min-width: 140px; }
-  .toolbar > div.no-flex { flex: 0; }
-  .barra-progreso { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
-  .barra-progreso-fill { height: 100%; background: #0a4d8c; }
-  .detalle-row { background: #f8fafc; padding: 8px 12px; font-size: 0.85rem; }
-  .header-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px; }
-  .estado-tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-  .estado-activo { background: #d1fae5; color: #065f46; }
-  .estado-cancelado { background: #fee2e2; color: #991b1b; }
-  .destacado { background: #fef3c7; padding: 2px 6px; border-radius: 3px; font-weight: 700; color: #92400e; }
-  details { margin-top: 8px; }
-  details summary { cursor: pointer; padding: 6px 10px; background: #f1f5f9; border-radius: 6px; font-size: 0.85rem; font-weight: 600; color: #475569; }
-  details summary:hover { background: #e2e8f0; }
-  details[open] summary { margin-bottom: 8px; }
+
+  .barra-progreso { width: 100%; height: 8px; background: #E5E7EB; border-radius: 4px; overflow: hidden; }
+  .barra-progreso-fill { height: 100%; background: #FFCD11; }
+
+  .header-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 2px solid #F5F5F5; margin-bottom: 16px; }
+
+  .mensaje { padding: 12px; border-radius: 8px; margin-bottom: 12px; font-weight: 500; }
+  .info { background: #FFFEF5; color: #1A1A1A; border-left: 4px solid #FFCD11; }
+  .error { background: #FEE2E2; color: #991B1B; border-left: 4px solid #DC2626; }
+
+  .credito-shgestion {
+    text-align: center; padding: 12px 0; color: #6B7280; font-size: 0.75rem;
+    margin-top: 20px;
+  }
+  .credito-shgestion strong { color: #1A1A1A; }
 </style>
 </head>
 <body>
@@ -77,8 +109,16 @@
 
   <!-- LOGIN -->
   <div id="login-admin" class="card">
-    <h1>Admin — SH Gestión</h1>
-    <p class="subtitle">Panel de reportes de selección de menús</p>
+    <div class="brand-header">
+      <div class="brand-badge">B</div>
+      <div>
+        <div class="brand-name">Bitumix Austral</div>
+        <div class="brand-tag">Panel administrativo</div>
+      </div>
+    </div>
+    <div class="divider-yellow"></div>
+    <h1 style="margin-top: 8px;">Reportes de selección</h1>
+    <p class="subtitle">Ingresa con el token de administrador para acceder.</p>
     <label>Token de administrador</label>
     <input type="password" id="token" placeholder="Pega tu token">
     <div id="msg-login"></div>
@@ -89,34 +129,35 @@
   <div id="app-admin" class="hidden">
     <div class="card">
       <div class="header-bar">
-        <div>
-          <h1>Reportes — Selección de Menús</h1>
-          <div class="subtitle">SH Gestión y Servicios · Compas Marine</div>
+        <div class="brand-header">
+          <div class="brand-badge">B</div>
+          <div>
+            <div class="brand-name">Bitumix Austral</div>
+            <div class="subtitle" style="margin: 0;">Panel administrativo</div>
+          </div>
         </div>
         <button class="gris" id="btn-salir">Salir</button>
       </div>
       <div class="tabs">
-        <div class="tab activo" data-tab="diario">Consolidado Diario</div>
-        <div class="tab" data-tab="participacion">Participación</div>
+        <div class="tab activo" data-tab="diario">Resumen Diario</div>
+        <div class="tab" data-tab="participacion">Participación Mensual</div>
         <div class="tab" data-tab="cancelaciones">Cancelaciones</div>
-        <div class="tab" data-tab="comensal">Por Comensal</div>
       </div>
 
-      <!-- TAB DIARIO -->
       <div id="tab-diario" class="tab-content">
         <div class="toolbar">
           <div>
-            <label>Mes</label>
-            <input type="month" id="mes-diario">
+            <label>Fecha</label>
+            <input type="date" id="fecha-diario">
           </div>
           <button id="btn-diario">Cargar reporte</button>
-          <button class="verde" id="btn-export-diario">Exportar CSV</button>
+          <button class="oscuro" id="btn-export-diario">Exportar CSV</button>
         </div>
+        <div id="msg-diario"></div>
         <div id="diario-stats"></div>
-        <div id="diario-tabla"></div>
+        <div id="diario-detalle"></div>
       </div>
 
-      <!-- TAB PARTICIPACIÓN -->
       <div id="tab-participacion" class="tab-content hidden">
         <div class="toolbar">
           <div>
@@ -124,37 +165,28 @@
             <input type="month" id="mes-part">
           </div>
           <button id="btn-part">Cargar reporte</button>
-          <button class="verde" id="btn-export-part">Exportar CSV</button>
+          <button class="oscuro" id="btn-export-part">Exportar CSV</button>
         </div>
         <div id="part-stats"></div>
         <div id="part-tabla"></div>
       </div>
 
-      <!-- TAB CANCELACIONES -->
       <div id="tab-cancelaciones" class="tab-content hidden">
         <div class="toolbar">
           <div>
             <label>Mes</label>
-            <input type="month" id="mes-canc">
+            <input type="month" id="mes-cancel">
           </div>
-          <button id="btn-canc">Cargar reporte</button>
-          <button class="verde" id="btn-export-canc">Exportar CSV</button>
+          <button id="btn-cancel">Cargar reporte</button>
+          <button class="oscuro" id="btn-export-cancel">Exportar CSV</button>
         </div>
-        <div id="canc-stats"></div>
-        <div id="canc-tabla"></div>
+        <div id="cancel-stats"></div>
+        <div id="cancel-tabla"></div>
       </div>
+    </div>
 
-      <!-- TAB POR COMENSAL -->
-      <div id="tab-comensal" class="tab-content hidden">
-        <div class="toolbar">
-          <div>
-            <label>RUT del comensal</label>
-            <input type="text" id="rut-comensal" placeholder="12345678-9">
-          </div>
-          <button id="btn-comensal">Buscar</button>
-        </div>
-        <div id="comensal-tabla"></div>
-      </div>
+    <div class="credito-shgestion">
+      Plataforma operada por <strong>SH Gestión y Servicios SpA</strong>
     </div>
   </div>
 
@@ -166,23 +198,24 @@ let TOKEN = '';
 
 const $ = (id) => document.getElementById(id);
 
-// =================== LOGIN ===================
 $('btn-entrar').addEventListener('click', () => {
   const t = $('token').value.trim();
   if (!t) return;
   TOKEN = t;
-  sessionStorage.setItem('admin_token', t);
+  sessionStorage.setItem('bitumix_admin_token', t);
   $('login-admin').classList.add('hidden');
   $('app-admin').classList.remove('hidden');
+
   const hoy = new Date();
-  const mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
-  $('mes-diario').value = mesActual;
-  $('mes-part').value = mesActual;
-  $('mes-canc').value = mesActual;
+  const hoyStr = hoy.toISOString().substring(0, 10);
+  const mesStr = hoy.toISOString().substring(0, 7);
+  $('fecha-diario').value = hoyStr;
+  $('mes-part').value = mesStr;
+  $('mes-cancel').value = mesStr;
 });
 
 $('btn-salir').addEventListener('click', () => {
-  sessionStorage.removeItem('admin_token');
+  sessionStorage.removeItem('bitumix_admin_token');
   TOKEN = '';
   $('app-admin').classList.add('hidden');
   $('login-admin').classList.remove('hidden');
@@ -190,11 +223,10 @@ $('btn-salir').addEventListener('click', () => {
 });
 
 window.addEventListener('load', () => {
-  const t = sessionStorage.getItem('admin_token');
+  const t = sessionStorage.getItem('bitumix_admin_token');
   if (t) { $('token').value = t; $('btn-entrar').click(); }
 });
 
-// =================== TABS ===================
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('activo'));
@@ -204,113 +236,61 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// =================== DIARIO ===================
 $('btn-diario').addEventListener('click', async () => {
-  const mes = $('mes-diario').value;
-  if (!mes) return alert('Selecciona un mes');
-  const r = await apiCall({ accion: 'reporteDiario', admin_token: TOKEN, mes });
+  const fecha = $('fecha-diario').value;
+  if (!fecha) return alert('Selecciona una fecha');
+  const r = await apiCall({ accion: 'reporteDiario', admin_token: TOKEN, fecha });
   if (!r.ok) { alert(r.error); return; }
-  renderDiario(r.resumen, mes);
+  renderDiario(r);
 });
 
-function renderDiario(resumen, mes) {
-  const fechas = Object.keys(resumen).sort();
-  let totalA=0, totalB=0, totalC=0, totalCanc=0, totalRaciones=0;
-  fechas.forEach(f => {
-    totalA += resumen[f].A || 0;
-    totalB += resumen[f].B || 0;
-    totalC += resumen[f].C || 0;
-    totalCanc += resumen[f].cancelados || 0;
-    totalRaciones += resumen[f].total_raciones || 0;
-  });
-
+function renderDiario(r) {
+  const d = r.resumen;
   $('diario-stats').innerHTML = `
     <div class="stat-grid">
-      <div class="stat verde"><span class="stat-num">${totalRaciones}</span><span class="stat-label">Total raciones</span></div>
-      <div class="stat"><span class="stat-num">${totalA}</span><span class="stat-label">Alt. A</span></div>
-      <div class="stat"><span class="stat-num">${totalB}</span><span class="stat-label">Alt. B</span></div>
-      <div class="stat"><span class="stat-num">${totalC}</span><span class="stat-label">Hipocalórico</span></div>
-      <div class="stat rojo"><span class="stat-num">${totalCanc}</span><span class="stat-label">Cancelados</span></div>
+      <div class="stat verde"><span class="stat-num">${d.activos}</span><span class="stat-label">Pedidos activos</span></div>
+      <div class="stat"><span class="stat-num">${d.MENU}</span><span class="stat-label">Menús</span></div>
+      <div class="stat"><span class="stat-num">${d.HIPO}</span><span class="stat-label">Hipocalóricos</span></div>
+      <div class="stat rojo"><span class="stat-num">${d.cancelados}</span><span class="stat-label">Cancelados</span></div>
     </div>
   `;
 
-  let html = `
-    <h3>Detalle diario</h3>
-    <p class="subtitle">Cantidad de raciones a preparar por día. Los cancelados no cuentan como ración.</p>
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>A</th>
-          <th>B</th>
-          <th>C (Hipo)</th>
-          <th>Cancelados</th>
-          <th class="destacado-col">Total Raciones</th>
-          <th>Detalle</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-  fechas.forEach(f => {
-    const d = resumen[f];
-    const detalleId = `det-${f}`;
-    html += `
-      <tr>
-        <td><strong>${formatFecha(f)}</strong></td>
-        <td><span class="badge badge-A">${d.A||0}</span></td>
-        <td><span class="badge badge-B">${d.B||0}</span></td>
-        <td><span class="badge badge-C">${d.C||0}</span></td>
-        <td><span class="badge badge-cancel">${d.cancelados||0}</span></td>
-        <td><span class="destacado">${d.total_raciones||0}</span></td>
-        <td><button class="btn-pequeno gris" style="padding:4px 10px; font-size:0.75rem;" onclick="document.getElementById('${detalleId}').classList.toggle('hidden')">Ver</button></td>
-      </tr>
-      <tr id="${detalleId}" class="hidden">
-        <td colspan="7">
-          ${renderDetalleDia(d.detalle)}
-        </td>
-      </tr>
-    `;
-  });
-  html += '</tbody></table>';
-  $('diario-tabla').innerHTML = html;
-  window._diarioData = { fechas, resumen, mes };
-}
-
-function renderDetalleDia(detalle) {
-  if (!detalle || detalle.length === 0) return '<em>Sin selecciones</em>';
-  const activos = detalle.filter(d => d.estado === 'ACTIVO');
-  const cancelados = detalle.filter(d => d.estado === 'CANCELADO');
-
-  let html = '<div class="detalle-row">';
-  if (activos.length > 0) {
-    html += '<strong>Comerán:</strong><br>';
-    activos.forEach(d => {
-      html += `· ${d.nombre} (${d.area || 's/a'}) — <span class="badge badge-${d.alt}">${d.alt}</span> ${d.desc}<br>`;
+  let html = `<h3>Detalle del ${r.fecha}</h3>`;
+  if (d.detalle.length === 0) {
+    html += '<p style="color:#6B7280; text-align:center; padding:20px;">Sin registros para esta fecha.</p>';
+  } else {
+    html += `<table><thead><tr>
+      <th>RUT</th><th>Nombre</th><th>Área</th><th>Alternativa</th><th>Descripción</th><th>Estado</th><th>Motivo</th>
+    </tr></thead><tbody>`;
+    d.detalle.forEach(x => {
+      const badgeAlt = x.alternativa ? `<span class="badge badge-${x.alternativa}">${x.alternativa === 'MENU' ? 'Menú' : 'Hipo'}</span>` : '—';
+      const badgeEst = `<span class="badge badge-${x.estado}">${x.estado}</span>`;
+      html += `<tr>
+        <td>${x.rut}</td>
+        <td><b>${x.nombre}</b></td>
+        <td>${x.area || ''}</td>
+        <td>${badgeAlt}</td>
+        <td>${x.descripcion || '—'}</td>
+        <td>${badgeEst}</td>
+        <td>${x.motivo || '—'}</td>
+      </tr>`;
     });
+    html += '</tbody></table>';
   }
-  if (cancelados.length > 0) {
-    html += activos.length > 0 ? '<br>' : '';
-    html += '<strong>Cancelaron:</strong><br>';
-    cancelados.forEach(d => {
-      html += `· ${d.nombre} (${d.area || 's/a'}) — <em>${d.motivo}</em><br>`;
-    });
-  }
-  html += '</div>';
-  return html;
+  $('diario-detalle').innerHTML = html;
+  window._diarioData = r;
 }
 
 $('btn-export-diario').addEventListener('click', () => {
   if (!window._diarioData) return alert('Primero carga el reporte');
-  const { fechas, resumen, mes } = window._diarioData;
-  let csv = 'Fecha,Alt_A,Alt_B,Alt_C_Hipo,Cancelados,Total_Raciones\n';
-  fechas.forEach(f => {
-    const d = resumen[f];
-    csv += `${f},${d.A||0},${d.B||0},${d.C||0},${d.cancelados||0},${d.total_raciones||0}\n`;
+  const r = window._diarioData;
+  let csv = 'RUT,Nombre,Area,Alternativa,Descripcion,Estado,Motivo\n';
+  r.resumen.detalle.forEach(x => {
+    csv += `"${x.rut}","${x.nombre}","${x.area||''}","${x.alternativa||''}","${(x.descripcion||'').replace(/"/g,'""')}","${x.estado}","${x.motivo||''}"\n`;
   });
-  descargarCSV(csv, `consolidado_diario_${mes}.csv`);
+  descargarCSV(csv, `bitumix_diario_${r.fecha}.csv`);
 });
 
-// =================== PARTICIPACIÓN ===================
 $('btn-part').addEventListener('click', async () => {
   const mes = $('mes-part').value;
   if (!mes) return alert('Selecciona un mes');
@@ -322,38 +302,33 @@ $('btn-part').addEventListener('click', async () => {
 function renderPart(r) {
   const d = r.detalle;
   const total = d.length;
-  const completos = d.filter(x => x.decididos === r.totalDias).length;
-  const sinDecidir = d.filter(x => x.decididos === 0).length;
+  const completos = d.filter(x => x.elegidos === r.totalDias).length;
+  const sinPedir = d.filter(x => x.elegidos === 0).length;
   const promedio = total > 0 ? Math.round(d.reduce((s,x)=>s+x.porcentaje,0)/total) : 0;
 
   $('part-stats').innerHTML = `
     <div class="stat-grid">
-      <div class="stat"><span class="stat-num">${total}</span><span class="stat-label">Comensales activos</span></div>
-      <div class="stat verde"><span class="stat-num">${completos}</span><span class="stat-label">Completos</span></div>
-      <div class="stat naranja"><span class="stat-num">${sinDecidir}</span><span class="stat-label">Sin decidir</span></div>
-      <div class="stat"><span class="stat-num">${promedio}%</span><span class="stat-label">Participación</span></div>
+      <div class="stat"><span class="stat-num">${total}</span><span class="stat-label">Usuarios activos</span></div>
+      <div class="stat verde"><span class="stat-num">${completos}</span><span class="stat-label">Pidieron todos los días</span></div>
+      <div class="stat rojo"><span class="stat-num">${sinPedir}</span><span class="stat-label">Sin pedir aún</span></div>
+      <div class="stat"><span class="stat-num">${promedio}%</span><span class="stat-label">Participación promedio</span></div>
     </div>
   `;
 
-  let html = `
-    <h3>Detalle por comensal</h3>
-    <p class="subtitle">Decididos = elegidos + cancelados. Pendientes = días aún no respondidos.</p>
-    <table><thead><tr>
-      <th>RUT</th><th>Nombre</th><th>Área</th>
-      <th>Elegidos</th><th>Cancelados</th><th>Pendientes</th><th style="width:140px;">Avance</th>
-    </tr></thead><tbody>
-  `;
-  d.sort((a,b) => a.porcentaje - b.porcentaje);
+  let html = `<h3>Detalle por usuario (${r.totalDias} días de menú publicados)</h3><table><thead><tr>
+    <th>RUT</th><th>Nombre</th><th>Área</th><th>Email</th><th>Pedidos</th><th style="width:200px;">Avance</th>
+  </tr></thead><tbody>`;
   d.forEach(x => {
     html += `<tr>
-      <td>${x.rut}</td><td>${x.nombre}</td><td>${x.area||''}</td>
-      <td><span class="badge badge-A">${x.activos}</span></td>
-      <td><span class="badge badge-cancel">${x.cancelados}</span></td>
-      <td>${x.faltantes}/${r.totalDias}</td>
+      <td>${x.rut}</td>
+      <td><b>${x.nombre}</b></td>
+      <td>${x.area || ''}</td>
+      <td style="font-size:0.85rem;">${x.email || ''}</td>
+      <td>${x.elegidos}/${r.totalDias}</td>
       <td>
         <div style="display:flex; align-items:center; gap:8px;">
           <div class="barra-progreso" style="flex:1;"><div class="barra-progreso-fill" style="width:${x.porcentaje}%"></div></div>
-          <span style="font-size:0.8rem; min-width:36px; text-align:right;">${x.porcentaje}%</span>
+          <span style="font-size:0.8rem; min-width:36px;">${x.porcentaje}%</span>
         </div>
       </td>
     </tr>`;
@@ -365,132 +340,65 @@ function renderPart(r) {
 
 $('btn-export-part').addEventListener('click', () => {
   if (!window._partData) return alert('Primero carga el reporte');
-  let csv = 'RUT,Nombre,Area,Elegidos,Cancelados,Decididos,Pendientes,Total_Dias,Porcentaje\n';
+  let csv = 'RUT,Nombre,Area,Email,Pedidos,Faltantes,Porcentaje\n';
   window._partData.detalle.forEach(x => {
-    csv += `${x.rut},"${x.nombre}","${x.area||''}",${x.activos},${x.cancelados},${x.decididos},${x.faltantes},${window._partData.totalDias},${x.porcentaje}\n`;
+    csv += `"${x.rut}","${x.nombre}","${x.area||''}","${x.email||''}",${x.elegidos},${x.faltantes},${x.porcentaje}\n`;
   });
-  descargarCSV(csv, `participacion_${window._partData.mes}.csv`);
+  descargarCSV(csv, `bitumix_participacion_${window._partData.mes}.csv`);
 });
 
-// =================== CANCELACIONES ===================
-$('btn-canc').addEventListener('click', async () => {
-  const mes = $('mes-canc').value;
+$('btn-cancel').addEventListener('click', async () => {
+  const mes = $('mes-cancel').value;
   if (!mes) return alert('Selecciona un mes');
-  const r = await apiCall({ accion: 'reporteDiario', admin_token: TOKEN, mes });
+  const r = await apiCall({ accion: 'reporteCancelaciones', admin_token: TOKEN, mes });
   if (!r.ok) { alert(r.error); return; }
-  renderCanc(r.resumen, mes);
+  renderCancel(r);
 });
 
-function renderCanc(resumen, mes) {
-  // Extraer todas las cancelaciones de todos los días
-  const todas = [];
-  Object.keys(resumen).sort().forEach(fecha => {
-    (resumen[fecha].detalle || []).forEach(d => {
-      if (d.estado === 'CANCELADO') {
-        todas.push({ fecha: fecha, ...d });
-      }
-    });
-  });
-
-  // Agrupar por motivo
-  const porMotivo = {};
-  todas.forEach(c => {
-    const motivoBase = c.motivo.startsWith('Otro:') ? 'Otro' : (c.motivo || 'Sin motivo');
-    porMotivo[motivoBase] = (porMotivo[motivoBase] || 0) + 1;
-  });
-
-  // Stats
-  const totalCanc = todas.length;
-  const motivos = Object.keys(porMotivo).sort((a,b)=>porMotivo[b]-porMotivo[a]);
-
-  let statsHtml = `<div class="stat-grid">
-    <div class="stat rojo"><span class="stat-num">${totalCanc}</span><span class="stat-label">Total cancelaciones</span></div>`;
-  motivos.forEach(m => {
-    statsHtml += `<div class="stat"><span class="stat-num">${porMotivo[m]}</span><span class="stat-label">${m}</span></div>`;
-  });
-  statsHtml += '</div>';
-  $('canc-stats').innerHTML = statsHtml;
-
-  if (todas.length === 0) {
-    $('canc-tabla').innerHTML = '<p>No hay cancelaciones registradas en este mes.</p>';
-    return;
-  }
-
-  let html = `
-    <h3>Detalle de cancelaciones</h3>
-    <table><thead><tr>
-      <th>Fecha</th><th>RUT</th><th>Nombre</th><th>Área</th><th>Motivo</th>
-    </tr></thead><tbody>
+function renderCancel(r) {
+  const pm = r.porMotivo;
+  $('cancel-stats').innerHTML = `
+    <div class="stat-grid">
+      <div class="stat rojo"><span class="stat-num">${r.total}</span><span class="stat-label">Total cancelaciones</span></div>
+      <div class="stat"><span class="stat-num">${pm.Viaje || 0}</span><span class="stat-label">Viaje</span></div>
+      <div class="stat"><span class="stat-num">${pm['Licencia médica'] || 0}</span><span class="stat-label">Licencia médica</span></div>
+      <div class="stat"><span class="stat-num">${pm.Permiso || 0}</span><span class="stat-label">Permiso</span></div>
+      <div class="stat gris"><span class="stat-num">${pm.Otro || 0}</span><span class="stat-label">Otro</span></div>
+    </div>
   `;
-  todas.forEach(c => {
-    html += `<tr>
-      <td>${formatFecha(c.fecha)}</td>
-      <td>${c.rut}</td>
-      <td>${c.nombre}</td>
-      <td>${c.area||''}</td>
-      <td><span class="badge badge-cancel">${c.motivo}</span></td>
-    </tr>`;
-  });
-  html += '</tbody></table>';
-  $('canc-tabla').innerHTML = html;
-  window._cancData = { todas, mes };
-}
 
-$('btn-export-canc').addEventListener('click', () => {
-  if (!window._cancData) return alert('Primero carga el reporte');
-  let csv = 'Fecha,RUT,Nombre,Area,Motivo\n';
-  window._cancData.todas.forEach(c => {
-    csv += `${c.fecha},${c.rut},"${c.nombre}","${c.area||''}","${c.motivo}"\n`;
-  });
-  descargarCSV(csv, `cancelaciones_${window._cancData.mes}.csv`);
-});
-
-// =================== POR COMENSAL ===================
-$('btn-comensal').addEventListener('click', async () => {
-  const rut = $('rut-comensal').value.trim();
-  if (!rut) return;
-  const r = await apiCall({ accion: 'reportePorComensal', admin_token: TOKEN, rut });
-  if (!r.ok) { alert(r.error); return; }
-  let html = `<h3>Histórico de ${r.rut}</h3>`;
-  if (r.historico.length === 0) {
-    html += '<p>Sin selecciones registradas.</p>';
+  let html = '<h3>Detalle de cancelaciones</h3>';
+  if (r.cancelaciones.length === 0) {
+    html += '<p style="color:#6B7280; text-align:center; padding:20px;">Sin cancelaciones este mes.</p>';
   } else {
-    const activos = r.historico.filter(h => (h.estado||'ACTIVO') === 'ACTIVO').length;
-    const cancelados = r.historico.filter(h => h.estado === 'CANCELADO').length;
-    html += `
-      <div class="stat-grid">
-        <div class="stat verde"><span class="stat-num">${activos}</span><span class="stat-label">Elegidos</span></div>
-        <div class="stat rojo"><span class="stat-num">${cancelados}</span><span class="stat-label">Cancelados</span></div>
-        <div class="stat"><span class="stat-num">${r.historico.length}</span><span class="stat-label">Total registros</span></div>
-      </div>
-      <table><thead><tr>
-        <th>Fecha</th><th>Estado</th><th>Alt.</th><th>Menú / Motivo</th><th>Registrado</th>
-      </tr></thead><tbody>
-    `;
-    r.historico.forEach(h => {
-      const estado = h.estado || 'ACTIVO';
-      const estadoTag = estado === 'CANCELADO' ?
-        '<span class="estado-tag estado-cancelado">CANCELADO</span>' :
-        '<span class="estado-tag estado-activo">ACTIVO</span>';
-      const filaClass = estado === 'CANCELADO' ? 'fila-cancelado' : '';
-      const altCol = h.alternativa ?
-        `<span class="badge badge-${h.alternativa}">${h.alternativa}</span>` : '—';
-      const detCol = estado === 'CANCELADO' ?
-        `<em>Motivo: ${h.motivo}</em>` : h.descripcion;
-      html += `<tr class="${filaClass}">
-        <td>${formatFecha(h.fecha)}</td>
-        <td>${estadoTag}</td>
-        <td>${altCol}</td>
-        <td>${detCol}</td>
-        <td style="font-size:0.8rem; color:#64748b;">${h.timestamp}</td>
+    html += `<table><thead><tr>
+      <th>Fecha</th><th>RUT</th><th>Nombre</th><th>Área</th><th>Motivo</th>
+    </tr></thead><tbody>`;
+    r.cancelaciones.forEach(x => {
+      const [y,m,d] = x.fecha.split('-');
+      html += `<tr>
+        <td><b>${d}/${m}/${y}</b></td>
+        <td>${x.rut}</td>
+        <td>${x.nombre}</td>
+        <td>${x.area || ''}</td>
+        <td><span class="badge badge-CANCELADO">${x.motivo}</span></td>
       </tr>`;
     });
     html += '</tbody></table>';
   }
-  $('comensal-tabla').innerHTML = html;
+  $('cancel-tabla').innerHTML = html;
+  window._cancelData = r;
+}
+
+$('btn-export-cancel').addEventListener('click', () => {
+  if (!window._cancelData) return alert('Primero carga el reporte');
+  let csv = 'Fecha,RUT,Nombre,Area,Motivo\n';
+  window._cancelData.cancelaciones.forEach(x => {
+    csv += `${x.fecha},"${x.rut}","${x.nombre}","${x.area||''}","${x.motivo}"\n`;
+  });
+  descargarCSV(csv, `bitumix_cancelaciones_${window._cancelData.mes}.csv`);
 });
 
-// =================== UTILS ===================
 async function apiCall(payload) {
   const r = await fetch(API_URL, {
     method: 'POST',
@@ -498,11 +406,6 @@ async function apiCall(payload) {
     body: JSON.stringify(payload)
   });
   return await r.json();
-}
-
-function formatFecha(f) {
-  const [y,m,d] = f.split('-');
-  return `${d}/${m}/${y}`;
 }
 
 function descargarCSV(contenido, nombre) {
