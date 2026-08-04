@@ -9,6 +9,7 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: #F5F5F5; color: #1A1A1A; min-height: 100vh; padding: 16px;
+    padding-bottom: 130px;
   }
   .container { max-width: 720px; margin: 0 auto; }
   .card {
@@ -20,10 +21,7 @@
   h2 { font-size: 1.15rem; margin-bottom: 12px; color: #000; }
   .subtitle { color: #333; font-size: 0.9rem; margin-bottom: 16px; }
 
-  /* Marca Bitumix con estilo Caterpillar */
-  .brand-header {
-    display: flex; align-items: center; gap: 12px;
-  }
+  .brand-header { display: flex; align-items: center; gap: 12px; }
   .brand-badge {
     background: #FFCD11; color: #000;
     width: 42px; height: 42px; border-radius: 8px;
@@ -32,18 +30,9 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   }
   .brand-textos { display: flex; flex-direction: column; }
-  .brand-name {
-    font-weight: 800; color: #000; font-size: 1.25rem;
-    letter-spacing: -0.3px; line-height: 1;
-  }
-  .brand-tag {
-    color: #333; font-weight: 600; font-size: 0.7rem;
-    text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px;
-  }
-  .divider-yellow {
-    height: 4px; background: #FFCD11; width: 60px;
-    margin: 14px 0; border-radius: 2px;
-  }
+  .brand-name { font-weight: 800; color: #000; font-size: 1.25rem; letter-spacing: -0.3px; line-height: 1; }
+  .brand-tag { color: #333; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+  .divider-yellow { height: 4px; background: #FFCD11; width: 60px; margin: 14px 0; border-radius: 2px; }
 
   label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.9rem; color: #1A1A1A; }
   input[type="text"], input[type="password"], select {
@@ -63,50 +52,37 @@
   }
   #nombre-select:disabled { background-color: #F3F4F6; cursor: wait; }
 
-  /* Botones estilo Caterpillar */
   button {
-    background: #FFCD11; color: #000; border: none; padding: 13px 20px;
-    border-radius: 8px; font-size: 1rem; font-weight: 800;
+    background: #FFCD11; color: #000; border: 2px solid #FFCD11;
+    padding: 13px 20px; border-radius: 8px; font-size: 1rem; font-weight: 800;
     cursor: pointer; width: 100%; transition: all 0.15s;
     letter-spacing: 0.3px; text-transform: uppercase;
-    border: 2px solid #FFCD11;
   }
-  button:hover:not(:disabled) {
-    background: #E6B800; border-color: #E6B800;
-  }
+  button:hover:not(:disabled) { background: #E6B800; border-color: #E6B800; }
   button:disabled { background: #E5E7EB; border-color: #E5E7EB; color: #9CA3AF; cursor: not-allowed; }
   button.btn-secundario { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
   button.btn-secundario:hover:not(:disabled) { background: #333; border-color: #333; }
   button.btn-pequeno { padding: 8px 14px; font-size: 0.75rem; width: auto; }
-  button.btn-cancelar { background: #fff; color: #DC2626; border: 2px solid #DC2626; }
-  button.btn-cancelar:hover:not(:disabled) { background: #DC2626; color: #fff; }
 
-  /* Header del mes */
   .mes-header {
     background: #1A1A1A; color: white;
     padding: 20px; border-radius: 12px; margin-bottom: 16px;
     border-left: 6px solid #FFCD11;
   }
-  .mes-header .titulo {
-    font-size: 0.75rem; color: #FFCD11; margin-bottom: 4px;
-    text-transform: uppercase; letter-spacing: 2px; font-weight: 700;
-  }
+  .mes-header .titulo { font-size: 0.75rem; color: #FFCD11; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
   .mes-header .mes { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; }
   .mes-header .subinfo { font-size: 0.85rem; margin-top: 6px; color: #CCC; }
 
-  /* Card de día */
   .dia-card {
     background: #fff; border: 1.5px solid #E5E5E5; border-radius: 10px;
     padding: 16px; margin-bottom: 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    transition: all 0.15s;
   }
-  .dia-card.cerrado { opacity: 0.6; background: #FAFAFA; }
-  .dia-card.cancelado { background: #FEF2F2; border-color: #FCA5A5; }
   .dia-card.elegido {
     border-color: #FFCD11; border-left: 6px solid #FFCD11;
     background: #FFFEF5;
   }
+  .dia-card.solo-lectura { opacity: 0.95; }
 
   .dia-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -114,10 +90,8 @@
   }
   .dia-fecha-cont { display: flex; flex-direction: column; }
   .dia-fecha { font-weight: 800; color: #1A1A1A; font-size: 1.05rem; }
-  .dia-fecha.tachado { text-decoration: line-through; color: #6B7280; }
   .dia-nombre { color: #4A4A4A; font-size: 0.85rem; font-weight: 600; }
 
-  /* Opciones */
   .opcion {
     display: flex; align-items: flex-start; padding: 12px;
     border: 2px solid #E5E7EB; border-radius: 8px; margin-bottom: 10px;
@@ -149,46 +123,23 @@
   .opcion-HIPO { background: #E8F5E8; color: #166534; border: 1px solid #86EFAC; }
   .opcion-desc { font-size: 0.95rem; color: #1A1A1A; line-height: 1.4; font-weight: 500; }
 
-  /* Info elegido */
-  .elegido-info {
-    padding: 10px 12px; background: #FFFEF5; border-left: 4px solid #FFCD11;
-    border-radius: 4px; font-size: 0.9rem; color: #1A1A1A; margin-bottom: 8px;
-  }
-
-  /* Info cancelado */
-  .cancelado-info {
-    padding: 10px 12px; background: #FEF2F2; border-left: 4px solid #DC2626;
-    border-radius: 4px; font-size: 0.9rem; color: #991B1B;
-  }
-
-  .botones-dia {
-    display: flex; gap: 8px; margin-top: 10px;
-  }
-  .botones-dia button {
-    flex: 1; padding: 10px; font-size: 0.75rem;
-  }
-
-  /* Mensajes */
   .mensaje { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem; white-space: pre-line; font-weight: 500; }
   .error { background: #FEE2E2; color: #991B1B; border-left: 4px solid #DC2626; }
   .ok { background: #E8F5E8; color: #166534; border-left: 4px solid #16A34A; }
   .info { background: #FFFEF5; color: #1A1A1A; border-left: 4px solid #FFCD11; }
-  .warn { background: #FEF3C7; color: #92400E; border-left: 4px solid #F59E0B; }
 
-  /* Resumen (contadores) */
   .resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
   .resumen-item {
     padding: 14px 8px; background: #FAFAFA; border-radius: 8px; text-align: center;
     border: 1px solid #E5E5E5;
   }
-  .resumen-item .num { font-size: 1.6rem; font-weight: 800; display: block; }
+  .resumen-item .num { font-size: 1.6rem; font-weight: 800; display: block; color: #000; }
   .resumen-item .label { font-size: 0.65rem; color: #4A4A4A; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-  .resumen-item.elegidos { border-top: 3px solid #16A34A; }
-  .resumen-item.elegidos .num { color: #16A34A; }
-  .resumen-item.cancelados { border-top: 3px solid #DC2626; }
-  .resumen-item.cancelados .num { color: #DC2626; }
-  .resumen-item.pendientes { border-top: 3px solid #FFCD11; }
-  .resumen-item.pendientes .num { color: #B8940D; }
+  .resumen-item.menu { border-top: 3px solid #FFCD11; }
+  .resumen-item.hipo { border-top: 3px solid #16A34A; }
+  .resumen-item.hipo .num { color: #166534; }
+  .resumen-item.pendientes { border-top: 3px solid #4A4A4A; }
+  .resumen-item.pendientes .num { color: #6B7280; }
 
   .header-bar {
     display: flex; justify-content: space-between; align-items: center;
@@ -205,33 +156,82 @@
 
   .hidden { display: none !important; }
 
-  .badge-cerrado {
-    display: inline-block; font-size: 0.65rem; padding: 2px 8px;
-    background: #1A1A1A; color: #fff; border-radius: 4px;
-    font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+  /* Banner de "ya enviaste" */
+  .banner-enviado {
+    background: linear-gradient(135deg, #1A1A1A 0%, #333 100%);
+    color: white; padding: 20px; border-radius: 12px; margin-bottom: 16px;
+    border-left: 6px solid #FFCD11;
+  }
+  .banner-enviado .check-badge {
+    display: inline-block; background: #16A34A; color: #fff;
+    width: 40px; height: 40px; border-radius: 50%; text-align: center;
+    line-height: 40px; font-size: 20px; font-weight: 900;
+    margin-right: 12px; vertical-align: middle;
+  }
+  .banner-enviado .titulo-badge {
+    font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px;
+    display: inline-block; vertical-align: middle;
+  }
+  .banner-enviado .sub-badge {
+    font-size: 0.85rem; margin-top: 10px; color: #CCC; line-height: 1.5;
+  }
+  .banner-enviado .contacto {
+    margin-top: 12px; padding: 10px 12px; background: rgba(255,205,17,0.15);
+    border-radius: 6px; border-left: 3px solid #FFCD11;
+    font-size: 0.85rem;
+  }
+  .banner-enviado .contacto strong { color: #FFCD11; }
+
+  /* Barra fija de envío */
+  .barra-envio {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #FFCD11;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    padding: 14px 16px; z-index: 100;
+  }
+  .barra-envio-cont {
+    max-width: 720px; margin: 0 auto;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .progreso-cont { flex: 1; min-width: 0; }
+  .progreso-texto {
+    font-size: 0.85rem; color: #1A1A1A; margin-bottom: 4px; font-weight: 700;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .progreso-sub {
+    font-size: 0.7rem; color: #6B7280; font-weight: 600;
+  }
+  .btn-enviar {
+    width: auto; padding: 14px 26px; font-size: 0.9rem;
+    white-space: nowrap; min-width: 160px;
   }
 
-  /* Modal cancelación */
+  .credito-shgestion {
+    text-align: center; padding: 16px 0; color: #6B7280; font-size: 0.75rem;
+  }
+  .credito-shgestion strong { color: #1A1A1A; }
+
+  /* Modal de confirmación */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6);
     display: flex; align-items: center; justify-content: center;
     z-index: 1000; padding: 16px;
   }
   .modal {
-    background: #fff; border-radius: 12px; padding: 24px;
+    background: #fff; border-radius: 12px; padding: 28px;
     max-width: 480px; width: 100%;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    border-top: 6px solid #DC2626;
+    border-top: 6px solid #FFCD11;
   }
-  .modal h3 { color: #1A1A1A; margin-bottom: 8px; font-size: 1.2rem; font-weight: 800; }
-  .modal p { color: #4A4A4A; margin-bottom: 16px; font-size: 0.9rem; }
-  .modal-botones { display: flex; gap: 10px; margin-top: 16px; }
+  .modal h3 { color: #000; margin-bottom: 12px; font-size: 1.3rem; font-weight: 800; }
+  .modal p { color: #333; margin-bottom: 8px; font-size: 0.95rem; line-height: 1.5; }
+  .modal .info-box {
+    background: #FFFEF5; border-left: 4px solid #FFCD11;
+    padding: 12px 14px; border-radius: 6px; margin: 14px 0;
+    font-size: 0.85rem; color: #333;
+  }
+  .modal-botones { display: flex; gap: 10px; margin-top: 20px; }
   .modal-botones button { flex: 1; }
-
-  .credito-shgestion {
-    text-align: center; padding: 16px 0; color: #6B7280; font-size: 0.75rem;
-  }
-  .credito-shgestion strong { color: #1A1A1A; }
 </style>
 </head>
 <body>
@@ -277,6 +277,7 @@
         <button class="btn-secundario btn-pequeno" id="btn-logout">Salir</button>
       </div>
       <div id="msg-app"></div>
+      <div id="banner-enviado-cont"></div>
       <div id="mes-header"></div>
       <div id="resumen-cont"></div>
     </div>
@@ -290,21 +291,30 @@
 
 </div>
 
-<!-- Modal cancelación -->
-<div id="modal-cancelar" class="modal-overlay hidden">
+<!-- Barra fija de envío -->
+<div id="barra-envio" class="barra-envio hidden">
+  <div class="barra-envio-cont">
+    <div class="progreso-cont">
+      <div class="progreso-texto" id="progreso-texto">0 días seleccionados</div>
+      <div class="progreso-sub" id="progreso-sub">Puedes enviar cuando quieras</div>
+    </div>
+    <button class="btn-enviar" id="btn-enviar">Enviar pedido</button>
+  </div>
+</div>
+
+<!-- Modal de confirmación de envío -->
+<div id="modal-confirmar" class="modal-overlay hidden" style="display:none;">
   <div class="modal">
-    <h3>¿Cancelar tu menú?</h3>
-    <p id="modal-cancelar-info">Estás a punto de cancelar tu pedido del <b>[fecha]</b>. Selecciona el motivo:</p>
-    <label>Motivo de cancelación</label>
-    <select id="motivo-cancelacion">
-      <option value="Viaje">Viaje</option>
-      <option value="Licencia médica">Licencia médica</option>
-      <option value="Permiso">Permiso</option>
-      <option value="Otro">Otro</option>
-    </select>
+    <h3>¿Confirmas envío del pedido?</h3>
+    <p>Estás a punto de enviar tu selección de menús para <b id="modal-mes"></b>.</p>
+    <div class="info-box">
+      <p style="margin:0;"><b>Total de días seleccionados:</b> <span id="modal-total-dias"></span></p>
+      <p style="margin:6px 0 0 0;"><b>Días sin selección:</b> No se te asignará comida esos días.</p>
+    </div>
+    <p style="font-size:0.85rem; color:#666;">⚠️ Una vez enviado, no podrás modificar tu pedido. Las excepciones se canalizan directamente con SH Gestión.</p>
     <div class="modal-botones">
-      <button class="btn-secundario" id="btn-modal-volver">Volver</button>
-      <button class="btn-cancelar" id="btn-modal-confirmar">Confirmar cancelación</button>
+      <button class="btn-secundario" id="btn-modal-volver">Volver a editar</button>
+      <button id="btn-modal-confirmar">Confirmar envío</button>
     </div>
   </div>
 </div>
@@ -314,8 +324,9 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzjbdUoHmtMx7uLA_UA1N9G
 
 let usuarioActual = null;
 let menusCache = [];
-let seleccionesCache = {};
-let fechaACancelar = null;
+let seleccionesLocales = {};  // lo que el usuario está eligiendo (memoria)
+let seleccionesGuardadas = {};  // lo que hay en el server (después de enviar)
+let yaEnvio = false;
 
 const $ = (id) => document.getElementById(id);
 
@@ -390,6 +401,7 @@ $('btn-logout').addEventListener('click', () => {
   usuarioActual = null;
   $('pantalla-app').classList.add('hidden');
   $('pantalla-login').classList.remove('hidden');
+  $('barra-envio').classList.add('hidden');
   $('pin').value = '';
   const select = $('nombre-select');
   if (select.options.length > 0) select.selectedIndex = 0;
@@ -422,13 +434,25 @@ async function cargarTodo() {
   try {
     mostrarMsg('msg-app', 'Cargando menús...', 'info');
     const mesActual = new Date().toISOString().substring(0, 7);
-    const [rMenus, rSel] = await Promise.all([
+    const [rMenus, rSel, rEstado] = await Promise.all([
       apiCall({ accion: 'getMenus', mes: mesActual }),
-      apiCall({ accion: 'getSelecciones', rut: usuarioActual.rut })
+      apiCall({ accion: 'getSelecciones', rut: usuarioActual.rut }),
+      apiCall({ accion: 'getEstadoEnvio', rut: usuarioActual.rut, mes: mesActual })
     ]);
 
     menusCache = rMenus.ok ? (rMenus.dias || []) : [];
-    seleccionesCache = (rSel && rSel.ok) ? (rSel.selecciones || {}) : {};
+    seleccionesGuardadas = (rSel && rSel.ok) ? (rSel.selecciones || {}) : {};
+    yaEnvio = (rEstado && rEstado.ok) ? !!rEstado.enviado : false;
+
+    // Si ya envió, las selecciones locales = guardadas
+    if (yaEnvio) {
+      seleccionesLocales = {};
+      for (const fecha in seleccionesGuardadas) {
+        seleccionesLocales[fecha] = { ...seleccionesGuardadas[fecha] };
+      }
+    } else {
+      seleccionesLocales = {};
+    }
 
     render();
     limpiarMsg('msg-app');
@@ -438,9 +462,33 @@ async function cargarTodo() {
 }
 
 function render() {
+  renderBannerEnviado();
   renderMesHeader();
   renderResumen();
   renderDias();
+  renderBarraEnvio();
+}
+
+function renderBannerEnviado() {
+  const cont = $('banner-enviado-cont');
+  if (yaEnvio) {
+    cont.innerHTML = `
+      <div class="banner-enviado">
+        <div>
+          <span class="check-badge">✓</span>
+          <span class="titulo-badge">Pedido enviado</span>
+        </div>
+        <div class="sub-badge">
+          Tu selección está registrada. Puedes ver el detalle de tu pedido a continuación.
+        </div>
+        <div class="contacto">
+          <strong>¿Necesitas cambiar algo?</strong> Contacta directamente a SH Gestión: <strong>msothers@shgestion.cl</strong>
+        </div>
+      </div>
+    `;
+  } else {
+    cont.innerHTML = '';
+  }
 }
 
 function renderMesHeader() {
@@ -452,9 +500,19 @@ function renderMesHeader() {
     <div class="mes-header">
       <div class="titulo">Menús del mes</div>
       <div class="mes">${nombreMes} ${anio}</div>
-      <div class="subinfo">Puedes cambiar o cancelar hasta 24 horas antes de cada día.</div>
+      <div class="subinfo">${yaEnvio ? 'Pedido cerrado. Solo lectura.' : 'Elige tus opciones y presiona "Enviar pedido" cuando termines.'}</div>
     </div>
   `;
+}
+
+function contarSelecciones() {
+  let menu = 0, hipo = 0;
+  for (const f in seleccionesLocales) {
+    const s = seleccionesLocales[f];
+    if (s && s.alternativa === 'MENU') menu++;
+    else if (s && s.alternativa === 'HIPO') hipo++;
+  }
+  return { menu, hipo, total: menu + hipo, pendientes: menusCache.length - (menu + hipo) };
 }
 
 function renderResumen() {
@@ -462,36 +520,23 @@ function renderResumen() {
     $('resumen-cont').innerHTML = '';
     return;
   }
-  let elegidos = 0, cancelados = 0, pendientes = 0;
-  menusCache.forEach(d => {
-    const sel = seleccionesCache[d.fecha];
-    if (!sel) pendientes++;
-    else if (sel.estado === 'CANCELADO') cancelados++;
-    else elegidos++;
-  });
+  const c = contarSelecciones();
   $('resumen-cont').innerHTML = `
     <div class="resumen">
-      <div class="resumen-item elegidos">
-        <span class="num">${elegidos}</span>
-        <span class="label">Elegidos</span>
+      <div class="resumen-item menu">
+        <span class="num">${c.menu}</span>
+        <span class="label">Menús</span>
       </div>
-      <div class="resumen-item cancelados">
-        <span class="num">${cancelados}</span>
-        <span class="label">Cancelados</span>
+      <div class="resumen-item hipo">
+        <span class="num">${c.hipo}</span>
+        <span class="label">Hipocalóricos</span>
       </div>
       <div class="resumen-item pendientes">
-        <span class="num">${pendientes}</span>
-        <span class="label">Pendientes</span>
+        <span class="num">${c.pendientes}</span>
+        <span class="label">${yaEnvio ? 'Sin comida' : 'Pendientes'}</span>
       </div>
     </div>
   `;
-}
-
-function puedeModificar(fechaStr) {
-  const [y,m,d] = fechaStr.split('-').map(Number);
-  const fechaComida = new Date(y, m-1, d, 12, 0, 0);
-  const limite = new Date(fechaComida.getTime() - 24 * 60 * 60 * 1000);
-  return new Date() < limite;
 }
 
 function renderDias() {
@@ -510,74 +555,25 @@ function renderDias() {
   }
 
   menusCache.forEach(dia => {
-    const seleccion = seleccionesCache[dia.fecha];
-    const cerrado = !puedeModificar(dia.fecha);
-    const estado = seleccion ? seleccion.estado : null;
+    const seleccion = seleccionesLocales[dia.fecha];
+    const bloqueado = yaEnvio;
 
     const card = document.createElement('div');
     let claseExtra = '';
-    if (estado === 'CANCELADO') claseExtra = 'cancelado';
-    else if (estado === 'ACTIVO') claseExtra = 'elegido';
-    if (cerrado) claseExtra += ' cerrado';
+    if (seleccion) claseExtra = 'elegido';
+    if (bloqueado) claseExtra += ' solo-lectura';
     card.className = 'card dia-card ' + claseExtra;
-
-    let badgeCerrado = cerrado ? '<span class="badge-cerrado">cerrado</span>' : '';
 
     card.innerHTML = `
       <div class="dia-header">
         <div class="dia-fecha-cont">
-          <span class="dia-fecha ${estado === 'CANCELADO' ? 'tachado' : ''}">${formatFecha(dia.fecha)}</span>
-          <span class="dia-nombre">${dia.diaSemana} ${badgeCerrado}</span>
+          <span class="dia-fecha">${formatFecha(dia.fecha)}</span>
+          <span class="dia-nombre">${dia.diaSemana}</span>
         </div>
       </div>
       <div class="contenido-dia"></div>
     `;
     const contDia = card.querySelector('.contenido-dia');
-
-    if (estado === 'CANCELADO') {
-      contDia.innerHTML = `
-        <div class="cancelado-info">
-          <b>❌ Cancelado</b> — Motivo: ${seleccion.motivo || 'Sin motivo'}
-        </div>
-      `;
-      cont.appendChild(card);
-      return;
-    }
-
-    if (estado === 'ACTIVO' && !cerrado) {
-      const label = seleccion.alternativa === 'MENU' ? 'Menú' : 'Hipocalórico';
-      contDia.innerHTML = `
-        <div class="elegido-info">
-          <span class="opcion-tag opcion-${seleccion.alternativa}">${label}</span><br>
-          <b>${seleccion.descripcion}</b>
-        </div>
-        <div class="botones-dia">
-          <button class="btn-secundario btn-cambiar">Cambiar</button>
-          <button class="btn-cancelar btn-cancelar-dia">Cancelar pedido</button>
-        </div>
-      `;
-      card.querySelector('.btn-cambiar').addEventListener('click', () => {
-        seleccionesCache[dia.fecha] = null;
-        render();
-      });
-      card.querySelector('.btn-cancelar-dia').addEventListener('click', () => {
-        abrirModalCancelar(dia.fecha);
-      });
-      cont.appendChild(card);
-      return;
-    }
-
-    if (estado === 'ACTIVO' && cerrado) {
-      const label = seleccion.alternativa === 'MENU' ? 'Menú' : 'Hipocalórico';
-      contDia.innerHTML = `
-        <div class="elegido-info">
-          <span class="opcion-tag opcion-${seleccion.alternativa}">${label}</span><br>
-          <b>${seleccion.descripcion}</b>
-        </div>
-      `;
-      cont.appendChild(card);
-      return;
-    }
 
     const opciones = [
       { codigo: 'MENU', label: 'Menú', descripcion: dia.menu_principal },
@@ -586,8 +582,13 @@ function renderDias() {
 
     opciones.forEach(opt => {
       if (!opt.descripcion) return;
+      const esSel = seleccion && seleccion.alternativa === opt.codigo;
+
+      // En modo bloqueado, solo mostrar la que está seleccionada
+      if (bloqueado && !esSel) return;
+
       const div = document.createElement('div');
-      div.className = 'opcion' + (cerrado ? ' bloqueado' : '');
+      div.className = 'opcion' + (esSel ? ' seleccionada' : '') + (bloqueado ? ' bloqueado' : '');
       div.innerHTML = `
         <div class="opcion-radio"></div>
         <div class="opcion-info">
@@ -595,86 +596,117 @@ function renderDias() {
           <div class="opcion-desc">${opt.descripcion}</div>
         </div>
       `;
-      if (!cerrado) {
-        div.addEventListener('click', () => elegir(dia.fecha, opt));
+      if (!bloqueado) {
+        div.addEventListener('click', () => elegirLocal(dia.fecha, opt));
       }
       contDia.appendChild(div);
     });
+
+    // Si no hay ninguna opción visible (bloqueado y sin selección)
+    if (bloqueado && !seleccion) {
+      contDia.innerHTML = '<div style="padding: 12px; color: #6B7280; font-style: italic; font-size: 0.9rem;">Sin selección — no se asignó comida este día</div>';
+    }
 
     cont.appendChild(card);
   });
 }
 
-async function elegir(fecha, opt) {
-  try {
-    mostrarMsg('msg-app', 'Guardando...', 'info');
-    const r = await apiCall({
-      accion: 'guardarSeleccion',
-      rut: usuarioActual.rut,
-      fecha: fecha,
+function renderBarraEnvio() {
+  const barra = $('barra-envio');
+
+  // Ocultar barra si ya envió
+  if (yaEnvio || menusCache.length === 0) {
+    barra.classList.add('hidden');
+    return;
+  }
+
+  barra.classList.remove('hidden');
+  const c = contarSelecciones();
+  $('progreso-texto').textContent = `${c.total} de ${menusCache.length} días seleccionados`;
+  $('progreso-sub').textContent = c.total === 0 ?
+    'Aún no has elegido ningún día' :
+    (c.pendientes > 0 ? `${c.pendientes} días quedarán sin comida` : 'Todos los días con selección');
+}
+
+function elegirLocal(fecha, opt) {
+  // Toggle: si vuelve a hacer clic en la misma, la deselecciona
+  const actual = seleccionesLocales[fecha];
+  if (actual && actual.alternativa === opt.codigo) {
+    delete seleccionesLocales[fecha];
+  } else {
+    seleccionesLocales[fecha] = {
       alternativa: opt.codigo,
       descripcion: opt.descripcion
-    });
-    if (!r.ok) { mostrarMsg('msg-app', r.error || 'Error al guardar', 'error'); return; }
-    seleccionesCache[fecha] = {
-      alternativa: opt.codigo,
-      descripcion: opt.descripcion,
-      estado: 'ACTIVO',
-      motivo: ''
     };
-    render();
-    mostrarMsg('msg-app', `✓ ${formatFecha(fecha)}: ${opt.label}`, 'ok');
-    setTimeout(() => limpiarMsg('msg-app'), 2500);
-  } catch (e) {
-    mostrarMsg('msg-app', 'Error: ' + e.message, 'error');
   }
+  render();
 }
 
-function abrirModalCancelar(fecha) {
-  fechaACancelar = fecha;
-  $('modal-cancelar-info').innerHTML = `Estás a punto de cancelar tu pedido del <b>${formatFecha(fecha)}</b>. Selecciona el motivo:`;
-  $('motivo-cancelacion').value = 'Viaje';
-  $('modal-cancelar').classList.remove('hidden');
-}
+// =================== ENVIAR PEDIDO ===================
+
+$('btn-enviar').addEventListener('click', () => {
+  const c = contarSelecciones();
+  const mesActual = new Date();
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  $('modal-mes').textContent = `${meses[mesActual.getMonth()]} ${mesActual.getFullYear()}`;
+  $('modal-total-dias').textContent = c.total + (c.total === 1 ? ' día' : ' días');
+  $('modal-confirmar').classList.remove('hidden');
+  $('modal-confirmar').style.display = 'flex';
+});
 
 $('btn-modal-volver').addEventListener('click', () => {
-  $('modal-cancelar').classList.add('hidden');
-  fechaACancelar = null;
+  $('modal-confirmar').classList.add('hidden');
+  $('modal-confirmar').style.display = 'none';
 });
 
 $('btn-modal-confirmar').addEventListener('click', async () => {
-  const motivo = $('motivo-cancelacion').value;
-  if (!fechaACancelar) return;
   const btn = $('btn-modal-confirmar');
   btn.disabled = true;
   btn.innerHTML = '<span class="loader"></span>';
   try {
+    const selecciones = [];
+    for (const fecha in seleccionesLocales) {
+      const s = seleccionesLocales[fecha];
+      selecciones.push({
+        fecha: fecha,
+        alternativa: s.alternativa,
+        descripcion: s.descripcion
+      });
+    }
+
+    const mesActual = new Date().toISOString().substring(0, 7);
     const r = await apiCall({
-      accion: 'cancelarSeleccion',
+      accion: 'enviarPedidoMensual',
       rut: usuarioActual.rut,
-      fecha: fechaACancelar,
-      motivo: motivo
+      mes: mesActual,
+      selecciones: selecciones
     });
+
     if (!r.ok) {
-      mostrarMsg('msg-app', r.error || 'Error al cancelar', 'error');
+      mostrarMsg('msg-app', r.error || 'Error al enviar', 'error');
+      $('modal-confirmar').classList.add('hidden');
+      $('modal-confirmar').style.display = 'none';
       return;
     }
-    seleccionesCache[fechaACancelar] = {
-      alternativa: '',
-      descripcion: '',
-      estado: 'CANCELADO',
-      motivo: motivo
-    };
-    $('modal-cancelar').classList.add('hidden');
+
+    // Éxito: bloquear la app
+    yaEnvio = true;
+    seleccionesGuardadas = { ...seleccionesLocales };
+    $('modal-confirmar').classList.add('hidden');
+    $('modal-confirmar').style.display = 'none';
     render();
-    mostrarMsg('msg-app', `✓ Cancelación registrada para el ${formatFecha(fechaACancelar)}`, 'ok');
-    setTimeout(() => limpiarMsg('msg-app'), 3000);
-    fechaACancelar = null;
+
+    const msgEmail = r.emailEnviado ?
+      `✓ Pedido enviado y confirmación enviada a ${r.email}` :
+      `✓ Pedido enviado (no se pudo enviar email de confirmación)`;
+    mostrarMsg('msg-app', msgEmail, 'ok');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => limpiarMsg('msg-app'), 6000);
   } catch (e) {
     mostrarMsg('msg-app', 'Error: ' + e.message, 'error');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Confirmar cancelación';
+    btn.textContent = 'Confirmar envío';
   }
 });
 
