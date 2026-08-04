@@ -82,7 +82,11 @@
     border-color: #FFCD11; border-left: 6px solid #FFCD11;
     background: #FFFEF5;
   }
-  .dia-card.solo-lectura { opacity: 0.95; }
+  .dia-card.enviado {
+    background: #FAFAFA;
+    border-left: 6px solid #16A34A;
+    opacity: 0.95;
+  }
 
   .dia-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -102,7 +106,7 @@
     border-color: #FFCD11; background: #FFFEF5;
     box-shadow: 0 0 0 3px rgba(255,205,17,0.25);
   }
-  .opcion.bloqueado { cursor: default; opacity: 0.85; }
+  .opcion.bloqueado { cursor: default; opacity: 0.9; }
   .opcion-radio {
     width: 22px; height: 22px; border: 2px solid #D1D5DB; border-radius: 50%;
     margin-right: 12px; flex-shrink: 0; position: relative; margin-top: 2px;
@@ -135,11 +139,12 @@
   }
   .resumen-item .num { font-size: 1.6rem; font-weight: 800; display: block; color: #000; }
   .resumen-item .label { font-size: 0.65rem; color: #4A4A4A; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-  .resumen-item.menu { border-top: 3px solid #FFCD11; }
-  .resumen-item.hipo { border-top: 3px solid #16A34A; }
-  .resumen-item.hipo .num { color: #166534; }
-  .resumen-item.pendientes { border-top: 3px solid #4A4A4A; }
-  .resumen-item.pendientes .num { color: #6B7280; }
+  .resumen-item.enviados { border-top: 3px solid #16A34A; }
+  .resumen-item.enviados .num { color: #16A34A; }
+  .resumen-item.pendientes { border-top: 3px solid #FFCD11; }
+  .resumen-item.pendientes .num { color: #B8940D; }
+  .resumen-item.nuevos { border-top: 3px solid #4A4A4A; }
+  .resumen-item.nuevos .num { color: #4A4A4A; }
 
   .header-bar {
     display: flex; justify-content: space-between; align-items: center;
@@ -156,31 +161,13 @@
 
   .hidden { display: none !important; }
 
-  /* Banner de "ya enviaste" */
-  .banner-enviado {
-    background: linear-gradient(135deg, #1A1A1A 0%, #333 100%);
-    color: white; padding: 20px; border-radius: 12px; margin-bottom: 16px;
-    border-left: 6px solid #FFCD11;
-  }
-  .banner-enviado .check-badge {
+  /* Badge "enviado" en cards */
+  .badge-enviado {
     display: inline-block; background: #16A34A; color: #fff;
-    width: 40px; height: 40px; border-radius: 50%; text-align: center;
-    line-height: 40px; font-size: 20px; font-weight: 900;
-    margin-right: 12px; vertical-align: middle;
+    padding: 2px 8px; border-radius: 4px; font-size: 0.65rem;
+    font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+    margin-left: 8px;
   }
-  .banner-enviado .titulo-badge {
-    font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px;
-    display: inline-block; vertical-align: middle;
-  }
-  .banner-enviado .sub-badge {
-    font-size: 0.85rem; margin-top: 10px; color: #CCC; line-height: 1.5;
-  }
-  .banner-enviado .contacto {
-    margin-top: 12px; padding: 10px 12px; background: rgba(255,205,17,0.15);
-    border-radius: 6px; border-left: 3px solid #FFCD11;
-    font-size: 0.85rem;
-  }
-  .banner-enviado .contacto strong { color: #FFCD11; }
 
   /* Barra fija de envío */
   .barra-envio {
@@ -232,6 +219,20 @@
   }
   .modal-botones { display: flex; gap: 10px; margin-top: 20px; }
   .modal-botones button { flex: 1; }
+
+  /* Aviso de "todos enviados" */
+  .aviso-completo {
+    background: #F0FDF4; border: 1px solid #16A34A;
+    padding: 16px; border-radius: 10px; margin-bottom: 16px;
+    text-align: center;
+  }
+  .aviso-completo .check {
+    display: inline-block; background: #16A34A; color: #fff;
+    width: 32px; height: 32px; border-radius: 50%; line-height: 32px;
+    font-weight: 900; font-size: 16px; margin-bottom: 8px;
+  }
+  .aviso-completo .titulo { color: #166534; font-weight: 800; font-size: 1rem; }
+  .aviso-completo .sub { color: #166534; font-size: 0.85rem; margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -277,8 +278,8 @@
         <button class="btn-secundario btn-pequeno" id="btn-logout">Salir</button>
       </div>
       <div id="msg-app"></div>
-      <div id="banner-enviado-cont"></div>
       <div id="mes-header"></div>
+      <div id="aviso-cont"></div>
       <div id="resumen-cont"></div>
     </div>
 
@@ -302,16 +303,16 @@
   </div>
 </div>
 
-<!-- Modal de confirmación de envío -->
+<!-- Modal de confirmación -->
 <div id="modal-confirmar" class="modal-overlay hidden" style="display:none;">
   <div class="modal">
     <h3>¿Confirmas envío del pedido?</h3>
     <p>Estás a punto de enviar tu selección de menús para <b id="modal-mes"></b>.</p>
     <div class="info-box">
-      <p style="margin:0;"><b>Total de días seleccionados:</b> <span id="modal-total-dias"></span></p>
+      <p style="margin:0;"><b>Total de días en este envío:</b> <span id="modal-total-dias"></span></p>
       <p style="margin:6px 0 0 0;"><b>Días sin selección:</b> No se te asignará comida esos días.</p>
     </div>
-    <p style="font-size:0.85rem; color:#666;">⚠️ Una vez enviado, no podrás modificar tu pedido. Las excepciones se canalizan directamente con SH Gestión.</p>
+    <p style="font-size:0.85rem; color:#666;">⚠️ Una vez enviado, estos días quedarán bloqueados. Las excepciones se canalizan directamente con SH Gestión.</p>
     <div class="modal-botones">
       <button class="btn-secundario" id="btn-modal-volver">Volver a editar</button>
       <button id="btn-modal-confirmar">Confirmar envío</button>
@@ -324,9 +325,10 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzjbdUoHmtMx7uLA_UA1N9G
 
 let usuarioActual = null;
 let menusCache = [];
-let seleccionesLocales = {};  // lo que el usuario está eligiendo (memoria)
-let seleccionesGuardadas = {};  // lo que hay en el server (después de enviar)
-let yaEnvio = false;
+let seleccionesGuardadas = {};  // lo que ya envió (viene del server)
+let seleccionesLocales = {};    // lo que está eligiendo en modo edición (memoria)
+let fechasEnviadas = new Set(); // set de fechas ya bloqueadas
+let vecesEnviado = 0;
 
 const $ = (id) => document.getElementById(id);
 
@@ -442,17 +444,14 @@ async function cargarTodo() {
 
     menusCache = rMenus.ok ? (rMenus.dias || []) : [];
     seleccionesGuardadas = (rSel && rSel.ok) ? (rSel.selecciones || {}) : {};
-    yaEnvio = (rEstado && rEstado.ok) ? !!rEstado.enviado : false;
 
-    // Si ya envió, las selecciones locales = guardadas
-    if (yaEnvio) {
-      seleccionesLocales = {};
-      for (const fecha in seleccionesGuardadas) {
-        seleccionesLocales[fecha] = { ...seleccionesGuardadas[fecha] };
-      }
-    } else {
-      seleccionesLocales = {};
+    fechasEnviadas = new Set();
+    if (rEstado && rEstado.ok && rEstado.fechasEnviadas) {
+      rEstado.fechasEnviadas.forEach(f => fechasEnviadas.add(f));
     }
+    vecesEnviado = (rEstado && rEstado.ok) ? (rEstado.vecesEnviado || 0) : 0;
+
+    seleccionesLocales = {};
 
     render();
     limpiarMsg('msg-app');
@@ -462,33 +461,11 @@ async function cargarTodo() {
 }
 
 function render() {
-  renderBannerEnviado();
   renderMesHeader();
+  renderAvisoCompleto();
   renderResumen();
   renderDias();
   renderBarraEnvio();
-}
-
-function renderBannerEnviado() {
-  const cont = $('banner-enviado-cont');
-  if (yaEnvio) {
-    cont.innerHTML = `
-      <div class="banner-enviado">
-        <div>
-          <span class="check-badge">✓</span>
-          <span class="titulo-badge">Pedido enviado</span>
-        </div>
-        <div class="sub-badge">
-          Tu selección está registrada. Puedes ver el detalle de tu pedido a continuación.
-        </div>
-        <div class="contacto">
-          <strong>¿Necesitas cambiar algo?</strong> Contacta directamente a SH Gestión: <strong>msothers@shgestion.cl</strong>
-        </div>
-      </div>
-    `;
-  } else {
-    cont.innerHTML = '';
-  }
 }
 
 function renderMesHeader() {
@@ -496,23 +473,50 @@ function renderMesHeader() {
   const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const nombreMes = meses[mesActual.getMonth()];
   const anio = mesActual.getFullYear();
+
+  let subInfo = 'Elige tus opciones y presiona "Enviar pedido" cuando termines.';
+  if (menusCache.length > 0 && diasNuevosDisponibles().length === 0 && fechasEnviadas.size > 0) {
+    subInfo = 'Todos los días publicados ya fueron enviados.';
+  } else if (fechasEnviadas.size > 0) {
+    subInfo = `Tienes ${fechasEnviadas.size} día${fechasEnviadas.size === 1 ? '' : 's'} enviados. Elige los nuevos y envía cuando quieras.`;
+  }
+
   $('mes-header').innerHTML = `
     <div class="mes-header">
       <div class="titulo">Menús del mes</div>
       <div class="mes">${nombreMes} ${anio}</div>
-      <div class="subinfo">${yaEnvio ? 'Pedido cerrado. Solo lectura.' : 'Elige tus opciones y presiona "Enviar pedido" cuando termines.'}</div>
+      <div class="subinfo">${subInfo}</div>
     </div>
   `;
 }
 
-function contarSelecciones() {
-  let menu = 0, hipo = 0;
-  for (const f in seleccionesLocales) {
-    const s = seleccionesLocales[f];
-    if (s && s.alternativa === 'MENU') menu++;
-    else if (s && s.alternativa === 'HIPO') hipo++;
+function diasNuevosDisponibles() {
+  // Días del mes que NO están enviados aún
+  return menusCache.filter(d => !fechasEnviadas.has(d.fecha));
+}
+
+function renderAvisoCompleto() {
+  const cont = $('aviso-cont');
+  const nuevos = diasNuevosDisponibles();
+  if (menusCache.length > 0 && nuevos.length === 0 && fechasEnviadas.size > 0) {
+    cont.innerHTML = `
+      <div class="aviso-completo">
+        <div class="check">✓</div>
+        <div class="titulo">Todo al día</div>
+        <div class="sub">Ya enviaste tus selecciones para todos los días publicados este mes. Vuelve a revisar cuando se publiquen nuevos días.</div>
+      </div>
+    `;
+  } else {
+    cont.innerHTML = '';
   }
-  return { menu, hipo, total: menu + hipo, pendientes: menusCache.length - (menu + hipo) };
+}
+
+function contarLocales() {
+  let count = 0;
+  for (const f in seleccionesLocales) {
+    if (seleccionesLocales[f]) count++;
+  }
+  return count;
 }
 
 function renderResumen() {
@@ -520,20 +524,23 @@ function renderResumen() {
     $('resumen-cont').innerHTML = '';
     return;
   }
-  const c = contarSelecciones();
+  const enviados = fechasEnviadas.size;
+  const nuevos = diasNuevosDisponibles().length;
+  const enSeleccion = contarLocales();
+
   $('resumen-cont').innerHTML = `
     <div class="resumen">
-      <div class="resumen-item menu">
-        <span class="num">${c.menu}</span>
-        <span class="label">Menús</span>
-      </div>
-      <div class="resumen-item hipo">
-        <span class="num">${c.hipo}</span>
-        <span class="label">Hipocalóricos</span>
+      <div class="resumen-item enviados">
+        <span class="num">${enviados}</span>
+        <span class="label">Enviados</span>
       </div>
       <div class="resumen-item pendientes">
-        <span class="num">${c.pendientes}</span>
-        <span class="label">${yaEnvio ? 'Sin comida' : 'Pendientes'}</span>
+        <span class="num">${enSeleccion}</span>
+        <span class="label">Por enviar</span>
+      </div>
+      <div class="resumen-item nuevos">
+        <span class="num">${nuevos - enSeleccion}</span>
+        <span class="label">Sin elegir</span>
       </div>
     </div>
   `;
@@ -555,26 +562,47 @@ function renderDias() {
   }
 
   menusCache.forEach(dia => {
-    const seleccion = seleccionesLocales[dia.fecha];
-    const bloqueado = yaEnvio;
+    const yaEnviado = fechasEnviadas.has(dia.fecha);
+    const seleccionGuardada = seleccionesGuardadas[dia.fecha];
+    const seleccionLocal = seleccionesLocales[dia.fecha];
 
     const card = document.createElement('div');
     let claseExtra = '';
-    if (seleccion) claseExtra = 'elegido';
-    if (bloqueado) claseExtra += ' solo-lectura';
+    if (yaEnviado) claseExtra = 'enviado';
+    else if (seleccionLocal) claseExtra = 'elegido';
     card.className = 'card dia-card ' + claseExtra;
+
+    const badgeEnviado = yaEnviado ? '<span class="badge-enviado">Enviado</span>' : '';
 
     card.innerHTML = `
       <div class="dia-header">
         <div class="dia-fecha-cont">
           <span class="dia-fecha">${formatFecha(dia.fecha)}</span>
-          <span class="dia-nombre">${dia.diaSemana}</span>
+          <span class="dia-nombre">${dia.diaSemana} ${badgeEnviado}</span>
         </div>
       </div>
       <div class="contenido-dia"></div>
     `;
     const contDia = card.querySelector('.contenido-dia');
 
+    // Si ya fue enviado → mostrar solo la opción elegida
+    if (yaEnviado && seleccionGuardada) {
+      const alt = seleccionGuardada.alternativa;
+      const label = alt === 'MENU' ? 'Menú' : 'Hipocalórico';
+      contDia.innerHTML = `
+        <div class="opcion seleccionada bloqueado">
+          <div class="opcion-radio"></div>
+          <div class="opcion-info">
+            <span class="opcion-tag opcion-${alt}">${label}</span>
+            <div class="opcion-desc">${seleccionGuardada.descripcion}</div>
+          </div>
+        </div>
+      `;
+      cont.appendChild(card);
+      return;
+    }
+
+    // Modo edición: mostrar ambas opciones
     const opciones = [
       { codigo: 'MENU', label: 'Menú', descripcion: dia.menu_principal },
       { codigo: 'HIPO', label: 'Hipocalórico', descripcion: dia.hipocalorico }
@@ -582,13 +610,9 @@ function renderDias() {
 
     opciones.forEach(opt => {
       if (!opt.descripcion) return;
-      const esSel = seleccion && seleccion.alternativa === opt.codigo;
-
-      // En modo bloqueado, solo mostrar la que está seleccionada
-      if (bloqueado && !esSel) return;
-
+      const esSel = seleccionLocal && seleccionLocal.alternativa === opt.codigo;
       const div = document.createElement('div');
-      div.className = 'opcion' + (esSel ? ' seleccionada' : '') + (bloqueado ? ' bloqueado' : '');
+      div.className = 'opcion' + (esSel ? ' seleccionada' : '');
       div.innerHTML = `
         <div class="opcion-radio"></div>
         <div class="opcion-info">
@@ -596,16 +620,9 @@ function renderDias() {
           <div class="opcion-desc">${opt.descripcion}</div>
         </div>
       `;
-      if (!bloqueado) {
-        div.addEventListener('click', () => elegirLocal(dia.fecha, opt));
-      }
+      div.addEventListener('click', () => elegirLocal(dia.fecha, opt));
       contDia.appendChild(div);
     });
-
-    // Si no hay ninguna opción visible (bloqueado y sin selección)
-    if (bloqueado && !seleccion) {
-      contDia.innerHTML = '<div style="padding: 12px; color: #6B7280; font-style: italic; font-size: 0.9rem;">Sin selección — no se asignó comida este día</div>';
-    }
 
     cont.appendChild(card);
   });
@@ -613,23 +630,32 @@ function renderDias() {
 
 function renderBarraEnvio() {
   const barra = $('barra-envio');
+  const nuevos = diasNuevosDisponibles();
 
-  // Ocultar barra si ya envió
-  if (yaEnvio || menusCache.length === 0) {
+  // Ocultar barra si no hay días nuevos disponibles
+  if (menusCache.length === 0 || nuevos.length === 0) {
     barra.classList.add('hidden');
     return;
   }
 
   barra.classList.remove('hidden');
-  const c = contarSelecciones();
-  $('progreso-texto').textContent = `${c.total} de ${menusCache.length} días seleccionados`;
-  $('progreso-sub').textContent = c.total === 0 ?
-    'Aún no has elegido ningún día' :
-    (c.pendientes > 0 ? `${c.pendientes} días quedarán sin comida` : 'Todos los días con selección');
+  const seleccionados = contarLocales();
+  const sinElegir = nuevos.length - seleccionados;
+
+  $('progreso-texto').textContent = `${seleccionados} de ${nuevos.length} días seleccionados`;
+  if (seleccionados === 0) {
+    $('progreso-sub').textContent = 'Elige al menos un día para enviar';
+  } else if (sinElegir > 0) {
+    $('progreso-sub').textContent = `${sinElegir} día${sinElegir === 1 ? '' : 's'} quedará${sinElegir === 1 ? '' : 'n'} sin comida`;
+  } else {
+    $('progreso-sub').textContent = 'Todos los días con selección';
+  }
+
+  $('btn-enviar').disabled = seleccionados === 0;
 }
 
 function elegirLocal(fecha, opt) {
-  // Toggle: si vuelve a hacer clic en la misma, la deselecciona
+  // Toggle
   const actual = seleccionesLocales[fecha];
   if (actual && actual.alternativa === opt.codigo) {
     delete seleccionesLocales[fecha];
@@ -645,11 +671,13 @@ function elegirLocal(fecha, opt) {
 // =================== ENVIAR PEDIDO ===================
 
 $('btn-enviar').addEventListener('click', () => {
-  const c = contarSelecciones();
+  const seleccionados = contarLocales();
+  if (seleccionados === 0) return;
+
   const mesActual = new Date();
   const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   $('modal-mes').textContent = `${meses[mesActual.getMonth()]} ${mesActual.getFullYear()}`;
-  $('modal-total-dias').textContent = c.total + (c.total === 1 ? ' día' : ' días');
+  $('modal-total-dias').textContent = seleccionados + (seleccionados === 1 ? ' día' : ' días');
   $('modal-confirmar').classList.remove('hidden');
   $('modal-confirmar').style.display = 'flex';
 });
@@ -689,16 +717,15 @@ $('btn-modal-confirmar').addEventListener('click', async () => {
       return;
     }
 
-    // Éxito: bloquear la app
-    yaEnvio = true;
-    seleccionesGuardadas = { ...seleccionesLocales };
     $('modal-confirmar').classList.add('hidden');
     $('modal-confirmar').style.display = 'none';
-    render();
+
+    // Recargar todo desde el server para sincronizar
+    await cargarTodo();
 
     const msgEmail = r.emailEnviado ?
-      `✓ Pedido enviado y confirmación enviada a ${r.email}` :
-      `✓ Pedido enviado (no se pudo enviar email de confirmación)`;
+      `✓ Pedido enviado. Confirmación enviada a ${r.email}` :
+      `✓ Pedido enviado (sin email de confirmación)`;
     mostrarMsg('msg-app', msgEmail, 'ok');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => limpiarMsg('msg-app'), 6000);
