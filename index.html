@@ -78,9 +78,17 @@
     padding: 16px; margin-bottom: 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
-  .dia-card.elegido {
+  .dia-card.elegido-menu {
     border-color: #FFCD11; border-left: 6px solid #FFCD11;
     background: #FFFEF5;
+  }
+  .dia-card.elegido-hipo {
+    border-color: #16A34A; border-left: 6px solid #16A34A;
+    background: #F0FDF4;
+  }
+  .dia-card.elegido-ausente {
+    border-color: #6B7280; border-left: 6px solid #6B7280;
+    background: #FAFAFA; opacity: 0.85;
   }
   .dia-card.enviado {
     background: #FAFAFA;
@@ -102,9 +110,17 @@
     cursor: pointer; transition: all 0.15s; background: #FAFAFA;
   }
   .opcion:hover:not(.bloqueado) { border-color: #FFCD11; background: #FFFEF5; }
-  .opcion.seleccionada {
+  .opcion.seleccionada.tipo-menu {
     border-color: #FFCD11; background: #FFFEF5;
     box-shadow: 0 0 0 3px rgba(255,205,17,0.25);
+  }
+  .opcion.seleccionada.tipo-hipo {
+    border-color: #16A34A; background: #F0FDF4;
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.15);
+  }
+  .opcion.seleccionada.tipo-ausente {
+    border-color: #6B7280; background: #FAFAFA;
+    box-shadow: 0 0 0 3px rgba(107,114,128,0.15);
   }
   .opcion.bloqueado { cursor: default; opacity: 0.9; }
   .opcion-radio {
@@ -112,10 +128,20 @@
     margin-right: 12px; flex-shrink: 0; position: relative; margin-top: 2px;
     background: #fff;
   }
-  .opcion.seleccionada .opcion-radio { border-color: #000; background: #FFCD11; }
-  .opcion.seleccionada .opcion-radio::after {
+  .opcion.seleccionada.tipo-menu .opcion-radio { border-color: #000; background: #FFCD11; }
+  .opcion.seleccionada.tipo-menu .opcion-radio::after {
     content: ''; position: absolute; top: 4px; left: 4px;
     width: 10px; height: 10px; background: #000; border-radius: 50%;
+  }
+  .opcion.seleccionada.tipo-hipo .opcion-radio { border-color: #166534; background: #16A34A; }
+  .opcion.seleccionada.tipo-hipo .opcion-radio::after {
+    content: ''; position: absolute; top: 4px; left: 4px;
+    width: 10px; height: 10px; background: #fff; border-radius: 50%;
+  }
+  .opcion.seleccionada.tipo-ausente .opcion-radio { border-color: #4A4A4A; background: #6B7280; }
+  .opcion.seleccionada.tipo-ausente .opcion-radio::after {
+    content: ''; position: absolute; top: 4px; left: 4px;
+    width: 10px; height: 10px; background: #fff; border-radius: 50%;
   }
   .opcion-info { flex: 1; }
   .opcion-tag {
@@ -125,26 +151,30 @@
   }
   .opcion-MENU { background: #FFCD11; color: #000; }
   .opcion-HIPO { background: #E8F5E8; color: #166534; border: 1px solid #86EFAC; }
+  .opcion-AUSENTE { background: #E5E5E5; color: #4A4A4A; }
   .opcion-desc { font-size: 0.95rem; color: #1A1A1A; line-height: 1.4; font-weight: 500; }
+  .opcion-desc-ausente { font-size: 0.85rem; color: #6B7280; font-style: italic; }
 
   .mensaje { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem; white-space: pre-line; font-weight: 500; }
   .error { background: #FEE2E2; color: #991B1B; border-left: 4px solid #DC2626; }
   .ok { background: #E8F5E8; color: #166534; border-left: 4px solid #16A34A; }
   .info { background: #FFFEF5; color: #1A1A1A; border-left: 4px solid #FFCD11; }
 
-  .resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+  .resumen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
   .resumen-item {
-    padding: 14px 8px; background: #FAFAFA; border-radius: 8px; text-align: center;
+    padding: 12px 4px; background: #FAFAFA; border-radius: 8px; text-align: center;
     border: 1px solid #E5E5E5;
   }
-  .resumen-item .num { font-size: 1.6rem; font-weight: 800; display: block; color: #000; }
-  .resumen-item .label { font-size: 0.65rem; color: #4A4A4A; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+  .resumen-item .num { font-size: 1.4rem; font-weight: 800; display: block; color: #000; }
+  .resumen-item .label { font-size: 0.6rem; color: #4A4A4A; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-top: 2px; }
   .resumen-item.enviados { border-top: 3px solid #16A34A; }
   .resumen-item.enviados .num { color: #16A34A; }
-  .resumen-item.pendientes { border-top: 3px solid #FFCD11; }
-  .resumen-item.pendientes .num { color: #B8940D; }
-  .resumen-item.nuevos { border-top: 3px solid #4A4A4A; }
-  .resumen-item.nuevos .num { color: #4A4A4A; }
+  .resumen-item.menu { border-top: 3px solid #FFCD11; }
+  .resumen-item.menu .num { color: #B8940D; }
+  .resumen-item.hipo { border-top: 3px solid #16A34A; }
+  .resumen-item.hipo .num { color: #166534; }
+  .resumen-item.ausencias { border-top: 3px solid #6B7280; }
+  .resumen-item.ausencias .num { color: #6B7280; }
 
   .header-bar {
     display: flex; justify-content: space-between; align-items: center;
@@ -161,7 +191,6 @@
 
   .hidden { display: none !important; }
 
-  /* Badge "enviado" en cards */
   .badge-enviado {
     display: inline-block; background: #16A34A; color: #fff;
     padding: 2px 8px; border-radius: 4px; font-size: 0.65rem;
@@ -169,7 +198,6 @@
     margin-left: 8px;
   }
 
-  /* Barra fija de envío */
   .barra-envio {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: #fff; border-top: 2px solid #FFCD11;
@@ -188,6 +216,8 @@
   .progreso-sub {
     font-size: 0.7rem; color: #6B7280; font-weight: 600;
   }
+  .progreso-sub.falta { color: #B45309; }
+  .progreso-sub.completo { color: #166534; }
   .btn-enviar {
     width: auto; padding: 14px 26px; font-size: 0.9rem;
     white-space: nowrap; min-width: 160px;
@@ -198,7 +228,6 @@
   }
   .credito-shgestion strong { color: #1A1A1A; }
 
-  /* Modal de confirmación */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6);
     display: flex; align-items: center; justify-content: center;
@@ -217,10 +246,10 @@
     padding: 12px 14px; border-radius: 6px; margin: 14px 0;
     font-size: 0.85rem; color: #333;
   }
+  .modal .info-box p { margin: 4px 0; }
   .modal-botones { display: flex; gap: 10px; margin-top: 20px; }
   .modal-botones button { flex: 1; }
 
-  /* Aviso de "todos enviados" */
   .aviso-completo {
     background: #F0FDF4; border: 1px solid #16A34A;
     padding: 16px; border-radius: 10px; margin-bottom: 16px;
@@ -297,9 +326,9 @@
   <div class="barra-envio-cont">
     <div class="progreso-cont">
       <div class="progreso-texto" id="progreso-texto">0 días seleccionados</div>
-      <div class="progreso-sub" id="progreso-sub">Puedes enviar cuando quieras</div>
+      <div class="progreso-sub" id="progreso-sub">Debes elegir todos los días para poder enviar</div>
     </div>
-    <button class="btn-enviar" id="btn-enviar">Enviar pedido</button>
+    <button class="btn-enviar" id="btn-enviar" disabled>Enviar pedido</button>
   </div>
 </div>
 
@@ -309,8 +338,9 @@
     <h3>¿Confirmas envío del pedido?</h3>
     <p>Estás a punto de enviar tu selección de menús para <b id="modal-mes"></b>.</p>
     <div class="info-box">
-      <p style="margin:0;"><b>Total de días en este envío:</b> <span id="modal-total-dias"></span></p>
-      <p style="margin:6px 0 0 0;"><b>Días sin selección:</b> No se te asignará comida esos días.</p>
+      <p><b>Días con Menú:</b> <span id="modal-menu"></span></p>
+      <p><b>Días con Hipocalórico:</b> <span id="modal-hipo"></span></p>
+      <p><b>Días sin comida (No estaré):</b> <span id="modal-ausente"></span></p>
     </div>
     <p style="font-size:0.85rem; color:#666;">⚠️ Una vez enviado, estos días quedarán bloqueados. Las excepciones se canalizan directamente con el Contacto administrativo.</p>
     <div class="modal-botones">
@@ -325,9 +355,9 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzjbdUoHmtMx7uLA_UA1N9G
 
 let usuarioActual = null;
 let menusCache = [];
-let seleccionesGuardadas = {};  // lo que ya envió (viene del server)
-let seleccionesLocales = {};    // lo que está eligiendo en modo edición (memoria)
-let fechasEnviadas = new Set(); // set de fechas ya bloqueadas
+let seleccionesGuardadas = {};
+let seleccionesLocales = {};
+let fechasEnviadas = new Set();
 let vecesEnviado = 0;
 
 const $ = (id) => document.getElementById(id);
@@ -474,11 +504,11 @@ function renderMesHeader() {
   const nombreMes = meses[mesActual.getMonth()];
   const anio = mesActual.getFullYear();
 
-  let subInfo = 'Elige tus opciones y presiona "Enviar pedido" cuando termines.';
+  let subInfo = 'Elige una opción por cada día y envía cuando termines.';
   if (menusCache.length > 0 && diasNuevosDisponibles().length === 0 && fechasEnviadas.size > 0) {
     subInfo = 'Todos los días publicados ya fueron enviados.';
   } else if (fechasEnviadas.size > 0) {
-    subInfo = `Tienes ${fechasEnviadas.size} día${fechasEnviadas.size === 1 ? '' : 's'} enviados. Elige los nuevos y envía cuando quieras.`;
+    subInfo = `Tienes ${fechasEnviadas.size} día${fechasEnviadas.size === 1 ? '' : 's'} enviados. Completa los nuevos para enviar.`;
   }
 
   $('mes-header').innerHTML = `
@@ -491,7 +521,6 @@ function renderMesHeader() {
 }
 
 function diasNuevosDisponibles() {
-  // Días del mes que NO están enviados aún
   return menusCache.filter(d => !fechasEnviadas.has(d.fecha));
 }
 
@@ -511,6 +540,27 @@ function renderAvisoCompleto() {
   }
 }
 
+function contarPorTipo() {
+  let menu = 0, hipo = 0, ausente = 0;
+  // Contar guardados (enviados)
+  let menuG = 0, hipoG = 0, ausenteG = 0;
+  for (const f in seleccionesGuardadas) {
+    if (!fechasEnviadas.has(f)) continue;
+    const s = seleccionesGuardadas[f];
+    if (s.alternativa === 'MENU') menuG++;
+    else if (s.alternativa === 'HIPO') hipoG++;
+    else if (s.alternativa === 'AUSENTE') ausenteG++;
+  }
+  // Contar locales (por enviar)
+  for (const f in seleccionesLocales) {
+    const s = seleccionesLocales[f];
+    if (s.alternativa === 'MENU') menu++;
+    else if (s.alternativa === 'HIPO') hipo++;
+    else if (s.alternativa === 'AUSENTE') ausente++;
+  }
+  return { menu, hipo, ausente, menuG, hipoG, ausenteG };
+}
+
 function contarLocales() {
   let count = 0;
   for (const f in seleccionesLocales) {
@@ -524,9 +574,8 @@ function renderResumen() {
     $('resumen-cont').innerHTML = '';
     return;
   }
+  const c = contarPorTipo();
   const enviados = fechasEnviadas.size;
-  const nuevos = diasNuevosDisponibles().length;
-  const enSeleccion = contarLocales();
 
   $('resumen-cont').innerHTML = `
     <div class="resumen">
@@ -534,13 +583,17 @@ function renderResumen() {
         <span class="num">${enviados}</span>
         <span class="label">Enviados</span>
       </div>
-      <div class="resumen-item pendientes">
-        <span class="num">${enSeleccion}</span>
-        <span class="label">Por enviar</span>
+      <div class="resumen-item menu">
+        <span class="num">${c.menu + c.menuG}</span>
+        <span class="label">Menús</span>
       </div>
-      <div class="resumen-item nuevos">
-        <span class="num">${nuevos - enSeleccion}</span>
-        <span class="label">Sin elegir</span>
+      <div class="resumen-item hipo">
+        <span class="num">${c.hipo + c.hipoG}</span>
+        <span class="label">Hipo</span>
+      </div>
+      <div class="resumen-item ausencias">
+        <span class="num">${c.ausente + c.ausenteG}</span>
+        <span class="label">Ausencias</span>
       </div>
     </div>
   `;
@@ -569,7 +622,11 @@ function renderDias() {
     const card = document.createElement('div');
     let claseExtra = '';
     if (yaEnviado) claseExtra = 'enviado';
-    else if (seleccionLocal) claseExtra = 'elegido';
+    else if (seleccionLocal) {
+      if (seleccionLocal.alternativa === 'MENU') claseExtra = 'elegido-menu';
+      else if (seleccionLocal.alternativa === 'HIPO') claseExtra = 'elegido-hipo';
+      else if (seleccionLocal.alternativa === 'AUSENTE') claseExtra = 'elegido-ausente';
+    }
     card.className = 'card dia-card ' + claseExtra;
 
     const badgeEnviado = yaEnviado ? '<span class="badge-enviado">Enviado</span>' : '';
@@ -588,13 +645,24 @@ function renderDias() {
     // Si ya fue enviado → mostrar solo la opción elegida
     if (yaEnviado && seleccionGuardada) {
       const alt = seleccionGuardada.alternativa;
-      const label = alt === 'MENU' ? 'Menú' : 'Hipocalórico';
+      let label = 'Menú';
+      let descHtml = '';
+      let tipoClase = 'tipo-menu';
+      if (alt === 'HIPO') { label = 'Hipocalórico'; tipoClase = 'tipo-hipo'; }
+      else if (alt === 'AUSENTE') { label = 'No estaré'; tipoClase = 'tipo-ausente'; }
+
+      if (alt === 'AUSENTE') {
+        descHtml = '<div class="opcion-desc-ausente">No consumirá comida este día</div>';
+      } else {
+        descHtml = `<div class="opcion-desc">${seleccionGuardada.descripcion}</div>`;
+      }
+
       contDia.innerHTML = `
-        <div class="opcion seleccionada bloqueado">
+        <div class="opcion seleccionada ${tipoClase} bloqueado">
           <div class="opcion-radio"></div>
           <div class="opcion-info">
             <span class="opcion-tag opcion-${alt}">${label}</span>
-            <div class="opcion-desc">${seleccionGuardada.descripcion}</div>
+            ${descHtml}
           </div>
         </div>
       `;
@@ -602,22 +670,24 @@ function renderDias() {
       return;
     }
 
-    // Modo edición: mostrar ambas opciones
+    // Modo edición: mostrar las 3 opciones
     const opciones = [
-      { codigo: 'MENU', label: 'Menú', descripcion: dia.menu_principal },
-      { codigo: 'HIPO', label: 'Hipocalórico', descripcion: dia.hipocalorico }
+      { codigo: 'MENU', label: 'Menú', descripcion: dia.menu_principal, tipoClase: 'tipo-menu' },
+      { codigo: 'HIPO', label: 'Hipocalórico', descripcion: dia.hipocalorico, tipoClase: 'tipo-hipo' },
+      { codigo: 'AUSENTE', label: 'No estaré', descripcion: 'No consumiré comida este día', tipoClase: 'tipo-ausente', esAusente: true }
     ];
 
     opciones.forEach(opt => {
-      if (!opt.descripcion) return;
+      if (!opt.esAusente && !opt.descripcion) return;
       const esSel = seleccionLocal && seleccionLocal.alternativa === opt.codigo;
       const div = document.createElement('div');
-      div.className = 'opcion' + (esSel ? ' seleccionada' : '');
+      div.className = 'opcion' + (esSel ? ' seleccionada ' + opt.tipoClase : '');
+      const descClass = opt.esAusente ? 'opcion-desc-ausente' : 'opcion-desc';
       div.innerHTML = `
         <div class="opcion-radio"></div>
         <div class="opcion-info">
           <span class="opcion-tag opcion-${opt.codigo}">${opt.label}</span>
-          <div class="opcion-desc">${opt.descripcion}</div>
+          <div class="${descClass}">${opt.descripcion}</div>
         </div>
       `;
       div.addEventListener('click', () => elegirLocal(dia.fecha, opt));
@@ -632,7 +702,6 @@ function renderBarraEnvio() {
   const barra = $('barra-envio');
   const nuevos = diasNuevosDisponibles();
 
-  // Ocultar barra si no hay días nuevos disponibles
   if (menusCache.length === 0 || nuevos.length === 0) {
     barra.classList.add('hidden');
     return;
@@ -640,22 +709,28 @@ function renderBarraEnvio() {
 
   barra.classList.remove('hidden');
   const seleccionados = contarLocales();
-  const sinElegir = nuevos.length - seleccionados;
+  const total = nuevos.length;
+  const faltan = total - seleccionados;
 
-  $('progreso-texto').textContent = `${seleccionados} de ${nuevos.length} días seleccionados`;
+  $('progreso-texto').textContent = `${seleccionados} de ${total} días seleccionados`;
+
+  const sub = $('progreso-sub');
+  sub.classList.remove('falta', 'completo');
   if (seleccionados === 0) {
-    $('progreso-sub').textContent = 'Elige al menos un día para enviar';
-  } else if (sinElegir > 0) {
-    $('progreso-sub').textContent = `${sinElegir} día${sinElegir === 1 ? '' : 's'} quedará${sinElegir === 1 ? '' : 'n'} sin comida`;
+    sub.textContent = 'Elige una opción por cada día para enviar';
+  } else if (faltan > 0) {
+    sub.textContent = `Faltan ${faltan} día${faltan === 1 ? '' : 's'} por elegir`;
+    sub.classList.add('falta');
   } else {
-    $('progreso-sub').textContent = 'Todos los días con selección';
+    sub.textContent = '✓ Todos los días completos, ya puedes enviar';
+    sub.classList.add('completo');
   }
 
-  $('btn-enviar').disabled = seleccionados === 0;
+  // Botón habilitado SOLO si están TODOS
+  $('btn-enviar').disabled = faltan > 0;
 }
 
 function elegirLocal(fecha, opt) {
-  // Toggle
   const actual = seleccionesLocales[fecha];
   if (actual && actual.alternativa === opt.codigo) {
     delete seleccionesLocales[fecha];
@@ -671,13 +746,25 @@ function elegirLocal(fecha, opt) {
 // =================== ENVIAR PEDIDO ===================
 
 $('btn-enviar').addEventListener('click', () => {
+  const nuevos = diasNuevosDisponibles();
   const seleccionados = contarLocales();
-  if (seleccionados === 0) return;
+  if (seleccionados < nuevos.length) return;
+
+  // Contar por tipo (solo locales, o sea del envío actual)
+  let menu = 0, hipo = 0, ausente = 0;
+  for (const f in seleccionesLocales) {
+    const s = seleccionesLocales[f];
+    if (s.alternativa === 'MENU') menu++;
+    else if (s.alternativa === 'HIPO') hipo++;
+    else if (s.alternativa === 'AUSENTE') ausente++;
+  }
 
   const mesActual = new Date();
   const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   $('modal-mes').textContent = `${meses[mesActual.getMonth()]} ${mesActual.getFullYear()}`;
-  $('modal-total-dias').textContent = seleccionados + (seleccionados === 1 ? ' día' : ' días');
+  $('modal-menu').textContent = menu;
+  $('modal-hipo').textContent = hipo;
+  $('modal-ausente').textContent = ausente;
   $('modal-confirmar').classList.remove('hidden');
   $('modal-confirmar').style.display = 'flex';
 });
@@ -720,7 +807,6 @@ $('btn-modal-confirmar').addEventListener('click', async () => {
     $('modal-confirmar').classList.add('hidden');
     $('modal-confirmar').style.display = 'none';
 
-    // Recargar todo desde el server para sincronizar
     await cargarTodo();
 
     const msgEmail = r.emailEnviado ?
