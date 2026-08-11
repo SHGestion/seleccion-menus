@@ -35,14 +35,14 @@
   .divider-yellow { height: 4px; background: #FFCD11; width: 60px; margin: 14px 0; border-radius: 2px; }
 
   label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.9rem; color: #1A1A1A; }
-  input[type="text"], input[type="password"], select {
+  input[type="text"], input[type="password"], input[type="number"], select {
     width: 100%; padding: 12px; border: 1.5px solid #D1D5DB;
     border-radius: 8px; font-size: 1rem; margin-bottom: 14px; background: #fff;
     font-family: inherit;
   }
   input:focus, select:focus { outline: none; border-color: #000; box-shadow: 0 0 0 3px rgba(255,205,17,0.3); }
 
-  #nombre-select {
+  #nombre-select, .select-equipo {
     appearance: none; -webkit-appearance: none; -moz-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -78,23 +78,11 @@
     padding: 16px; margin-bottom: 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
-  .dia-card.elegido-menu {
-    border-color: #FFCD11; border-left: 6px solid #FFCD11;
-    background: #FFFEF5;
-  }
-  .dia-card.elegido-hipo {
-    border-color: #16A34A; border-left: 6px solid #16A34A;
-    background: #F0FDF4;
-  }
-  .dia-card.elegido-ausente {
-    border-color: #6B7280; border-left: 6px solid #6B7280;
-    background: #FAFAFA; opacity: 0.85;
-  }
-  .dia-card.enviado {
-    background: #FAFAFA;
-    border-left: 6px solid #16A34A;
-    opacity: 0.95;
-  }
+  .dia-card.elegido-menu { border-color: #FFCD11; border-left: 6px solid #FFCD11; background: #FFFEF5; }
+  .dia-card.elegido-hipo { border-color: #16A34A; border-left: 6px solid #16A34A; background: #F0FDF4; }
+  .dia-card.elegido-ausente { border-color: #6B7280; border-left: 6px solid #6B7280; background: #FAFAFA; opacity: 0.85; }
+  .dia-card.enviado { background: #FAFAFA; border-left: 6px solid #16A34A; opacity: 0.95; }
+  .dia-card.cerrado { background: #FAFAFA; border-left: 6px solid #D1D5DB; opacity: 0.75; }
 
   .dia-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -110,23 +98,13 @@
     cursor: pointer; transition: all 0.15s; background: #FAFAFA;
   }
   .opcion:hover:not(.bloqueado) { border-color: #FFCD11; background: #FFFEF5; }
-  .opcion.seleccionada.tipo-menu {
-    border-color: #FFCD11; background: #FFFEF5;
-    box-shadow: 0 0 0 3px rgba(255,205,17,0.25);
-  }
-  .opcion.seleccionada.tipo-hipo {
-    border-color: #16A34A; background: #F0FDF4;
-    box-shadow: 0 0 0 3px rgba(22,163,74,0.15);
-  }
-  .opcion.seleccionada.tipo-ausente {
-    border-color: #6B7280; background: #FAFAFA;
-    box-shadow: 0 0 0 3px rgba(107,114,128,0.15);
-  }
+  .opcion.seleccionada.tipo-menu { border-color: #FFCD11; background: #FFFEF5; box-shadow: 0 0 0 3px rgba(255,205,17,0.25); }
+  .opcion.seleccionada.tipo-hipo { border-color: #16A34A; background: #F0FDF4; box-shadow: 0 0 0 3px rgba(22,163,74,0.15); }
+  .opcion.seleccionada.tipo-ausente { border-color: #6B7280; background: #FAFAFA; box-shadow: 0 0 0 3px rgba(107,114,128,0.15); }
   .opcion.bloqueado { cursor: default; opacity: 0.9; }
   .opcion-radio {
     width: 22px; height: 22px; border: 2px solid #D1D5DB; border-radius: 50%;
-    margin-right: 12px; flex-shrink: 0; position: relative; margin-top: 2px;
-    background: #fff;
+    margin-right: 12px; flex-shrink: 0; position: relative; margin-top: 2px; background: #fff;
   }
   .opcion.seleccionada.tipo-menu .opcion-radio { border-color: #000; background: #FFCD11; }
   .opcion.seleccionada.tipo-menu .opcion-radio::after {
@@ -161,10 +139,7 @@
   .info { background: #FFFEF5; color: #1A1A1A; border-left: 4px solid #FFCD11; }
 
   .resumen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px; }
-  .resumen-item {
-    padding: 12px 4px; background: #FAFAFA; border-radius: 8px; text-align: center;
-    border: 1px solid #E5E5E5;
-  }
+  .resumen-item { padding: 12px 4px; background: #FAFAFA; border-radius: 8px; text-align: center; border: 1px solid #E5E5E5; }
   .resumen-item .num { font-size: 1.4rem; font-weight: 800; display: block; color: #000; }
   .resumen-item .label { font-size: 0.6rem; color: #4A4A4A; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-top: 2px; }
   .resumen-item.enviados { border-top: 3px solid #16A34A; }
@@ -194,8 +169,17 @@
   .badge-enviado {
     display: inline-block; background: #16A34A; color: #fff;
     padding: 2px 8px; border-radius: 4px; font-size: 0.65rem;
+    font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-left: 8px;
+  }
+  .badge-cerrado {
+    display: inline-block; background: #9CA3AF; color: #fff;
+    padding: 2px 8px; border-radius: 4px; font-size: 0.65rem;
+    font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-left: 8px;
+  }
+  .badge-supervisor {
+    display: inline-block; background: #1A1A1A; color: #FFCD11;
+    padding: 2px 8px; border-radius: 4px; font-size: 0.6rem;
     font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-    margin-left: 8px;
   }
 
   .barra-envio {
@@ -204,28 +188,15 @@
     box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
     padding: 14px 16px; z-index: 100;
   }
-  .barra-envio-cont {
-    max-width: 720px; margin: 0 auto;
-    display: flex; gap: 12px; align-items: center;
-  }
+  .barra-envio-cont { max-width: 720px; margin: 0 auto; display: flex; gap: 12px; align-items: center; }
   .progreso-cont { flex: 1; min-width: 0; }
-  .progreso-texto {
-    font-size: 0.85rem; color: #1A1A1A; margin-bottom: 4px; font-weight: 700;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .progreso-sub {
-    font-size: 0.7rem; color: #6B7280; font-weight: 600;
-  }
+  .progreso-texto { font-size: 0.85rem; color: #1A1A1A; margin-bottom: 4px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .progreso-sub { font-size: 0.7rem; color: #6B7280; font-weight: 600; }
   .progreso-sub.falta { color: #B45309; }
   .progreso-sub.completo { color: #166534; }
-  .btn-enviar {
-    width: auto; padding: 14px 26px; font-size: 0.9rem;
-    white-space: nowrap; min-width: 160px;
-  }
+  .btn-enviar { width: auto; padding: 14px 26px; font-size: 0.9rem; white-space: nowrap; min-width: 160px; }
 
-  .credito-shgestion {
-    text-align: center; padding: 16px 0; color: #6B7280; font-size: 0.75rem;
-  }
+  .credito-shgestion { text-align: center; padding: 16px 0; color: #6B7280; font-size: 0.75rem; }
   .credito-shgestion strong { color: #1A1A1A; }
 
   .modal-overlay {
@@ -235,9 +206,8 @@
   }
   .modal {
     background: #fff; border-radius: 12px; padding: 28px;
-    max-width: 480px; width: 100%;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    border-top: 6px solid #FFCD11;
+    max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-top: 6px solid #FFCD11;
   }
   .modal h3 { color: #000; margin-bottom: 12px; font-size: 1.3rem; font-weight: 800; }
   .modal p { color: #333; margin-bottom: 8px; font-size: 0.95rem; line-height: 1.5; }
@@ -252,8 +222,7 @@
 
   .aviso-completo {
     background: #F0FDF4; border: 1px solid #16A34A;
-    padding: 16px; border-radius: 10px; margin-bottom: 16px;
-    text-align: center;
+    padding: 16px; border-radius: 10px; margin-bottom: 16px; text-align: center;
   }
   .aviso-completo .check {
     display: inline-block; background: #16A34A; color: #fff;
@@ -262,6 +231,67 @@
   }
   .aviso-completo .titulo { color: #166534; font-weight: 800; font-size: 1rem; }
   .aviso-completo .sub { color: #166534; font-size: 0.85rem; margin-top: 4px; }
+
+  /* ---- Pestañas de supervisor ---- */
+  .tabs-sup {
+    display: flex; gap: 4px; margin-bottom: 16px;
+    border-bottom: 2px solid #E5E7EB; flex-wrap: wrap;
+  }
+  .tab-sup {
+    padding: 12px 16px; cursor: pointer; border-bottom: 3px solid transparent;
+    color: #4A4A4A; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.3px; font-size: 0.8rem; margin-bottom: -2px;
+  }
+  .tab-sup.activo { color: #000; border-bottom-color: #FFCD11; }
+
+  .fila-equipo {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px; border: 1.5px solid #E5E5E5; border-radius: 10px;
+    margin-bottom: 10px; background: #fff; gap: 12px;
+  }
+  .fila-equipo.pendiente { border-left: 5px solid #DC2626; }
+  .fila-equipo.al-dia { border-left: 5px solid #16A34A; }
+  .fila-equipo .nombre { font-weight: 800; font-size: 0.95rem; }
+  .fila-equipo .detalle { font-size: 0.78rem; color: #6B7280; margin-top: 2px; }
+
+  .adic-dia {
+    border: 1.5px solid #E5E5E5; border-radius: 10px;
+    padding: 14px; margin-bottom: 10px; background: #fff;
+  }
+  .adic-dia.con-cantidad { border-color: #FFCD11; background: #FFFEF5; }
+  .adic-fecha { font-weight: 800; font-size: 0.95rem; margin-bottom: 2px; }
+  .adic-corte { font-size: 0.72rem; color: #6B7280; margin-bottom: 10px; }
+  .adic-controles { display: flex; gap: 14px; flex-wrap: wrap; }
+  .adic-grupo { display: flex; align-items: center; gap: 8px; }
+  .adic-label {
+    font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.5px; min-width: 44px;
+  }
+  .adic-label.menu { color: #B8940D; }
+  .adic-label.hipo { color: #166534; }
+  .contador { display: flex; align-items: center; gap: 6px; }
+  .contador button {
+    width: 34px; height: 34px; padding: 0; font-size: 1.1rem;
+    border-radius: 8px; min-width: 34px; line-height: 1;
+  }
+  .contador .valor {
+    min-width: 30px; text-align: center; font-weight: 800; font-size: 1rem;
+  }
+  .adic-ref { margin-top: 10px; }
+  .adic-ref input { margin-bottom: 0; font-size: 0.9rem; padding: 9px; }
+
+  .tabla-simple { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .tabla-simple th {
+    background: #1A1A1A; color: #FFCD11; padding: 10px; text-align: left;
+    font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+  }
+  .tabla-simple td { padding: 9px 10px; border-bottom: 1px solid #F3F4F6; font-size: 0.85rem; }
+
+  .nota-corte {
+    background: #FFFEF5; border-left: 4px solid #FFCD11;
+    padding: 12px 14px; border-radius: 6px; font-size: 0.82rem;
+    color: #333; margin-bottom: 14px; line-height: 1.5;
+  }
 </style>
 </head>
 <body>
@@ -287,7 +317,7 @@
     </select>
 
     <label for="pin">PIN</label>
-    <input type="password" id="pin" placeholder="Tu PIN de 4 dígitos" autocomplete="current-password" maxlength="10">
+    <input type="password" id="pin" placeholder="Tu PIN de 4 dígitos" autocomplete="current-password" maxlength="10" inputmode="numeric">
 
     <div id="msg-login"></div>
     <button id="btn-login" disabled>Ingresar</button>
@@ -306,10 +336,46 @@
         </div>
         <button class="btn-secundario btn-pequeno" id="btn-logout">Salir</button>
       </div>
+
+      <!-- Pestañas (solo supervisor) -->
+      <div class="tabs-sup hidden" id="tabs-sup">
+        <div class="tab-sup activo" data-vista="mia">Mi selección</div>
+        <div class="tab-sup" data-vista="equipo">Mi equipo</div>
+        <div class="tab-sup" data-vista="adicionales">Visitas</div>
+      </div>
+
       <div id="msg-app"></div>
-      <div id="mes-header"></div>
-      <div id="aviso-cont"></div>
-      <div id="resumen-cont"></div>
+
+      <!-- Vista: mi selección -->
+      <div id="vista-mia">
+        <div id="mes-header"></div>
+        <div id="aviso-cont"></div>
+        <div id="resumen-cont"></div>
+      </div>
+
+      <!-- Vista: equipo -->
+      <div id="vista-equipo" class="hidden">
+        <h2>Mi equipo</h2>
+        <p class="subtitle" id="equipo-subtitulo">Cargando...</p>
+        <div class="nota-corte">
+          Puedes completar la selección de quien no haya entrado a la app. Quedará registrado a tu nombre y la persona recibirá el correo de confirmación.
+        </div>
+        <div id="equipo-lista"></div>
+      </div>
+
+      <!-- Vista: adicionales -->
+      <div id="vista-adicionales" class="hidden">
+        <h2>Pedidos para visitas</h2>
+        <p class="subtitle">Porciones adicionales para personas que no están en la nómina.</p>
+        <div class="nota-corte">
+          <strong>Plazo:</strong> hasta las 09:00 del último día hábil anterior al consumo. Para el lunes, el plazo cierra el viernes a las 09:00.
+        </div>
+        <div id="adic-lista"></div>
+        <button id="btn-adic-enviar" style="margin-top: 8px;" disabled>Registrar adicionales</button>
+
+        <h3 style="margin-top: 26px; font-size: 1rem; font-weight: 800;">Ya registrados este mes</h3>
+        <div id="adic-historial"></div>
+      </div>
     </div>
 
     <div id="lista-dias"></div>
@@ -332,20 +398,33 @@
   </div>
 </div>
 
-<!-- Modal de confirmación -->
+<!-- Modal de confirmación de pedido propio -->
 <div id="modal-confirmar" class="modal-overlay hidden" style="display:none;">
   <div class="modal">
-    <h3>¿Confirmas envío del pedido?</h3>
-    <p>Estás a punto de enviar tu selección de menús para <b id="modal-mes"></b>.</p>
+    <h3 id="modal-titulo">¿Confirmas envío del pedido?</h3>
+    <p id="modal-intro">Estás a punto de enviar tu selección de menús para <b id="modal-mes"></b>.</p>
     <div class="info-box">
       <p><b>Días con Menú:</b> <span id="modal-menu"></span></p>
       <p><b>Días con Hipocalórico:</b> <span id="modal-hipo"></span></p>
       <p><b>Días sin comida (No estaré):</b> <span id="modal-ausente"></span></p>
     </div>
-    <p style="font-size:0.85rem; color:#666;">⚠️ Una vez enviado, estos días quedarán bloqueados. Las excepciones se canalizan directamente con el Contacto administrativo.</p>
+    <p style="font-size:0.85rem; color:#666;">Una vez enviado, estos días quedarán bloqueados. Las excepciones se canalizan directamente con el Contacto administrativo.</p>
     <div class="modal-botones">
       <button class="btn-secundario" id="btn-modal-volver">Volver a editar</button>
       <button id="btn-modal-confirmar">Confirmar envío</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: selección para un integrante del equipo -->
+<div id="modal-equipo" class="modal-overlay hidden" style="display:none;">
+  <div class="modal">
+    <h3 id="me-titulo">Seleccionar por…</h3>
+    <p style="font-size:0.85rem;color:#666;margin-bottom:14px;">Elige una opción por cada día pendiente. Quedará registrado que lo hiciste tú.</p>
+    <div id="me-dias"></div>
+    <div class="modal-botones">
+      <button class="btn-secundario" id="btn-me-cancelar">Cancelar</button>
+      <button id="btn-me-guardar" disabled>Registrar</button>
     </div>
   </div>
 </div>
@@ -354,13 +433,49 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbzjbdUoHmtMx7uLA_UA1N9GKICFND4YcJO4HUpuJnPx0g9YWuILgCCwMRg1a3Tcfb85bg/exec';
 
 let usuarioActual = null;
+let pinSesion = '';
 let menusCache = [];
 let seleccionesGuardadas = {};
 let seleccionesLocales = {};
 let fechasEnviadas = new Set();
 let vecesEnviado = 0;
+let vistaActual = 'mia';
+
+let equipoCache = null;
+let adicLocales = {};       // { fecha: { menu, hipo, referencia } }
+let adicHistorial = [];
+let meSeleccion = {};       // selección temporal del modal de equipo
+let mePersona = null;
 
 const $ = (id) => document.getElementById(id);
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+/* ---------- Fechas en horario local (NO usar toISOString) ---------- */
+function mesLocal(d) {
+  d = d || new Date();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  return d.getFullYear() + '-' + m;
+}
+function fechaLocal(d) {
+  d = d || new Date();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + m + '-' + dia;
+}
+function formatFecha(fechaStr) {
+  const p = String(fechaStr).split('-');
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+function esSupervisor() {
+  return usuarioActual && usuarioActual.rol === 'supervisor';
+}
+function escapar(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// =================== LOGIN ===================
 
 async function cargarNombres() {
   try {
@@ -369,16 +484,12 @@ async function cargarNombres() {
     select.innerHTML = '';
     if (r.ok && r.usuarios && r.usuarios.length > 0) {
       const ph = document.createElement('option');
-      ph.value = '';
-      ph.textContent = '— Selecciona tu nombre —';
-      ph.disabled = true;
-      ph.selected = true;
+      ph.value = ''; ph.textContent = '— Selecciona tu nombre —';
+      ph.disabled = true; ph.selected = true;
       select.appendChild(ph);
-
       r.usuarios.forEach(u => {
         const opt = document.createElement('option');
-        opt.value = u.rut;
-        opt.textContent = u.nombre;
+        opt.value = u.rut; opt.textContent = u.nombre;
         select.appendChild(opt);
       });
       select.disabled = false;
@@ -393,9 +504,7 @@ async function cargarNombres() {
 }
 
 function validarLogin() {
-  const rut = $('nombre-select').value;
-  const pin = $('pin').value.trim();
-  $('btn-login').disabled = !(rut && pin);
+  $('btn-login').disabled = !($('nombre-select').value && $('pin').value.trim());
 }
 
 $('nombre-select').addEventListener('change', validarLogin);
@@ -417,7 +526,10 @@ $('btn-login').addEventListener('click', async () => {
       return;
     }
     usuarioActual = r.usuario;
+    pinSesion = pin;
     sessionStorage.setItem('bitumix_user', JSON.stringify(usuarioActual));
+    sessionStorage.setItem('bitumix_pin', pin);
+    limpiarMsg('msg-login');
     await entrarApp();
   } catch (e) {
     mostrarMsg('msg-login', 'Error de conexión: ' + e.message, 'error');
@@ -430,7 +542,9 @@ $('btn-login').addEventListener('click', async () => {
 
 $('btn-logout').addEventListener('click', () => {
   sessionStorage.removeItem('bitumix_user');
-  usuarioActual = null;
+  sessionStorage.removeItem('bitumix_pin');
+  usuarioActual = null; pinSesion = ''; equipoCache = null;
+  adicLocales = {}; adicHistorial = [];
   $('pantalla-app').classList.add('hidden');
   $('pantalla-login').classList.remove('hidden');
   $('barra-envio').classList.add('hidden');
@@ -447,9 +561,11 @@ $('pin').addEventListener('keypress', (e) => {
 window.addEventListener('load', () => {
   cargarNombres();
   const s = sessionStorage.getItem('bitumix_user');
+  const p = sessionStorage.getItem('bitumix_pin');
   if (s) {
     try {
       usuarioActual = JSON.parse(s);
+      pinSesion = p || '';
       entrarApp();
     } catch (e) { sessionStorage.removeItem('bitumix_user'); }
   }
@@ -458,14 +574,53 @@ window.addEventListener('load', () => {
 async function entrarApp() {
   $('pantalla-login').classList.add('hidden');
   $('pantalla-app').classList.remove('hidden');
-  $('user-info').textContent = `${usuarioActual.nombre} · ${usuarioActual.area || ''}`;
+
+  let info = usuarioActual.nombre + ' · ' + (usuarioActual.area || '');
+  $('user-info').innerHTML = escapar(info) +
+    (esSupervisor() ? ' <span class="badge-supervisor">Supervisor</span>' : '');
+
+  if (esSupervisor()) {
+    $('tabs-sup').classList.remove('hidden');
+  } else {
+    $('tabs-sup').classList.add('hidden');
+  }
+
+  cambiarVista('mia');
   await cargarTodo();
 }
+
+// =================== PESTAÑAS ===================
+
+document.querySelectorAll('.tab-sup').forEach(tab => {
+  tab.addEventListener('click', () => cambiarVista(tab.dataset.vista));
+});
+
+function cambiarVista(vista) {
+  vistaActual = vista;
+  document.querySelectorAll('.tab-sup').forEach(t => {
+    t.classList.toggle('activo', t.dataset.vista === vista);
+  });
+  $('vista-mia').classList.toggle('hidden', vista !== 'mia');
+  $('vista-equipo').classList.toggle('hidden', vista !== 'equipo');
+  $('vista-adicionales').classList.toggle('hidden', vista !== 'adicionales');
+  $('lista-dias').classList.toggle('hidden', vista !== 'mia');
+
+  if (vista === 'mia') {
+    renderBarraEnvio();
+  } else {
+    $('barra-envio').classList.add('hidden');
+  }
+
+  if (vista === 'equipo' && !equipoCache) cargarEquipo();
+  if (vista === 'adicionales') renderAdicionales();
+}
+
+// =================== CARGA ===================
 
 async function cargarTodo() {
   try {
     mostrarMsg('msg-app', 'Cargando menús...', 'info');
-    const mesActual = new Date().toISOString().substring(0, 7);
+    const mesActual = mesLocal();
     const [rMenus, rSel, rEstado] = await Promise.all([
       apiCall({ accion: 'getMenus', mes: mesActual }),
       apiCall({ accion: 'getSelecciones', rut: usuarioActual.rut }),
@@ -482,9 +637,12 @@ async function cargarTodo() {
     vecesEnviado = (rEstado && rEstado.ok) ? (rEstado.vecesEnviado || 0) : 0;
 
     seleccionesLocales = {};
-
     render();
     limpiarMsg('msg-app');
+
+    if (esSupervisor()) {
+      cargarAdicionales();
+    }
   } catch (e) {
     mostrarMsg('msg-app', 'Error: ' + e.message, 'error');
   }
@@ -498,52 +656,54 @@ function render() {
   renderBarraEnvio();
 }
 
+// =================== VISTA: MI SELECCIÓN ===================
+
+/** Días que aún puedo elegir: publicados, no enviados y con plazo abierto. */
+function diasNuevosDisponibles() {
+  return menusCache.filter(d => !fechasEnviadas.has(d.fecha) && d.abierto !== false);
+}
+function diasCerradosSinEnviar() {
+  return menusCache.filter(d => !fechasEnviadas.has(d.fecha) && d.abierto === false);
+}
+
 function renderMesHeader() {
-  const mesActual = new Date();
-  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const nombreMes = meses[mesActual.getMonth()];
-  const anio = mesActual.getFullYear();
+  const ahora = new Date();
+  const nombreMes = MESES[ahora.getMonth()];
+  const anio = ahora.getFullYear();
 
   let subInfo = 'Elige una opción por cada día y envía cuando termines.';
   if (menusCache.length > 0 && diasNuevosDisponibles().length === 0 && fechasEnviadas.size > 0) {
-    subInfo = 'Todos los días publicados ya fueron enviados.';
+    subInfo = 'Todos los días disponibles ya fueron enviados.';
   } else if (fechasEnviadas.size > 0) {
-    subInfo = `Tienes ${fechasEnviadas.size} día${fechasEnviadas.size === 1 ? '' : 's'} enviados. Completa los nuevos para enviar.`;
+    subInfo = 'Tienes ' + fechasEnviadas.size + ' día' + (fechasEnviadas.size === 1 ? '' : 's') +
+      ' enviados. Completa los nuevos para enviar.';
   }
 
-  $('mes-header').innerHTML = `
-    <div class="mes-header">
-      <div class="titulo">Menús del mes</div>
-      <div class="mes">${nombreMes} ${anio}</div>
-      <div class="subinfo">${subInfo}</div>
-    </div>
-  `;
-}
-
-function diasNuevosDisponibles() {
-  return menusCache.filter(d => !fechasEnviadas.has(d.fecha));
+  $('mes-header').innerHTML =
+    '<div class="mes-header">' +
+    '<div class="titulo">Menús del mes</div>' +
+    '<div class="mes">' + nombreMes + ' ' + anio + '</div>' +
+    '<div class="subinfo">' + subInfo + '</div>' +
+    '</div>';
 }
 
 function renderAvisoCompleto() {
   const cont = $('aviso-cont');
   const nuevos = diasNuevosDisponibles();
   if (menusCache.length > 0 && nuevos.length === 0 && fechasEnviadas.size > 0) {
-    cont.innerHTML = `
-      <div class="aviso-completo">
-        <div class="check">✓</div>
-        <div class="titulo">Todo al día</div>
-        <div class="sub">Ya enviaste tus selecciones para todos los días publicados este mes. Vuelve a revisar cuando se publiquen nuevos días.</div>
-      </div>
-    `;
+    cont.innerHTML =
+      '<div class="aviso-completo">' +
+      '<div class="check">&#10003;</div>' +
+      '<div class="titulo">Todo al día</div>' +
+      '<div class="sub">Ya enviaste tus selecciones para todos los días disponibles. Vuelve a revisar cuando se publiquen nuevos días.</div>' +
+      '</div>';
   } else {
     cont.innerHTML = '';
   }
 }
 
 function contarPorTipo() {
-  let menu = 0, hipo = 0, ausente = 0;
-  // Contar guardados (enviados)
-  let menuG = 0, hipoG = 0, ausenteG = 0;
+  let menu = 0, hipo = 0, ausente = 0, menuG = 0, hipoG = 0, ausenteG = 0;
   for (const f in seleccionesGuardadas) {
     if (!fechasEnviadas.has(f)) continue;
     const s = seleccionesGuardadas[f];
@@ -551,7 +711,6 @@ function contarPorTipo() {
     else if (s.alternativa === 'HIPO') hipoG++;
     else if (s.alternativa === 'AUSENTE') ausenteG++;
   }
-  // Contar locales (por enviar)
   for (const f in seleccionesLocales) {
     const s = seleccionesLocales[f];
     if (s.alternativa === 'MENU') menu++;
@@ -562,41 +721,19 @@ function contarPorTipo() {
 }
 
 function contarLocales() {
-  let count = 0;
-  for (const f in seleccionesLocales) {
-    if (seleccionesLocales[f]) count++;
-  }
-  return count;
+  return Object.keys(seleccionesLocales).length;
 }
 
 function renderResumen() {
-  if (menusCache.length === 0) {
-    $('resumen-cont').innerHTML = '';
-    return;
-  }
+  if (menusCache.length === 0) { $('resumen-cont').innerHTML = ''; return; }
   const c = contarPorTipo();
-  const enviados = fechasEnviadas.size;
-
-  $('resumen-cont').innerHTML = `
-    <div class="resumen">
-      <div class="resumen-item enviados">
-        <span class="num">${enviados}</span>
-        <span class="label">Enviados</span>
-      </div>
-      <div class="resumen-item menu">
-        <span class="num">${c.menu + c.menuG}</span>
-        <span class="label">Menús</span>
-      </div>
-      <div class="resumen-item hipo">
-        <span class="num">${c.hipo + c.hipoG}</span>
-        <span class="label">Hipo</span>
-      </div>
-      <div class="resumen-item ausencias">
-        <span class="num">${c.ausente + c.ausenteG}</span>
-        <span class="label">Ausencias</span>
-      </div>
-    </div>
-  `;
+  $('resumen-cont').innerHTML =
+    '<div class="resumen">' +
+    '<div class="resumen-item enviados"><span class="num">' + fechasEnviadas.size + '</span><span class="label">Enviados</span></div>' +
+    '<div class="resumen-item menu"><span class="num">' + (c.menu + c.menuG) + '</span><span class="label">Menús</span></div>' +
+    '<div class="resumen-item hipo"><span class="num">' + (c.hipo + c.hipoG) + '</span><span class="label">Hipo</span></div>' +
+    '<div class="resumen-item ausencias"><span class="num">' + (c.ausente + c.ausenteG) + '</span><span class="label">Ausencias</span></div>' +
+    '</div>';
 }
 
 function renderDias() {
@@ -604,24 +741,24 @@ function renderDias() {
   cont.innerHTML = '';
 
   if (menusCache.length === 0) {
-    cont.innerHTML = `
-      <div class="card" style="text-align:center; padding: 40px 20px;">
-        <div style="font-size:3rem; margin-bottom: 16px;">📋</div>
-        <h3 style="color:#1A1A1A; margin-bottom: 8px;">Menús aún no disponibles</h3>
-        <p style="color:#6B7280;">Los menús de este mes se están preparando. Vuelve a revisar en unos días.</p>
-      </div>
-    `;
+    cont.innerHTML =
+      '<div class="card" style="text-align:center; padding: 40px 20px;">' +
+      '<h3 style="color:#1A1A1A; margin-bottom: 8px;">Menús aún no disponibles</h3>' +
+      '<p style="color:#6B7280;">Los menús de este mes se están preparando. Vuelve a revisar en unos días.</p>' +
+      '</div>';
     return;
   }
 
   menusCache.forEach(dia => {
     const yaEnviado = fechasEnviadas.has(dia.fecha);
+    const cerrado = !yaEnviado && dia.abierto === false;
     const seleccionGuardada = seleccionesGuardadas[dia.fecha];
     const seleccionLocal = seleccionesLocales[dia.fecha];
 
     const card = document.createElement('div');
     let claseExtra = '';
     if (yaEnviado) claseExtra = 'enviado';
+    else if (cerrado) claseExtra = 'cerrado';
     else if (seleccionLocal) {
       if (seleccionLocal.alternativa === 'MENU') claseExtra = 'elegido-menu';
       else if (seleccionLocal.alternativa === 'HIPO') claseExtra = 'elegido-hipo';
@@ -629,48 +766,54 @@ function renderDias() {
     }
     card.className = 'card dia-card ' + claseExtra;
 
-    const badgeEnviado = yaEnviado ? '<span class="badge-enviado">Enviado</span>' : '';
+    let badge = '';
+    if (yaEnviado) badge = '<span class="badge-enviado">Enviado</span>';
+    else if (cerrado) badge = '<span class="badge-cerrado">Plazo cerrado</span>';
 
-    card.innerHTML = `
-      <div class="dia-header">
-        <div class="dia-fecha-cont">
-          <span class="dia-fecha">${formatFecha(dia.fecha)}</span>
-          <span class="dia-nombre">${dia.diaSemana} ${badgeEnviado}</span>
-        </div>
-      </div>
-      <div class="contenido-dia"></div>
-    `;
+    card.innerHTML =
+      '<div class="dia-header">' +
+      '<div class="dia-fecha-cont">' +
+      '<span class="dia-fecha">' + formatFecha(dia.fecha) + '</span>' +
+      '<span class="dia-nombre">' + escapar(dia.diaSemana) + ' ' + badge + '</span>' +
+      '</div></div>' +
+      '<div class="contenido-dia"></div>';
+
     const contDia = card.querySelector('.contenido-dia');
 
-    // Si ya fue enviado → mostrar solo la opción elegida
     if (yaEnviado && seleccionGuardada) {
       const alt = seleccionGuardada.alternativa;
-      let label = 'Menú';
-      let descHtml = '';
-      let tipoClase = 'tipo-menu';
+      let label = 'Menú', tipoClase = 'tipo-menu', descHtml = '';
       if (alt === 'HIPO') { label = 'Hipocalórico'; tipoClase = 'tipo-hipo'; }
       else if (alt === 'AUSENTE') { label = 'No estaré'; tipoClase = 'tipo-ausente'; }
 
-      if (alt === 'AUSENTE') {
-        descHtml = '<div class="opcion-desc-ausente">No consumirá comida este día</div>';
-      } else {
-        descHtml = `<div class="opcion-desc">${seleccionGuardada.descripcion}</div>`;
+      descHtml = (alt === 'AUSENTE')
+        ? '<div class="opcion-desc-ausente">No consumirá comida este día</div>'
+        : '<div class="opcion-desc">' + escapar(seleccionGuardada.descripcion) + '</div>';
+
+      let notaOrigen = '';
+      if (String(seleccionGuardada.origen || '').indexOf('supervisor') === 0) {
+        const quien = String(seleccionGuardada.origen).split(':')[1] || 'tu supervisor';
+        notaOrigen = '<div style="font-size:0.72rem;color:#B45309;margin-top:6px;">Registrado por ' + escapar(quien) + '</div>';
       }
 
-      contDia.innerHTML = `
-        <div class="opcion seleccionada ${tipoClase} bloqueado">
-          <div class="opcion-radio"></div>
-          <div class="opcion-info">
-            <span class="opcion-tag opcion-${alt}">${label}</span>
-            ${descHtml}
-          </div>
-        </div>
-      `;
+      contDia.innerHTML =
+        '<div class="opcion seleccionada ' + tipoClase + ' bloqueado">' +
+        '<div class="opcion-radio"></div>' +
+        '<div class="opcion-info"><span class="opcion-tag opcion-' + alt + '">' + label + '</span>' +
+        descHtml + '</div></div>' + notaOrigen;
       cont.appendChild(card);
       return;
     }
 
-    // Modo edición: mostrar las 3 opciones
+    if (cerrado) {
+      contDia.innerHTML =
+        '<p style="color:#6B7280;font-size:0.88rem;line-height:1.5;">' +
+        'El plazo para este día cerró el <strong>' + escapar(dia.corte || '') + '</strong>. ' +
+        'Si necesitas una excepción, escribe a ventas@shgestion.cl.</p>';
+      cont.appendChild(card);
+      return;
+    }
+
     const opciones = [
       { codigo: 'MENU', label: 'Menú', descripcion: dia.menu_principal, tipoClase: 'tipo-menu' },
       { codigo: 'HIPO', label: 'Hipocalórico', descripcion: dia.hipocalorico, tipoClase: 'tipo-hipo' },
@@ -683,13 +826,12 @@ function renderDias() {
       const div = document.createElement('div');
       div.className = 'opcion' + (esSel ? ' seleccionada ' + opt.tipoClase : '');
       const descClass = opt.esAusente ? 'opcion-desc-ausente' : 'opcion-desc';
-      div.innerHTML = `
-        <div class="opcion-radio"></div>
-        <div class="opcion-info">
-          <span class="opcion-tag opcion-${opt.codigo}">${opt.label}</span>
-          <div class="${descClass}">${opt.descripcion}</div>
-        </div>
-      `;
+      div.innerHTML =
+        '<div class="opcion-radio"></div>' +
+        '<div class="opcion-info">' +
+        '<span class="opcion-tag opcion-' + opt.codigo + '">' + opt.label + '</span>' +
+        '<div class="' + descClass + '">' + escapar(opt.descripcion) + '</div>' +
+        '</div>';
       div.addEventListener('click', () => elegirLocal(dia.fecha, opt));
       contDia.appendChild(div);
     });
@@ -700,8 +842,9 @@ function renderDias() {
 
 function renderBarraEnvio() {
   const barra = $('barra-envio');
-  const nuevos = diasNuevosDisponibles();
+  if (vistaActual !== 'mia') { barra.classList.add('hidden'); return; }
 
+  const nuevos = diasNuevosDisponibles();
   if (menusCache.length === 0 || nuevos.length === 0) {
     barra.classList.add('hidden');
     return;
@@ -712,21 +855,20 @@ function renderBarraEnvio() {
   const total = nuevos.length;
   const faltan = total - seleccionados;
 
-  $('progreso-texto').textContent = `${seleccionados} de ${total} días seleccionados`;
+  $('progreso-texto').textContent = seleccionados + ' de ' + total + ' días seleccionados';
 
   const sub = $('progreso-sub');
   sub.classList.remove('falta', 'completo');
   if (seleccionados === 0) {
     sub.textContent = 'Elige una opción por cada día para enviar';
   } else if (faltan > 0) {
-    sub.textContent = `Faltan ${faltan} día${faltan === 1 ? '' : 's'} por elegir`;
+    sub.textContent = 'Faltan ' + faltan + ' día' + (faltan === 1 ? '' : 's') + ' por elegir';
     sub.classList.add('falta');
   } else {
-    sub.textContent = '✓ Todos los días completos, ya puedes enviar';
+    sub.textContent = 'Todos los días completos, ya puedes enviar';
     sub.classList.add('completo');
   }
 
-  // Botón habilitado SOLO si están TODOS
   $('btn-enviar').disabled = faltan > 0;
 }
 
@@ -735,22 +877,17 @@ function elegirLocal(fecha, opt) {
   if (actual && actual.alternativa === opt.codigo) {
     delete seleccionesLocales[fecha];
   } else {
-    seleccionesLocales[fecha] = {
-      alternativa: opt.codigo,
-      descripcion: opt.descripcion
-    };
+    seleccionesLocales[fecha] = { alternativa: opt.codigo, descripcion: opt.descripcion };
   }
   render();
 }
 
-// =================== ENVIAR PEDIDO ===================
+// =================== ENVIAR PEDIDO PROPIO ===================
 
 $('btn-enviar').addEventListener('click', () => {
   const nuevos = diasNuevosDisponibles();
-  const seleccionados = contarLocales();
-  if (seleccionados < nuevos.length) return;
+  if (contarLocales() < nuevos.length) return;
 
-  // Contar por tipo (solo locales, o sea del envío actual)
   let menu = 0, hipo = 0, ausente = 0;
   for (const f in seleccionesLocales) {
     const s = seleccionesLocales[f];
@@ -759,9 +896,8 @@ $('btn-enviar').addEventListener('click', () => {
     else if (s.alternativa === 'AUSENTE') ausente++;
   }
 
-  const mesActual = new Date();
-  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  $('modal-mes').textContent = `${meses[mesActual.getMonth()]} ${mesActual.getFullYear()}`;
+  const ahora = new Date();
+  $('modal-mes').textContent = MESES[ahora.getMonth()] + ' ' + ahora.getFullYear();
   $('modal-menu').textContent = menu;
   $('modal-hipo').textContent = hipo;
   $('modal-ausente').textContent = ausente;
@@ -769,10 +905,11 @@ $('btn-enviar').addEventListener('click', () => {
   $('modal-confirmar').style.display = 'flex';
 });
 
-$('btn-modal-volver').addEventListener('click', () => {
+$('btn-modal-volver').addEventListener('click', cerrarModalConfirmar);
+function cerrarModalConfirmar() {
   $('modal-confirmar').classList.add('hidden');
   $('modal-confirmar').style.display = 'none';
-});
+}
 
 $('btn-modal-confirmar').addEventListener('click', async () => {
   const btn = $('btn-modal-confirmar');
@@ -782,39 +919,34 @@ $('btn-modal-confirmar').addEventListener('click', async () => {
     const selecciones = [];
     for (const fecha in seleccionesLocales) {
       const s = seleccionesLocales[fecha];
-      selecciones.push({
-        fecha: fecha,
-        alternativa: s.alternativa,
-        descripcion: s.descripcion
-      });
+      selecciones.push({ fecha, alternativa: s.alternativa, descripcion: s.descripcion });
     }
 
-    const mesActual = new Date().toISOString().substring(0, 7);
     const r = await apiCall({
       accion: 'enviarPedidoMensual',
       rut: usuarioActual.rut,
-      mes: mesActual,
+      mes: mesLocal(),
       selecciones: selecciones
     });
 
+    cerrarModalConfirmar();
+
     if (!r.ok) {
       mostrarMsg('msg-app', r.error || 'Error al enviar', 'error');
-      $('modal-confirmar').classList.add('hidden');
-      $('modal-confirmar').style.display = 'none';
       return;
     }
 
-    $('modal-confirmar').classList.add('hidden');
-    $('modal-confirmar').style.display = 'none';
-
     await cargarTodo();
 
-    const msgEmail = r.emailEnviado ?
-      `✓ Pedido enviado. Confirmación enviada a ${r.email}` :
-      `✓ Pedido enviado (sin email de confirmación)`;
-    mostrarMsg('msg-app', msgEmail, 'ok');
+    let msg = r.emailEnviado
+      ? 'Pedido enviado el ' + r.registradoEn + '. Confirmación enviada a ' + r.email
+      : 'Pedido enviado el ' + r.registradoEn + ' (sin email de confirmación)';
+    if (r.cerradas > 0) {
+      msg += '\nNo se incluyeron ' + r.cerradas + ' día(s) con plazo cerrado.';
+    }
+    mostrarMsg('msg-app', msg, 'ok');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => limpiarMsg('msg-app'), 6000);
+    setTimeout(() => limpiarMsg('msg-app'), 8000);
   } catch (e) {
     mostrarMsg('msg-app', 'Error: ' + e.message, 'error');
   } finally {
@@ -823,13 +955,304 @@ $('btn-modal-confirmar').addEventListener('click', async () => {
   }
 });
 
-function formatFecha(fechaStr) {
-  const [y, m, d] = fechaStr.split('-');
-  return `${d}/${m}/${y}`;
+// =================== VISTA: EQUIPO ===================
+
+async function cargarEquipo() {
+  $('equipo-lista').innerHTML = '<p style="color:#6B7280;padding:16px 0;">Cargando equipo...</p>';
+  try {
+    const r = await apiCall({
+      accion: 'getEquipo',
+      supervisorRut: usuarioActual.rut,
+      supervisorPin: pinSesion,
+      mes: mesLocal()
+    });
+    if (!r.ok) {
+      $('equipo-lista').innerHTML = '<div class="mensaje error">' + escapar(r.error) + '</div>';
+      return;
+    }
+    equipoCache = r;
+    renderEquipo();
+  } catch (e) {
+    $('equipo-lista').innerHTML = '<div class="mensaje error">Error: ' + escapar(e.message) + '</div>';
+  }
 }
 
+function renderEquipo() {
+  if (!equipoCache) return;
+  const r = equipoCache;
+
+  $('equipo-subtitulo').textContent =
+    'Frente ' + (r.supervisor.frente || 'sin asignar') + ' · ' +
+    r.equipo.length + ' persona(s) · ' + r.diasAbiertos.length + ' día(s) con plazo abierto';
+
+  if (r.equipo.length === 0) {
+    $('equipo-lista').innerHTML =
+      '<p style="color:#6B7280;padding:16px 0;">No hay otras personas asignadas a tu frente. ' +
+      'Si esto no es correcto, revisa la columna Frente de la nómina con el Contacto administrativo.</p>';
+    return;
+  }
+
+  let html = '';
+  r.equipo.forEach((p, idx) => {
+    const alDia = p.totalPendientes === 0;
+    html +=
+      '<div class="fila-equipo ' + (alDia ? 'al-dia' : 'pendiente') + '">' +
+      '<div style="min-width:0;">' +
+      '<div class="nombre">' + escapar(p.nombre) + '</div>' +
+      '<div class="detalle">' + p.enviados + ' día(s) enviados · ' +
+      (alDia ? 'sin pendientes' : p.totalPendientes + ' pendiente(s)') + '</div>' +
+      '</div>' +
+      (alDia ? '<span class="badge-enviado">Al día</span>'
+             : '<button class="btn-pequeno" data-idx="' + idx + '">Completar</button>') +
+      '</div>';
+  });
+  $('equipo-lista').innerHTML = html;
+
+  $('equipo-lista').querySelectorAll('button[data-idx]').forEach(b => {
+    b.addEventListener('click', () => abrirModalEquipo(parseInt(b.dataset.idx, 10)));
+  });
+}
+
+function abrirModalEquipo(idx) {
+  mePersona = equipoCache.equipo[idx];
+  meSeleccion = {};
+  $('me-titulo').textContent = 'Seleccionar por ' + mePersona.nombre;
+
+  const mapaMenus = {};
+  menusCache.forEach(d => { mapaMenus[d.fecha] = d; });
+
+  let html = '';
+  mePersona.pendientes.forEach(fecha => {
+    const d = mapaMenus[fecha] || {};
+    html +=
+      '<div class="adic-dia" data-fecha="' + fecha + '">' +
+      '<div class="adic-fecha">' + formatFecha(fecha) + ' · ' + escapar(d.diaSemana || '') + '</div>' +
+      '<div class="me-opciones">' +
+      botonOpcion(fecha, 'MENU', 'Menú', d.menu_principal || '') +
+      botonOpcion(fecha, 'HIPO', 'Hipocalórico', d.hipocalorico || '') +
+      botonOpcion(fecha, 'AUSENTE', 'No estará', 'No consumirá comida') +
+      '</div></div>';
+  });
+  $('me-dias').innerHTML = html;
+
+  $('me-dias').querySelectorAll('.opcion').forEach(el => {
+    el.addEventListener('click', () => {
+      const fecha = el.dataset.fecha;
+      const alt = el.dataset.alt;
+      if (meSeleccion[fecha] && meSeleccion[fecha].alternativa === alt) {
+        delete meSeleccion[fecha];
+      } else {
+        meSeleccion[fecha] = { alternativa: alt, descripcion: el.dataset.desc || '' };
+      }
+      $('me-dias').querySelectorAll('.opcion[data-fecha="' + fecha + '"]').forEach(o => {
+        const activo = meSeleccion[fecha] && meSeleccion[fecha].alternativa === o.dataset.alt;
+        o.className = 'opcion' + (activo ? ' seleccionada tipo-' + o.dataset.alt.toLowerCase() : '');
+      });
+      $('btn-me-guardar').disabled =
+        Object.keys(meSeleccion).length !== mePersona.pendientes.length;
+    });
+  });
+
+  $('btn-me-guardar').disabled = true;
+  $('modal-equipo').classList.remove('hidden');
+  $('modal-equipo').style.display = 'flex';
+}
+
+function botonOpcion(fecha, alt, label, desc) {
+  const clase = alt === 'AUSENTE' ? 'opcion-desc-ausente' : 'opcion-desc';
+  return '<div class="opcion" data-fecha="' + fecha + '" data-alt="' + alt + '" data-desc="' + escapar(desc) + '">' +
+    '<div class="opcion-radio"></div>' +
+    '<div class="opcion-info"><span class="opcion-tag opcion-' + alt + '">' + label + '</span>' +
+    '<div class="' + clase + '">' + escapar(desc) + '</div></div></div>';
+}
+
+$('btn-me-cancelar').addEventListener('click', () => {
+  $('modal-equipo').classList.add('hidden');
+  $('modal-equipo').style.display = 'none';
+});
+
+$('btn-me-guardar').addEventListener('click', async () => {
+  const btn = $('btn-me-guardar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>';
+  try {
+    const selecciones = [];
+    for (const fecha in meSeleccion) {
+      selecciones.push({
+        fecha: fecha,
+        alternativa: meSeleccion[fecha].alternativa,
+        descripcion: meSeleccion[fecha].descripcion
+      });
+    }
+    const r = await apiCall({
+      accion: 'enviarPedidoPorSupervisor',
+      supervisorRut: usuarioActual.rut,
+      supervisorPin: pinSesion,
+      rutObjetivo: mePersona.rut,
+      mes: mesLocal(),
+      selecciones: selecciones
+    });
+
+    $('modal-equipo').classList.add('hidden');
+    $('modal-equipo').style.display = 'none';
+
+    if (!r.ok) {
+      mostrarMsg('msg-app', r.error || 'Error al registrar', 'error');
+      return;
+    }
+    mostrarMsg('msg-app',
+      'Registrado por ' + mePersona.nombre + ': ' + r.totalDias + ' día(s) el ' + r.registradoEn, 'ok');
+    equipoCache = null;
+    await cargarEquipo();
+    setTimeout(() => limpiarMsg('msg-app'), 7000);
+  } catch (e) {
+    mostrarMsg('msg-app', 'Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Registrar';
+  }
+});
+
+// =================== VISTA: ADICIONALES ===================
+
+async function cargarAdicionales() {
+  try {
+    const r = await apiCall({
+      accion: 'getAdicionales',
+      supervisorRut: usuarioActual.rut,
+      supervisorPin: pinSesion,
+      mes: mesLocal()
+    });
+    adicHistorial = (r && r.ok) ? (r.adicionales || []) : [];
+    if (vistaActual === 'adicionales') renderAdicionales();
+  } catch (e) { /* silencioso */ }
+}
+
+function renderAdicionales() {
+  const abiertos = menusCache.filter(d => d.abierto !== false);
+  const cont = $('adic-lista');
+
+  if (abiertos.length === 0) {
+    cont.innerHTML = '<p style="color:#6B7280;padding:12px 0;">No hay días con plazo abierto en este momento.</p>';
+    $('btn-adic-enviar').disabled = true;
+  } else {
+    let html = '';
+    abiertos.forEach(d => {
+      const v = adicLocales[d.fecha] || { menu: 0, hipo: 0, referencia: '' };
+      const tieneCant = (v.menu > 0 || v.hipo > 0);
+      html +=
+        '<div class="adic-dia ' + (tieneCant ? 'con-cantidad' : '') + '">' +
+        '<div class="adic-fecha">' + formatFecha(d.fecha) + ' · ' + escapar(d.diaSemana) + '</div>' +
+        '<div class="adic-corte">Plazo hasta ' + escapar(d.corte || '') + '</div>' +
+        '<div class="adic-controles">' +
+        contadorHtml(d.fecha, 'menu', 'Menú', v.menu) +
+        contadorHtml(d.fecha, 'hipo', 'Hipo', v.hipo) +
+        '</div>' +
+        (tieneCant
+          ? '<div class="adic-ref"><input type="text" data-ref="' + d.fecha + '" placeholder="Referencia (ej: visita gerencia, inspección)" value="' + escapar(v.referencia) + '"></div>'
+          : '') +
+        '</div>';
+    });
+    cont.innerHTML = html;
+
+    cont.querySelectorAll('button[data-accion]').forEach(b => {
+      b.addEventListener('click', () => {
+        const fecha = b.dataset.fecha, tipo = b.dataset.tipo, delta = b.dataset.accion === 'mas' ? 1 : -1;
+        if (!adicLocales[fecha]) adicLocales[fecha] = { menu: 0, hipo: 0, referencia: '' };
+        adicLocales[fecha][tipo] = Math.max(0, (adicLocales[fecha][tipo] || 0) + delta);
+        renderAdicionales();
+      });
+    });
+    cont.querySelectorAll('input[data-ref]').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const fecha = inp.dataset.ref;
+        if (!adicLocales[fecha]) adicLocales[fecha] = { menu: 0, hipo: 0, referencia: '' };
+        adicLocales[fecha].referencia = inp.value;
+      });
+    });
+
+    let total = 0;
+    for (const f in adicLocales) total += (adicLocales[f].menu || 0) + (adicLocales[f].hipo || 0);
+    $('btn-adic-enviar').disabled = total === 0;
+    $('btn-adic-enviar').textContent = total === 0
+      ? 'Registrar adicionales'
+      : 'Registrar ' + total + ' porción(es)';
+  }
+
+  renderAdicHistorial();
+}
+
+function contadorHtml(fecha, tipo, label, valor) {
+  return '<div class="adic-grupo">' +
+    '<span class="adic-label ' + tipo + '">' + label + '</span>' +
+    '<div class="contador">' +
+    '<button class="btn-secundario" data-accion="menos" data-fecha="' + fecha + '" data-tipo="' + tipo + '">&minus;</button>' +
+    '<span class="valor">' + valor + '</span>' +
+    '<button data-accion="mas" data-fecha="' + fecha + '" data-tipo="' + tipo + '">+</button>' +
+    '</div></div>';
+}
+
+function renderAdicHistorial() {
+  const cont = $('adic-historial');
+  if (adicHistorial.length === 0) {
+    cont.innerHTML = '<p style="color:#6B7280;font-size:0.85rem;padding:8px 0;">Sin adicionales registrados este mes.</p>';
+    return;
+  }
+  let html = '<table class="tabla-simple"><thead><tr><th>Fecha</th><th>Tipo</th><th>Cant.</th><th>Referencia</th></tr></thead><tbody>';
+  adicHistorial.forEach(a => {
+    html += '<tr><td><b>' + formatFecha(a.fecha) + '</b></td>' +
+      '<td>' + (a.tipo === 'MENU' ? 'Menú' : 'Hipo') + '</td>' +
+      '<td>' + a.cantidad + '</td>' +
+      '<td style="color:#6B7280;">' + escapar(a.referencia || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  cont.innerHTML = html;
+}
+
+$('btn-adic-enviar').addEventListener('click', async () => {
+  const btn = $('btn-adic-enviar');
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>';
+  try {
+    const items = [];
+    for (const fecha in adicLocales) {
+      const v = adicLocales[fecha];
+      if ((v.menu || 0) === 0 && (v.hipo || 0) === 0) continue;
+      items.push({ fecha, menu: v.menu || 0, hipo: v.hipo || 0, referencia: v.referencia || '' });
+    }
+
+    const r = await apiCall({
+      accion: 'enviarAdicionales',
+      supervisorRut: usuarioActual.rut,
+      supervisorPin: pinSesion,
+      adicionales: items
+    });
+
+    if (!r.ok) {
+      mostrarMsg('msg-app', r.error || 'Error al registrar adicionales', 'error');
+      return;
+    }
+
+    adicLocales = {};
+    mostrarMsg('msg-app',
+      r.totalPorciones + ' porción(es) adicional(es) registradas el ' + r.registradoEn, 'ok');
+    await cargarAdicionales();
+    renderAdicionales();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => limpiarMsg('msg-app'), 7000);
+  } catch (e) {
+    mostrarMsg('msg-app', 'Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+});
+
+// =================== UTILIDADES ===================
+
 function mostrarMsg(id, texto, tipo) {
-  $(id).innerHTML = `<div class="mensaje ${tipo}">${texto}</div>`;
+  $(id).innerHTML = '<div class="mensaje ' + tipo + '">' + escapar(texto) + '</div>';
 }
 function limpiarMsg(id) { $(id).innerHTML = ''; }
 
@@ -837,9 +1260,16 @@ async function apiCall(payload) {
   const r = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    redirect: 'follow'
   });
-  return await r.json();
+  const texto = await r.text();
+  try {
+    return JSON.parse(texto);
+  } catch (e) {
+    console.error('Respuesta no-JSON del servidor:', texto.substring(0, 300));
+    throw new Error('El servidor respondió con una página en vez de datos. Revisa los permisos del deployment.');
+  }
 }
 </script>
 

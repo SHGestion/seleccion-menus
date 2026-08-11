@@ -45,16 +45,14 @@
     font-size: 0.85rem;
   }
   button:hover { background: #E6B800; border-color: #E6B800; }
-  button.gris { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
-  button.gris:hover { background: #333; border-color: #333; }
-  button.oscuro { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
-  button.oscuro:hover { background: #333; border-color: #333; }
+  button.gris, button.oscuro { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
+  button.gris:hover, button.oscuro:hover { background: #333; border-color: #333; }
 
   .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid #E5E7EB; flex-wrap: wrap; }
   .tab {
-    padding: 12px 20px; cursor: pointer; border-bottom: 3px solid transparent;
+    padding: 12px 18px; cursor: pointer; border-bottom: 3px solid transparent;
     color: #4A4A4A; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
-    font-size: 0.85rem; margin-bottom: -2px;
+    font-size: 0.82rem; margin-bottom: -2px;
   }
   .tab.activo { color: #000; border-bottom-color: #FFCD11; }
 
@@ -66,8 +64,11 @@
   .badge { display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
   .badge-MENU { background: #FFCD11; color: #000; }
   .badge-HIPO { background: #E8F5E8; color: #166534; border: 1px solid #86EFAC; }
+  .badge-AUSENTE { background: #E5E5E5; color: #4A4A4A; }
   .badge-ACTIVO { background: #D1FAE5; color: #065F46; }
   .badge-CANCELADO { background: #FEE2E2; color: #991B1B; }
+  .badge-sup { background: #1A1A1A; color: #FFCD11; }
+  .badge-usr { background: #F3F4F6; color: #4A4A4A; }
 
   .hidden { display: none; }
   .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
@@ -83,6 +84,9 @@
   .stat.verde .stat-num { color: #16A34A; }
   .stat.gris { border-top-color: #6B7280; }
   .stat.gris .stat-num { color: #6B7280; }
+  .stat.negro { border-top-color: #1A1A1A; background: #1A1A1A; }
+  .stat.negro .stat-num { color: #FFCD11; }
+  .stat.negro .stat-label { color: #CCC; }
 
   .toolbar { display: flex; gap: 8px; margin-bottom: 12px; align-items: end; flex-wrap: wrap; }
   .toolbar > div { flex: 1; min-width: 140px; }
@@ -96,11 +100,10 @@
   .info { background: #FFFEF5; color: #1A1A1A; border-left: 4px solid #FFCD11; }
   .error { background: #FEE2E2; color: #991B1B; border-left: 4px solid #DC2626; }
 
-  .credito-shgestion {
-    text-align: center; padding: 12px 0; color: #6B7280; font-size: 0.75rem;
-    margin-top: 20px;
-  }
+  .credito-shgestion { text-align: center; padding: 12px 0; color: #6B7280; font-size: 0.75rem; margin-top: 20px; }
   .credito-shgestion strong { color: #1A1A1A; }
+
+  .nota { font-size: 0.82rem; color: #6B7280; margin-top: 6px; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -139,11 +142,14 @@
         <button class="gris" id="btn-salir">Salir</button>
       </div>
       <div class="tabs">
-        <div class="tab activo" data-tab="diario">Resumen Diario</div>
-        <div class="tab" data-tab="participacion">Participación Mensual</div>
+        <div class="tab activo" data-tab="diario">Producción diaria</div>
+        <div class="tab" data-tab="envios">Envíos</div>
+        <div class="tab" data-tab="adicionales">Adicionales</div>
+        <div class="tab" data-tab="participacion">Participación</div>
         <div class="tab" data-tab="cancelaciones">Cancelaciones</div>
       </div>
 
+      <!-- PRODUCCIÓN DIARIA -->
       <div id="tab-diario" class="tab-content">
         <div class="toolbar">
           <div>
@@ -155,9 +161,41 @@
         </div>
         <div id="msg-diario"></div>
         <div id="diario-stats"></div>
+        <div id="diario-adicionales"></div>
         <div id="diario-detalle"></div>
       </div>
 
+      <!-- ENVÍOS -->
+      <div id="tab-envios" class="tab-content hidden">
+        <div class="toolbar">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="mes-envios">
+          </div>
+          <button id="btn-envios">Cargar reporte</button>
+          <button class="oscuro" id="btn-export-envios">Exportar CSV</button>
+        </div>
+        <div id="envios-stats"></div>
+        <div id="envios-tabla"></div>
+        <div id="envios-sin"></div>
+      </div>
+
+      <!-- ADICIONALES -->
+      <div id="tab-adicionales" class="tab-content hidden">
+        <div class="toolbar">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="mes-adic">
+          </div>
+          <button id="btn-adic">Cargar reporte</button>
+          <button class="oscuro" id="btn-export-adic">Exportar CSV</button>
+        </div>
+        <div id="adic-stats"></div>
+        <div id="adic-frentes"></div>
+        <div id="adic-tabla"></div>
+      </div>
+
+      <!-- PARTICIPACIÓN -->
       <div id="tab-participacion" class="tab-content hidden">
         <div class="toolbar">
           <div>
@@ -171,6 +209,7 @@
         <div id="part-tabla"></div>
       </div>
 
+      <!-- CANCELACIONES -->
       <div id="tab-cancelaciones" class="tab-content hidden">
         <div class="toolbar">
           <div>
@@ -198,6 +237,36 @@ let TOKEN = '';
 
 const $ = (id) => document.getElementById(id);
 
+/* ---- Fechas locales (NO toISOString, que devuelve UTC) ---- */
+function fechaLocalHoy() {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+function mesLocalHoy() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+function fmtFecha(iso) {
+  const p = String(iso).split('-');
+  return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : iso;
+}
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function badgeOrigen(origen) {
+  const o = String(origen || 'usuario');
+  if (o.indexOf('supervisor') === 0) {
+    const quien = o.split(':')[1] || 'supervisor';
+    return '<span class="badge badge-sup">' + esc(quien) + '</span>';
+  }
+  return '<span class="badge badge-usr">Usuario</span>';
+}
+
+// =================== LOGIN ===================
+
 $('btn-entrar').addEventListener('click', () => {
   const t = $('token').value.trim();
   if (!t) return;
@@ -206,12 +275,13 @@ $('btn-entrar').addEventListener('click', () => {
   $('login-admin').classList.add('hidden');
   $('app-admin').classList.remove('hidden');
 
-  const hoy = new Date();
-  const hoyStr = hoy.toISOString().substring(0, 10);
-  const mesStr = hoy.toISOString().substring(0, 7);
+  const hoyStr = fechaLocalHoy();
+  const mesStr = mesLocalHoy();
   $('fecha-diario').value = hoyStr;
   $('mes-part').value = mesStr;
   $('mes-cancel').value = mesStr;
+  $('mes-envios').value = mesStr;
+  $('mes-adic').value = mesStr;
 });
 
 $('btn-salir').addEventListener('click', () => {
@@ -236,6 +306,8 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
+// =================== PRODUCCIÓN DIARIA ===================
+
 $('btn-diario').addEventListener('click', async () => {
   const fecha = $('fecha-diario').value;
   if (!fecha) return alert('Selecciona una fecha');
@@ -246,34 +318,50 @@ $('btn-diario').addEventListener('click', async () => {
 
 function renderDiario(r) {
   const d = r.resumen;
-  $('diario-stats').innerHTML = `
-    <div class="stat-grid">
-      <div class="stat verde"><span class="stat-num">${d.activos}</span><span class="stat-label">Pedidos activos</span></div>
-      <div class="stat"><span class="stat-num">${d.MENU}</span><span class="stat-label">Menús</span></div>
-      <div class="stat"><span class="stat-num">${d.HIPO}</span><span class="stat-label">Hipocalóricos</span></div>
-      <div class="stat rojo"><span class="stat-num">${d.cancelados}</span><span class="stat-label">Cancelados</span></div>
-    </div>
-  `;
+  $('diario-stats').innerHTML =
+    '<div class="stat-grid">' +
+    '<div class="stat negro"><span class="stat-num">' + d.totalProduccionMenu + '</span><span class="stat-label">Menús a producir</span></div>' +
+    '<div class="stat negro"><span class="stat-num">' + d.totalProduccionHipo + '</span><span class="stat-label">Hipos a producir</span></div>' +
+    '<div class="stat"><span class="stat-num">' + d.MENU + ' / ' + d.HIPO + '</span><span class="stat-label">Nómina (menú / hipo)</span></div>' +
+    '<div class="stat verde"><span class="stat-num">' + (d.adicionalesMenu + d.adicionalesHipo) + '</span><span class="stat-label">Adicionales visitas</span></div>' +
+    '<div class="stat gris"><span class="stat-num">' + d.AUSENTE + '</span><span class="stat-label">No estarán</span></div>' +
+    '<div class="stat rojo"><span class="stat-num">' + d.cancelados + '</span><span class="stat-label">Cancelados</span></div>' +
+    '</div>' +
+    '<p class="nota">Menús a producir = nómina + adicionales de visitas. Este es el número que va a cocina.</p>';
 
-  let html = `<h3>Detalle del ${r.fecha}</h3>`;
+  // Adicionales del día
+  let ha = '';
+  if (d.adicionales.length > 0) {
+    ha = '<h3>Adicionales del día</h3><table><thead><tr>' +
+      '<th>Solicitante</th><th>Frente</th><th>Tipo</th><th>Cant.</th><th>Referencia</th><th>Registrado</th>' +
+      '</tr></thead><tbody>';
+    d.adicionales.forEach(a => {
+      ha += '<tr><td><b>' + esc(a.solicitante) + '</b></td><td>' + esc(a.frente) + '</td>' +
+        '<td><span class="badge badge-' + a.tipo + '">' + (a.tipo === 'MENU' ? 'Menú' : 'Hipo') + '</span></td>' +
+        '<td><b>' + a.cantidad + '</b></td><td>' + esc(a.referencia || '—') + '</td>' +
+        '<td style="font-size:0.8rem;color:#6B7280;">' + esc(a.timestamp) + '</td></tr>';
+    });
+    ha += '</tbody></table>';
+  }
+  $('diario-adicionales').innerHTML = ha;
+
+  let html = '<h3>Detalle nómina · ' + fmtFecha(r.fecha) + '</h3>';
   if (d.detalle.length === 0) {
     html += '<p style="color:#6B7280; text-align:center; padding:20px;">Sin registros para esta fecha.</p>';
   } else {
-    html += `<table><thead><tr>
-      <th>RUT</th><th>Nombre</th><th>Área</th><th>Alternativa</th><th>Descripción</th><th>Estado</th><th>Motivo</th>
-    </tr></thead><tbody>`;
+    html += '<table><thead><tr>' +
+      '<th>RUT</th><th>Nombre</th><th>Área</th><th>Alternativa</th><th>Descripción</th><th>Origen</th><th>Estado</th>' +
+      '</tr></thead><tbody>';
     d.detalle.forEach(x => {
-      const badgeAlt = x.alternativa ? `<span class="badge badge-${x.alternativa}">${x.alternativa === 'MENU' ? 'Menú' : 'Hipo'}</span>` : '—';
-      const badgeEst = `<span class="badge badge-${x.estado}">${x.estado}</span>`;
-      html += `<tr>
-        <td>${x.rut}</td>
-        <td><b>${x.nombre}</b></td>
-        <td>${x.area || ''}</td>
-        <td>${badgeAlt}</td>
-        <td>${x.descripcion || '—'}</td>
-        <td>${badgeEst}</td>
-        <td>${x.motivo || '—'}</td>
-      </tr>`;
+      const etiquetas = { MENU: 'Menú', HIPO: 'Hipo', AUSENTE: 'No estará' };
+      const badgeAlt = x.alternativa
+        ? '<span class="badge badge-' + x.alternativa + '">' + (etiquetas[x.alternativa] || x.alternativa) + '</span>'
+        : '—';
+      html += '<tr><td>' + esc(x.rut) + '</td><td><b>' + esc(x.nombre) + '</b></td>' +
+        '<td>' + esc(x.area) + '</td><td>' + badgeAlt + '</td>' +
+        '<td>' + esc(x.descripcion || '—') + '</td>' +
+        '<td>' + badgeOrigen(x.origen) + '</td>' +
+        '<td><span class="badge badge-' + x.estado + '">' + esc(x.estado) + '</span></td></tr>';
     });
     html += '</tbody></table>';
   }
@@ -284,12 +372,147 @@ function renderDiario(r) {
 $('btn-export-diario').addEventListener('click', () => {
   if (!window._diarioData) return alert('Primero carga el reporte');
   const r = window._diarioData;
-  let csv = 'RUT,Nombre,Area,Alternativa,Descripcion,Estado,Motivo\n';
+  let csv = 'Tipo_registro,RUT,Nombre,Area,Alternativa,Descripcion,Origen,Estado,Referencia\n';
   r.resumen.detalle.forEach(x => {
-    csv += `"${x.rut}","${x.nombre}","${x.area||''}","${x.alternativa||''}","${(x.descripcion||'').replace(/"/g,'""')}","${x.estado}","${x.motivo||''}"\n`;
+    csv += '"NOMINA","' + x.rut + '","' + x.nombre + '","' + (x.area || '') + '","' +
+      (x.alternativa || '') + '","' + String(x.descripcion || '').replace(/"/g, '""') + '","' +
+      (x.origen || '') + '","' + x.estado + '",""\n';
   });
-  descargarCSV(csv, `bitumix_diario_${r.fecha}.csv`);
+  r.resumen.adicionales.forEach(a => {
+    csv += '"ADICIONAL","","' + a.solicitante + '","' + (a.frente || '') + '","' +
+      a.tipo + '","' + a.cantidad + ' porcion(es)","supervisor","ACTIVO","' +
+      String(a.referencia || '').replace(/"/g, '""') + '"\n';
+  });
+  descargarCSV(csv, 'bitumix_produccion_' + r.fecha + '.csv');
 });
+
+// =================== ENVÍOS ===================
+
+$('btn-envios').addEventListener('click', async () => {
+  const mes = $('mes-envios').value;
+  if (!mes) return alert('Selecciona un mes');
+  const r = await apiCall({ accion: 'reporteEnvios', admin_token: TOKEN, mes });
+  if (!r.ok) { alert(r.error); return; }
+  renderEnvios(r);
+});
+
+function renderEnvios(r) {
+  $('envios-stats').innerHTML =
+    '<div class="stat-grid">' +
+    '<div class="stat"><span class="stat-num">' + r.totalEnvios + '</span><span class="stat-label">Envíos registrados</span></div>' +
+    '<div class="stat verde"><span class="stat-num">' + r.totalPersonasQueEnviaron + '</span><span class="stat-label">Personas que enviaron</span></div>' +
+    '<div class="stat rojo"><span class="stat-num">' + r.sinEnviar.length + '</span><span class="stat-label">Sin enviar aún</span></div>' +
+    '</div>';
+
+  let html = '<h3>Bitácora de envíos</h3>';
+  if (r.envios.length === 0) {
+    html += '<p style="color:#6B7280; text-align:center; padding:20px;">Sin envíos este mes.</p>';
+  } else {
+    html += '<table><thead><tr>' +
+      '<th>Fecha y hora</th><th>Nombre</th><th>Días</th><th>Origen</th><th>Email</th><th>Días incluidos</th>' +
+      '</tr></thead><tbody>';
+    r.envios.forEach(e => {
+      const emailOk = e.emailEnviado === 'SI'
+        ? '<span class="badge badge-ACTIVO">Enviado</span>'
+        : '<span class="badge badge-CANCELADO">' + esc(e.emailEnviado || '—') + '</span>';
+      html += '<tr><td><b>' + esc(e.timestamp) + '</b></td>' +
+        '<td>' + esc(e.nombre) + '</td>' +
+        '<td><b>' + e.totalDias + '</b></td>' +
+        '<td>' + badgeOrigen(e.origen) + '</td>' +
+        '<td>' + emailOk + '</td>' +
+        '<td style="font-size:0.78rem;color:#6B7280;">' + esc(e.fechas) + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  }
+  $('envios-tabla').innerHTML = html;
+
+  let hs = '';
+  if (r.sinEnviar.length > 0) {
+    hs = '<h3>Aún no han enviado nada este mes</h3><table><thead><tr>' +
+      '<th>RUT</th><th>Nombre</th><th>Área</th><th>Frente</th></tr></thead><tbody>';
+    r.sinEnviar.forEach(p => {
+      hs += '<tr><td>' + esc(p.rut) + '</td><td><b>' + esc(p.nombre) + '</b></td>' +
+        '<td>' + esc(p.area) + '</td><td>' + esc(p.frente || '—') + '</td></tr>';
+    });
+    hs += '</tbody></table>';
+  }
+  $('envios-sin').innerHTML = hs;
+  window._enviosData = r;
+}
+
+$('btn-export-envios').addEventListener('click', () => {
+  if (!window._enviosData) return alert('Primero carga el reporte');
+  let csv = 'Fecha_hora,RUT,Nombre,Total_dias,Origen,Email,LoteID,Dias_incluidos\n';
+  window._enviosData.envios.forEach(e => {
+    csv += '"' + e.timestamp + '","' + e.rut + '","' + e.nombre + '",' + e.totalDias +
+      ',"' + e.origen + '","' + e.emailEnviado + '","' + e.loteID + '","' + e.fechas + '"\n';
+  });
+  descargarCSV(csv, 'bitumix_envios_' + window._enviosData.mes + '.csv');
+});
+
+// =================== ADICIONALES ===================
+
+$('btn-adic').addEventListener('click', async () => {
+  const mes = $('mes-adic').value;
+  if (!mes) return alert('Selecciona un mes');
+  const r = await apiCall({ accion: 'reporteAdicionales', admin_token: TOKEN, mes });
+  if (!r.ok) { alert(r.error); return; }
+  renderAdic(r);
+});
+
+function renderAdic(r) {
+  $('adic-stats').innerHTML =
+    '<div class="stat-grid">' +
+    '<div class="stat negro"><span class="stat-num">' + r.totalPorciones + '</span><span class="stat-label">Porciones adicionales</span></div>' +
+    '<div class="stat"><span class="stat-num">' + r.totalMenu + '</span><span class="stat-label">Menús</span></div>' +
+    '<div class="stat verde"><span class="stat-num">' + r.totalHipo + '</span><span class="stat-label">Hipocalóricos</span></div>' +
+    '</div>';
+
+  const frentes = Object.keys(r.porFrente);
+  let hf = '';
+  if (frentes.length > 0) {
+    hf = '<h3>Distribución por frente</h3><table><thead><tr><th>Frente</th><th>Porciones</th></tr></thead><tbody>';
+    frentes.sort((a, b) => r.porFrente[b] - r.porFrente[a]).forEach(f => {
+      hf += '<tr><td><b>' + esc(f) + '</b></td><td>' + r.porFrente[f] + '</td></tr>';
+    });
+    hf += '</tbody></table>' +
+      '<p class="nota">Útil para que Bitumix asigne el costo a sus centros de costo.</p>';
+  }
+  $('adic-frentes').innerHTML = hf;
+
+  let html = '<h3>Detalle</h3>';
+  if (r.adicionales.length === 0) {
+    html += '<p style="color:#6B7280; text-align:center; padding:20px;">Sin adicionales este mes.</p>';
+  } else {
+    html += '<table><thead><tr>' +
+      '<th>Fecha consumo</th><th>Solicitante</th><th>Frente</th><th>Tipo</th><th>Cant.</th><th>Referencia</th><th>Registrado</th>' +
+      '</tr></thead><tbody>';
+    r.adicionales.forEach(a => {
+      html += '<tr><td><b>' + fmtFecha(a.fecha) + '</b></td>' +
+        '<td>' + esc(a.solicitante) + '</td><td>' + esc(a.frente) + '</td>' +
+        '<td><span class="badge badge-' + a.tipo + '">' + (a.tipo === 'MENU' ? 'Menú' : 'Hipo') + '</span></td>' +
+        '<td><b>' + a.cantidad + '</b></td>' +
+        '<td>' + esc(a.referencia || '—') + '</td>' +
+        '<td style="font-size:0.8rem;color:#6B7280;">' + esc(a.timestamp) + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  }
+  $('adic-tabla').innerHTML = html;
+  window._adicData = r;
+}
+
+$('btn-export-adic').addEventListener('click', () => {
+  if (!window._adicData) return alert('Primero carga el reporte');
+  let csv = 'Fecha_consumo,Solicitante,Frente,Tipo,Cantidad,Referencia,Registrado,LoteID\n';
+  window._adicData.adicionales.forEach(a => {
+    csv += a.fecha + ',"' + a.solicitante + '","' + a.frente + '","' + a.tipo + '",' +
+      a.cantidad + ',"' + String(a.referencia || '').replace(/"/g, '""') + '","' +
+      a.timestamp + '","' + a.loteID + '"\n';
+  });
+  descargarCSV(csv, 'bitumix_adicionales_' + window._adicData.mes + '.csv');
+});
+
+// =================== PARTICIPACIÓN ===================
 
 $('btn-part').addEventListener('click', async () => {
   const mes = $('mes-part').value;
@@ -304,34 +527,35 @@ function renderPart(r) {
   const total = d.length;
   const completos = d.filter(x => x.elegidos === r.totalDias).length;
   const sinPedir = d.filter(x => x.elegidos === 0).length;
-  const promedio = total > 0 ? Math.round(d.reduce((s,x)=>s+x.porcentaje,0)/total) : 0;
+  const promedio = total > 0 ? Math.round(d.reduce((s, x) => s + x.porcentaje, 0) / total) : 0;
+  const totalPorSup = d.reduce((s, x) => s + (x.porSupervisor || 0), 0);
+  const totalSel = d.reduce((s, x) => s + x.elegidos, 0);
+  const pctSup = totalSel > 0 ? Math.round((totalPorSup / totalSel) * 100) : 0;
 
-  $('part-stats').innerHTML = `
-    <div class="stat-grid">
-      <div class="stat"><span class="stat-num">${total}</span><span class="stat-label">Usuarios activos</span></div>
-      <div class="stat verde"><span class="stat-num">${completos}</span><span class="stat-label">Pidieron todos los días</span></div>
-      <div class="stat rojo"><span class="stat-num">${sinPedir}</span><span class="stat-label">Sin pedir aún</span></div>
-      <div class="stat"><span class="stat-num">${promedio}%</span><span class="stat-label">Participación promedio</span></div>
-    </div>
-  `;
+  $('part-stats').innerHTML =
+    '<div class="stat-grid">' +
+    '<div class="stat"><span class="stat-num">' + total + '</span><span class="stat-label">Usuarios activos</span></div>' +
+    '<div class="stat verde"><span class="stat-num">' + completos + '</span><span class="stat-label">Pidieron todos los días</span></div>' +
+    '<div class="stat rojo"><span class="stat-num">' + sinPedir + '</span><span class="stat-label">Sin pedir aún</span></div>' +
+    '<div class="stat"><span class="stat-num">' + promedio + '%</span><span class="stat-label">Participación promedio</span></div>' +
+    '<div class="stat gris"><span class="stat-num">' + pctSup + '%</span><span class="stat-label">Cargado por supervisor</span></div>' +
+    '</div>' +
+    '<p class="nota">Si el porcentaje cargado por supervisor sube, la app se está usando como planilla manual: conviene reforzar la difusión interna.</p>';
 
-  let html = `<h3>Detalle por usuario (${r.totalDias} días de menú publicados)</h3><table><thead><tr>
-    <th>RUT</th><th>Nombre</th><th>Área</th><th>Email</th><th>Pedidos</th><th style="width:200px;">Avance</th>
-  </tr></thead><tbody>`;
+  let html = '<h3>Detalle por usuario (' + r.totalDias + ' días publicados)</h3><table><thead><tr>' +
+    '<th>Nombre</th><th>Área</th><th>Frente</th><th>Rol</th><th>Pedidos</th><th>Por supervisor</th><th style="width:180px;">Avance</th>' +
+    '</tr></thead><tbody>';
   d.forEach(x => {
-    html += `<tr>
-      <td>${x.rut}</td>
-      <td><b>${x.nombre}</b></td>
-      <td>${x.area || ''}</td>
-      <td style="font-size:0.85rem;">${x.email || ''}</td>
-      <td>${x.elegidos}/${r.totalDias}</td>
-      <td>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <div class="barra-progreso" style="flex:1;"><div class="barra-progreso-fill" style="width:${x.porcentaje}%"></div></div>
-          <span style="font-size:0.8rem; min-width:36px;">${x.porcentaje}%</span>
-        </div>
-      </td>
-    </tr>`;
+    html += '<tr>' +
+      '<td><b>' + esc(x.nombre) + '</b></td>' +
+      '<td>' + esc(x.area) + '</td>' +
+      '<td>' + esc(x.frente || '—') + '</td>' +
+      '<td>' + (x.rol === 'supervisor' ? '<span class="badge badge-sup">Supervisor</span>' : '—') + '</td>' +
+      '<td>' + x.elegidos + '/' + r.totalDias + '</td>' +
+      '<td>' + (x.porSupervisor > 0 ? '<b style="color:#B45309;">' + x.porSupervisor + '</b>' : '—') + '</td>' +
+      '<td><div style="display:flex; align-items:center; gap:8px;">' +
+      '<div class="barra-progreso" style="flex:1;"><div class="barra-progreso-fill" style="width:' + x.porcentaje + '%"></div></div>' +
+      '<span style="font-size:0.8rem; min-width:36px;">' + x.porcentaje + '%</span></div></td></tr>';
   });
   html += '</tbody></table>';
   $('part-tabla').innerHTML = html;
@@ -340,12 +564,16 @@ function renderPart(r) {
 
 $('btn-export-part').addEventListener('click', () => {
   if (!window._partData) return alert('Primero carga el reporte');
-  let csv = 'RUT,Nombre,Area,Email,Pedidos,Faltantes,Porcentaje\n';
+  let csv = 'RUT,Nombre,Area,Frente,Rol,Email,Pedidos,Por_supervisor,Faltantes,Porcentaje\n';
   window._partData.detalle.forEach(x => {
-    csv += `"${x.rut}","${x.nombre}","${x.area||''}","${x.email||''}",${x.elegidos},${x.faltantes},${x.porcentaje}\n`;
+    csv += '"' + x.rut + '","' + x.nombre + '","' + (x.area || '') + '","' + (x.frente || '') + '","' +
+      x.rol + '","' + (x.email || '') + '",' + x.elegidos + ',' + (x.porSupervisor || 0) + ',' +
+      x.faltantes + ',' + x.porcentaje + '\n';
   });
-  descargarCSV(csv, `bitumix_participacion_${window._partData.mes}.csv`);
+  descargarCSV(csv, 'bitumix_participacion_' + window._partData.mes + '.csv');
 });
+
+// =================== CANCELACIONES ===================
 
 $('btn-cancel').addEventListener('click', async () => {
   const mes = $('mes-cancel').value;
@@ -357,32 +585,25 @@ $('btn-cancel').addEventListener('click', async () => {
 
 function renderCancel(r) {
   const pm = r.porMotivo;
-  $('cancel-stats').innerHTML = `
-    <div class="stat-grid">
-      <div class="stat rojo"><span class="stat-num">${r.total}</span><span class="stat-label">Total cancelaciones</span></div>
-      <div class="stat"><span class="stat-num">${pm.Viaje || 0}</span><span class="stat-label">Viaje</span></div>
-      <div class="stat"><span class="stat-num">${pm['Licencia médica'] || 0}</span><span class="stat-label">Licencia médica</span></div>
-      <div class="stat"><span class="stat-num">${pm.Permiso || 0}</span><span class="stat-label">Permiso</span></div>
-      <div class="stat gris"><span class="stat-num">${pm.Otro || 0}</span><span class="stat-label">Otro</span></div>
-    </div>
-  `;
+  $('cancel-stats').innerHTML =
+    '<div class="stat-grid">' +
+    '<div class="stat rojo"><span class="stat-num">' + r.total + '</span><span class="stat-label">Total cancelaciones</span></div>' +
+    '<div class="stat"><span class="stat-num">' + (pm.Viaje || 0) + '</span><span class="stat-label">Viaje</span></div>' +
+    '<div class="stat"><span class="stat-num">' + (pm['Licencia médica'] || 0) + '</span><span class="stat-label">Licencia médica</span></div>' +
+    '<div class="stat"><span class="stat-num">' + (pm.Permiso || 0) + '</span><span class="stat-label">Permiso</span></div>' +
+    '<div class="stat gris"><span class="stat-num">' + (pm.Otro || 0) + '</span><span class="stat-label">Otro</span></div>' +
+    '</div>';
 
   let html = '<h3>Detalle de cancelaciones</h3>';
   if (r.cancelaciones.length === 0) {
     html += '<p style="color:#6B7280; text-align:center; padding:20px;">Sin cancelaciones este mes.</p>';
   } else {
-    html += `<table><thead><tr>
-      <th>Fecha</th><th>RUT</th><th>Nombre</th><th>Área</th><th>Motivo</th>
-    </tr></thead><tbody>`;
+    html += '<table><thead><tr><th>Fecha</th><th>RUT</th><th>Nombre</th><th>Área</th><th>Motivo</th></tr></thead><tbody>';
     r.cancelaciones.forEach(x => {
-      const [y,m,d] = x.fecha.split('-');
-      html += `<tr>
-        <td><b>${d}/${m}/${y}</b></td>
-        <td>${x.rut}</td>
-        <td>${x.nombre}</td>
-        <td>${x.area || ''}</td>
-        <td><span class="badge badge-CANCELADO">${x.motivo}</span></td>
-      </tr>`;
+      html += '<tr><td><b>' + fmtFecha(x.fecha) + '</b></td>' +
+        '<td>' + esc(x.rut) + '</td><td>' + esc(x.nombre) + '</td>' +
+        '<td>' + esc(x.area) + '</td>' +
+        '<td><span class="badge badge-CANCELADO">' + esc(x.motivo) + '</span></td></tr>';
     });
     html += '</tbody></table>';
   }
@@ -394,18 +615,27 @@ $('btn-export-cancel').addEventListener('click', () => {
   if (!window._cancelData) return alert('Primero carga el reporte');
   let csv = 'Fecha,RUT,Nombre,Area,Motivo\n';
   window._cancelData.cancelaciones.forEach(x => {
-    csv += `${x.fecha},"${x.rut}","${x.nombre}","${x.area||''}","${x.motivo}"\n`;
+    csv += x.fecha + ',"' + x.rut + '","' + x.nombre + '","' + (x.area || '') + '","' + x.motivo + '"\n';
   });
-  descargarCSV(csv, `bitumix_cancelaciones_${window._cancelData.mes}.csv`);
+  descargarCSV(csv, 'bitumix_cancelaciones_' + window._cancelData.mes + '.csv');
 });
+
+// =================== UTILIDADES ===================
 
 async function apiCall(payload) {
   const r = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    redirect: 'follow'
   });
-  return await r.json();
+  const texto = await r.text();
+  try {
+    return JSON.parse(texto);
+  } catch (e) {
+    console.error('Respuesta no-JSON:', texto.substring(0, 300));
+    return { ok: false, error: 'El servidor respondió con una página en vez de datos. Revisa los permisos del deployment.' };
+  }
 }
 
 function descargarCSV(contenido, nombre) {
