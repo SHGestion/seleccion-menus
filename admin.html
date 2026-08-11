@@ -267,21 +267,59 @@ function badgeOrigen(origen) {
 
 // =================== LOGIN ===================
 
-$('btn-entrar').addEventListener('click', () => {
+$('btn-entrar').addEventListener('click', async () => {
   const t = $('token').value.trim();
-  if (!t) return;
-  TOKEN = t;
-  sessionStorage.setItem('bitumix_admin_token', t);
-  $('login-admin').classList.add('hidden');
-  $('app-admin').classList.remove('hidden');
+  if (!t) {
+    $('msg-login').innerHTML = '<div class="mensaje error">Ingresa el token de administrador.</div>';
+    return;
+  }
 
-  const hoyStr = fechaLocalHoy();
-  const mesStr = mesLocalHoy();
-  $('fecha-diario').value = hoyStr;
-  $('mes-part').value = mesStr;
-  $('mes-cancel').value = mesStr;
-  $('mes-envios').value = mesStr;
-  $('mes-adic').value = mesStr;
+  const btn = $('btn-entrar');
+  btn.disabled = true;
+  btn.textContent = 'Verificando...';
+  $('msg-login').innerHTML = '';
+
+  // Validamos contra el backend antes de mostrar el panel. Si no, cualquier
+  // texto abre la interfaz y el error recién aparece al pedir un reporte.
+  try {
+    const prueba = await apiCall({
+      accion: 'reporteEnvios',
+      admin_token: t,
+      mes: mesLocalHoy()
+    });
+
+    if (!prueba.ok) {
+      sessionStorage.removeItem('bitumix_admin_token');
+      $('msg-login').innerHTML =
+        '<div class="mensaje error">Token incorrecto. Verifica que lo hayas copiado completo, sin espacios.</div>';
+      $('token').value = '';
+      $('token').focus();
+      return;
+    }
+
+    TOKEN = t;
+    sessionStorage.setItem('bitumix_admin_token', t);
+    $('login-admin').classList.add('hidden');
+    $('app-admin').classList.remove('hidden');
+
+    const hoyStr = fechaLocalHoy();
+    const mesStr = mesLocalHoy();
+    $('fecha-diario').value = hoyStr;
+    $('mes-part').value = mesStr;
+    $('mes-cancel').value = mesStr;
+    $('mes-envios').value = mesStr;
+    $('mes-adic').value = mesStr;
+  } catch (e) {
+    $('msg-login').innerHTML =
+      '<div class="mensaje error">No se pudo conectar con el servidor. Revisa tu conexión e intenta de nuevo.</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
+});
+
+$('token').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') $('btn-entrar').click();
 });
 
 $('btn-salir').addEventListener('click', () => {
