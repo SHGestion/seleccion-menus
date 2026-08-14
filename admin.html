@@ -105,6 +105,7 @@
 
   .nota { font-size: 0.82rem; color: #6B7280; margin-top: 6px; line-height: 1.5; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -143,6 +144,7 @@
       </div>
       <div class="tabs">
         <div class="tab activo" data-tab="diario">Producción diaria</div>
+        <div class="tab" data-tab="semanal">Producción semanal</div>
         <div class="tab" data-tab="envios">Envíos</div>
         <div class="tab" data-tab="adicionales">Adicionales</div>
         <div class="tab" data-tab="participacion">Participación</div>
@@ -157,12 +159,34 @@
             <input type="date" id="fecha-diario">
           </div>
           <button id="btn-diario">Cargar reporte</button>
-          <button class="oscuro" id="btn-export-diario">Exportar CSV</button>
+          <button class="oscuro" id="btn-export-diario">Exportar Excel</button>
         </div>
         <div id="msg-diario"></div>
         <div id="diario-stats"></div>
         <div id="diario-adicionales"></div>
         <div id="diario-detalle"></div>
+      </div>
+
+      <!-- PRODUCCIÓN SEMANAL -->
+      <div id="tab-semanal" class="tab-content hidden">
+        <div class="toolbar">
+          <div>
+            <label>Desde</label>
+            <input type="date" id="sem-desde">
+          </div>
+          <div>
+            <label>Hasta</label>
+            <input type="date" id="sem-hasta">
+          </div>
+          <button class="gris" id="btn-sem-anterior">◀ Semana anterior</button>
+          <button class="gris" id="btn-sem-siguiente">Semana siguiente ▶</button>
+          <button id="btn-semanal">Cargar reporte</button>
+          <button class="oscuro" id="btn-export-semanal">Exportar Excel</button>
+        </div>
+        <p class="nota" style="margin-bottom:12px;">Detalle por persona de lo pedido en el rango. Es la vista para revisar el consumo antes de facturar.</p>
+        <div id="sem-stats"></div>
+        <div id="sem-tabla"></div>
+        <div id="sem-adicionales"></div>
       </div>
 
       <!-- ENVÍOS -->
@@ -173,7 +197,7 @@
             <input type="month" id="mes-envios">
           </div>
           <button id="btn-envios">Cargar reporte</button>
-          <button class="oscuro" id="btn-export-envios">Exportar CSV</button>
+          <button class="oscuro" id="btn-export-envios">Exportar Excel</button>
         </div>
         <div id="envios-stats"></div>
         <div id="envios-tabla"></div>
@@ -188,7 +212,7 @@
             <input type="month" id="mes-adic">
           </div>
           <button id="btn-adic">Cargar reporte</button>
-          <button class="oscuro" id="btn-export-adic">Exportar CSV</button>
+          <button class="oscuro" id="btn-export-adic">Exportar Excel</button>
         </div>
         <div id="adic-stats"></div>
         <div id="adic-frentes"></div>
@@ -203,7 +227,7 @@
             <input type="month" id="mes-part">
           </div>
           <button id="btn-part">Cargar reporte</button>
-          <button class="oscuro" id="btn-export-part">Exportar CSV</button>
+          <button class="oscuro" id="btn-export-part">Exportar Excel</button>
         </div>
         <div id="part-stats"></div>
         <div id="part-tabla"></div>
@@ -217,7 +241,7 @@
             <input type="month" id="mes-cancel">
           </div>
           <button id="btn-cancel">Cargar reporte</button>
-          <button class="oscuro" id="btn-export-cancel">Exportar CSV</button>
+          <button class="oscuro" id="btn-export-cancel">Exportar Excel</button>
         </div>
         <div id="cancel-stats"></div>
         <div id="cancel-tabla"></div>
@@ -309,6 +333,7 @@ $('btn-entrar').addEventListener('click', async () => {
     $('mes-cancel').value = mesStr;
     $('mes-envios').value = mesStr;
     $('mes-adic').value = mesStr;
+    fijarSemana(new Date());
   } catch (e) {
     $('msg-login').innerHTML =
       '<div class="mensaje error">No se pudo conectar con el servidor. Revisa tu conexión e intenta de nuevo.</div>';
@@ -410,18 +435,247 @@ function renderDiario(r) {
 $('btn-export-diario').addEventListener('click', () => {
   if (!window._diarioData) return alert('Primero carga el reporte');
   const r = window._diarioData;
-  let csv = 'Tipo_registro,RUT,Nombre,Area,Alternativa,Descripcion,Origen,Estado,Referencia\n';
+  const etq = { MENU: 'Menú', HIPO: 'Hipocalórico', AUSENTE: 'No estará' };
+
+  const nom = [['RUT', 'Nombre', 'Área', 'Alternativa', 'Descripción', 'Origen', 'Estado']];
   r.resumen.detalle.forEach(x => {
-    csv += '"NOMINA","' + x.rut + '","' + x.nombre + '","' + (x.area || '') + '","' +
-      (x.alternativa || '') + '","' + String(x.descripcion || '').replace(/"/g, '""') + '","' +
-      (x.origen || '') + '","' + x.estado + '",""\n';
+    nom.push([x.rut, x.nombre, x.area || '', etq[x.alternativa] || x.alternativa || '',
+      x.descripcion || '', x.origen || 'usuario', x.estado]);
   });
-  r.resumen.adicionales.forEach(a => {
-    csv += '"ADICIONAL","","' + a.solicitante + '","' + (a.frente || '') + '","' +
-      a.tipo + '","' + a.cantidad + ' porcion(es)","supervisor","ACTIVO","' +
-      String(a.referencia || '').replace(/"/g, '""') + '"\n';
+
+  const hojas = [{ nombre: 'Nómina', filas: nom }];
+
+  if (r.resumen.adicionales.length > 0) {
+    const ad = [['Solicitante', 'Frente', 'Tipo', 'Cantidad', 'Referencia']];
+    r.resumen.adicionales.forEach(a => {
+      ad.push([a.solicitante, a.frente || '', etq[a.tipo] || a.tipo, a.cantidad, a.referencia || '']);
+    });
+    hojas.push({ nombre: 'Adicionales', filas: ad });
+  }
+
+  hojas.push({ nombre: 'Resumen', filas: [
+    ['Fecha', fmtFecha(r.fecha)],
+    [],
+    ['Concepto', 'Cantidad'],
+    ['Menús a producir', r.resumen.totalProduccionMenu],
+    ['Hipocalóricos a producir', r.resumen.totalProduccionHipo],
+    ['TOTAL PORCIONES', r.resumen.totalProduccionMenu + r.resumen.totalProduccionHipo],
+    [],
+    ['No estarán', r.resumen.AUSENTE],
+    ['Cancelados', r.resumen.cancelados]
+  ]});
+
+  exportarExcel(hojas, 'bitumix_produccion_' + r.fecha + '.xlsx');
+});
+
+// =================== PRODUCCIÓN SEMANAL ===================
+
+/** Lunes de la semana que contiene la fecha dada. */
+function lunesDe(d) {
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const dow = x.getDay();                 // 0 domingo, 1 lunes...
+  const resta = (dow === 0) ? 6 : dow - 1;
+  x.setDate(x.getDate() - resta);
+  return x;
+}
+
+function isoDe(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function fijarSemana(fechaBase) {
+  const lun = lunesDe(fechaBase);
+  const dom = new Date(lun.getFullYear(), lun.getMonth(), lun.getDate() + 6);
+  $('sem-desde').value = isoDe(lun);
+  $('sem-hasta').value = isoDe(dom);
+}
+
+function moverSemana(deltaDias) {
+  const base = $('sem-desde').value
+    ? new Date($('sem-desde').value + 'T12:00:00')
+    : new Date();
+  base.setDate(base.getDate() + deltaDias);
+  fijarSemana(base);
+  $('btn-semanal').click();
+}
+
+$('btn-sem-anterior').addEventListener('click', function () { moverSemana(-7); });
+$('btn-sem-siguiente').addEventListener('click', function () { moverSemana(7); });
+
+$('btn-semanal').addEventListener('click', async () => {
+  const desde = $('sem-desde').value;
+  const hasta = $('sem-hasta').value;
+  if (!desde || !hasta) return alert('Selecciona el rango de fechas');
+  const r = await apiCall({ accion: 'reporteSemanal', admin_token: TOKEN, desde, hasta });
+  if (!r.ok) { alert(r.error); return; }
+  renderSemanal(r);
+});
+
+function etiquetaAlt(alt) {
+  if (alt === 'MENU') return '<span class="badge badge-MENU">Menú</span>';
+  if (alt === 'HIPO') return '<span class="badge badge-HIPO">Hipo</span>';
+  if (alt === 'AUSENTE') return '<span class="badge badge-AUSENTE">No estará</span>';
+  return '<span style="color:#DC2626;font-weight:bold;">—</span>';
+}
+
+function renderSemanal(r) {
+  const t = r.totales;
+
+  $('sem-stats').innerHTML =
+    '<div class="stat-grid">' +
+    '<div class="stat negro"><span class="stat-num">' + t.porciones + '</span><span class="stat-label">Porciones totales</span></div>' +
+    '<div class="stat"><span class="stat-num">' + (t.menu + t.adiMenu) + '</span><span class="stat-label">Menús</span></div>' +
+    '<div class="stat verde"><span class="stat-num">' + (t.hipo + t.adiHipo) + '</span><span class="stat-label">Hipocalóricos</span></div>' +
+    '<div class="stat gris"><span class="stat-num">' + t.ausente + '</span><span class="stat-label">No estarán</span></div>' +
+    '<div class="stat rojo"><span class="stat-num">' + t.sinPedir + '</span><span class="stat-label">Sin pedido</span></div>' +
+    '</div>' +
+    '<p class="nota">Porciones totales incluye los adicionales de visitas (' +
+    (t.adiMenu + t.adiHipo) + '). Es la cifra a facturar por el período.</p>';
+
+  if (r.dias.length === 0) {
+    $('sem-tabla').innerHTML =
+      '<p style="color:#6B7280;text-align:center;padding:24px;">No hay menús publicados en este rango.</p>';
+    $('sem-adicionales').innerHTML = '';
+    window._semData = r;
+    return;
+  }
+
+  // Cabecera con los días
+  let html = '<h3>Detalle por persona</h3>' +
+    '<div style="overflow-x:auto;"><table><thead><tr>' +
+    '<th style="min-width:170px;">Nombre</th><th>Frente</th>';
+  r.dias.forEach(function (d) {
+    const p = d.fecha.split('-');
+    html += '<th style="text-align:center;">' + p[2] + '/' + p[1] +
+      '<br><span style="font-weight:400;font-size:9px;">' + d.diaSemana.substring(0, 3) + '</span></th>';
   });
-  descargarCSV(csv, 'bitumix_produccion_' + r.fecha + '.csv');
+  html += '<th style="text-align:center;">Menús</th>' +
+    '<th style="text-align:center;">Hipo</th>' +
+    '<th style="text-align:center;">Porciones</th></tr></thead><tbody>';
+
+  let frenteActual = null;
+  r.personas.forEach(function (p) {
+    if (p.frente !== frenteActual) {
+      frenteActual = p.frente;
+      html += '<tr><td colspan="' + (r.dias.length + 5) + '" ' +
+        'style="background:#FFFEF5;font-weight:800;font-size:0.8rem;text-transform:uppercase;' +
+        'letter-spacing:0.5px;padding:8px 10px;">' + esc(p.frente || 'Sin frente') + '</td></tr>';
+    }
+    html += '<tr><td><b>' + esc(p.nombre) + '</b>' +
+      (p.rol === 'supervisor' ? ' <span class="badge badge-sup">Sup</span>' : '') + '</td>' +
+      '<td style="font-size:0.8rem;color:#6B7280;">' + esc(p.frente) + '</td>';
+    r.dias.forEach(function (d) {
+      html += '<td style="text-align:center;">' + etiquetaAlt(p.detalle[d.fecha]) + '</td>';
+    });
+    html += '<td style="text-align:center;font-weight:bold;color:#B8940D;">' + p.menu + '</td>' +
+      '<td style="text-align:center;font-weight:bold;color:#166534;">' + p.hipo + '</td>' +
+      '<td style="text-align:center;font-weight:800;">' + p.porciones + '</td></tr>';
+  });
+
+  // Fila de totales por día
+  html += '<tr style="background:#1A1A1A;color:#fff;">' +
+    '<td colspan="2" style="color:#FFCD11;font-weight:800;">TOTAL POR DÍA</td>';
+  r.dias.forEach(function (d) {
+    const td = r.totalesPorDia[d.fecha];
+    html += '<td style="text-align:center;color:#fff;font-weight:bold;">' +
+      (td.menu + td.hipo) + '</td>';
+  });
+  html += '<td style="text-align:center;color:#FFCD11;font-weight:800;">' + r.totales.menu + '</td>' +
+    '<td style="text-align:center;color:#86EFAC;font-weight:800;">' + r.totales.hipo + '</td>' +
+    '<td style="text-align:center;color:#fff;font-weight:800;">' +
+    (r.totales.menu + r.totales.hipo) + '</td></tr>';
+
+  html += '</tbody></table></div>';
+  $('sem-tabla').innerHTML = html;
+
+  // Adicionales del rango
+  let ha = '';
+  if (r.adicionales.length > 0) {
+    ha = '<h3>Adicionales de visitas en el período</h3><table><thead><tr>' +
+      '<th>Fecha</th><th>Solicitante</th><th>Frente</th><th>Tipo</th><th>Cant.</th><th>Referencia</th>' +
+      '</tr></thead><tbody>';
+    r.adicionales.forEach(function (a) {
+      ha += '<tr><td><b>' + fmtFecha(a.fecha) + '</b></td>' +
+        '<td>' + esc(a.solicitante) + '</td><td>' + esc(a.frente) + '</td>' +
+        '<td><span class="badge badge-' + a.tipo + '">' +
+        (a.tipo === 'MENU' ? 'Menú' : 'Hipo') + '</span></td>' +
+        '<td><b>' + a.cantidad + '</b></td>' +
+        '<td style="color:#6B7280;">' + esc(a.referencia || '—') + '</td></tr>';
+    });
+    ha += '</tbody></table>';
+  }
+  $('sem-adicionales').innerHTML = ha;
+
+  window._semData = r;
+}
+
+$('btn-export-semanal').addEventListener('click', () => {
+  const r = window._semData;
+  if (!r) return alert('Primero carga el reporte');
+
+  const etiqueta = { MENU: 'Menú', HIPO: 'Hipocalórico', AUSENTE: 'No estará', '': 'Sin pedido' };
+
+  // Hoja 1: matriz por persona
+  const cab = ['Nombre', 'RUT', 'Frente', 'Área'];
+  r.dias.forEach(function (d) {
+    const p = d.fecha.split('-');
+    cab.push(d.diaSemana.substring(0, 3) + ' ' + p[2] + '/' + p[1]);
+  });
+  cab.push('Menús', 'Hipocalóricos', 'No estará', 'Sin pedido', 'Porciones');
+
+  const filas = [cab];
+  r.personas.forEach(function (p) {
+    const fila = [p.nombre, p.rut, p.frente, p.area];
+    r.dias.forEach(function (d) {
+      fila.push(etiqueta[p.detalle[d.fecha]] || 'Sin pedido');
+    });
+    fila.push(p.menu, p.hipo, p.ausente, p.sinPedir, p.porciones);
+    filas.push(fila);
+  });
+
+  const totalFila = ['TOTAL', '', '', ''];
+  r.dias.forEach(function (d) {
+    const td = r.totalesPorDia[d.fecha];
+    totalFila.push(td.menu + td.hipo);
+  });
+  totalFila.push(r.totales.menu, r.totales.hipo, r.totales.ausente,
+    r.totales.sinPedir, r.totales.menu + r.totales.hipo);
+  filas.push(totalFila);
+
+  const hojas = [{ nombre: 'Detalle por persona', filas: filas }];
+
+  // Hoja 2: adicionales
+  if (r.adicionales.length > 0) {
+    const fa = [['Fecha', 'Solicitante', 'Frente', 'Tipo', 'Cantidad', 'Referencia']];
+    r.adicionales.forEach(function (a) {
+      fa.push([fmtFecha(a.fecha), a.solicitante, a.frente,
+        a.tipo === 'MENU' ? 'Menú' : 'Hipocalórico', a.cantidad, a.referencia]);
+    });
+    hojas.push({ nombre: 'Adicionales', filas: fa });
+  }
+
+  // Hoja 3: resumen para facturación
+  hojas.push({
+    nombre: 'Resumen', filas: [
+      ['Período', fmtFecha(r.desde) + ' al ' + fmtFecha(r.hasta)],
+      [],
+      ['Concepto', 'Cantidad'],
+      ['Menús nómina', r.totales.menu],
+      ['Hipocalóricos nómina', r.totales.hipo],
+      ['Menús adicionales (visitas)', r.totales.adiMenu],
+      ['Hipocalóricos adicionales (visitas)', r.totales.adiHipo],
+      ['TOTAL PORCIONES', r.totales.porciones],
+      [],
+      ['No estarán (no se facturan)', r.totales.ausente],
+      ['Sin pedido registrado', r.totales.sinPedir],
+      [],
+      ['Generado', new Date().toLocaleString('es-CL')]
+    ]
+  });
+
+  exportarExcel(hojas, 'bitumix_semanal_' + r.desde + '_a_' + r.hasta + '.xlsx');
 });
 
 // =================== ENVÍOS ===================
@@ -479,13 +733,24 @@ function renderEnvios(r) {
 }
 
 $('btn-export-envios').addEventListener('click', () => {
-  if (!window._enviosData) return alert('Primero carga el reporte');
-  let csv = 'Fecha_hora,RUT,Nombre,Total_dias,Origen,Email,LoteID,Dias_incluidos\n';
-  window._enviosData.envios.forEach(e => {
-    csv += '"' + e.timestamp + '","' + e.rut + '","' + e.nombre + '",' + e.totalDias +
-      ',"' + e.origen + '","' + e.emailEnviado + '","' + e.loteID + '","' + e.fechas + '"\n';
+  const r = window._enviosData;
+  if (!r) return alert('Primero carga el reporte');
+
+  const env = [['Fecha y hora', 'RUT', 'Nombre', 'Días', 'Origen', 'Email', 'LoteID', 'Días incluidos']];
+  r.envios.forEach(e => {
+    env.push([e.timestamp, e.rut, e.nombre, e.totalDias, e.origen,
+      e.emailEnviado, e.loteID, e.fechas]);
   });
-  descargarCSV(csv, 'bitumix_envios_' + window._enviosData.mes + '.csv');
+
+  const hojas = [{ nombre: 'Envíos', filas: env }];
+
+  if (r.sinEnviar.length > 0) {
+    const sin = [['RUT', 'Nombre', 'Área', 'Frente']];
+    r.sinEnviar.forEach(p => sin.push([p.rut, p.nombre, p.area || '', p.frente || '']));
+    hojas.push({ nombre: 'Sin enviar', filas: sin });
+  }
+
+  exportarExcel(hojas, 'bitumix_envios_' + r.mes + '.xlsx');
 });
 
 // =================== ADICIONALES ===================
@@ -540,14 +805,26 @@ function renderAdic(r) {
 }
 
 $('btn-export-adic').addEventListener('click', () => {
-  if (!window._adicData) return alert('Primero carga el reporte');
-  let csv = 'Fecha_consumo,Solicitante,Frente,Tipo,Cantidad,Referencia,Registrado,LoteID\n';
-  window._adicData.adicionales.forEach(a => {
-    csv += a.fecha + ',"' + a.solicitante + '","' + a.frente + '","' + a.tipo + '",' +
-      a.cantidad + ',"' + String(a.referencia || '').replace(/"/g, '""') + '","' +
-      a.timestamp + '","' + a.loteID + '"\n';
+  const r = window._adicData;
+  if (!r) return alert('Primero carga el reporte');
+  const etq = { MENU: 'Menú', HIPO: 'Hipocalórico' };
+
+  const det = [['Fecha consumo', 'Solicitante', 'Frente', 'Tipo', 'Cantidad',
+    'Referencia', 'Registrado', 'LoteID']];
+  r.adicionales.forEach(a => {
+    det.push([fmtFecha(a.fecha), a.solicitante, a.frente, etq[a.tipo] || a.tipo,
+      a.cantidad, a.referencia || '', a.timestamp, a.loteID]);
   });
-  descargarCSV(csv, 'bitumix_adicionales_' + window._adicData.mes + '.csv');
+
+  const fr = [['Frente', 'Porciones']];
+  Object.keys(r.porFrente).forEach(f => fr.push([f, r.porFrente[f]]));
+  fr.push([]);
+  fr.push(['TOTAL', r.totalPorciones]);
+
+  exportarExcel([
+    { nombre: 'Detalle', filas: det },
+    { nombre: 'Por frente', filas: fr }
+  ], 'bitumix_adicionales_' + r.mes + '.xlsx');
 });
 
 // =================== PARTICIPACIÓN ===================
@@ -601,14 +878,18 @@ function renderPart(r) {
 }
 
 $('btn-export-part').addEventListener('click', () => {
-  if (!window._partData) return alert('Primero carga el reporte');
-  let csv = 'RUT,Nombre,Area,Frente,Rol,Email,Pedidos,Por_supervisor,Faltantes,Porcentaje\n';
-  window._partData.detalle.forEach(x => {
-    csv += '"' + x.rut + '","' + x.nombre + '","' + (x.area || '') + '","' + (x.frente || '') + '","' +
-      x.rol + '","' + (x.email || '') + '",' + x.elegidos + ',' + (x.porSupervisor || 0) + ',' +
-      x.faltantes + ',' + x.porcentaje + '\n';
+  const r = window._partData;
+  if (!r) return alert('Primero carga el reporte');
+
+  const f = [['RUT', 'Nombre', 'Área', 'Frente', 'Rol', 'Email',
+    'Pedidos', 'Por supervisor', 'Faltantes', '% participación']];
+  r.detalle.forEach(x => {
+    f.push([x.rut, x.nombre, x.area || '', x.frente || '', x.rol, x.email || '',
+      x.elegidos, x.porSupervisor || 0, x.faltantes, x.porcentaje / 100]);
   });
-  descargarCSV(csv, 'bitumix_participacion_' + window._partData.mes + '.csv');
+
+  exportarExcel([{ nombre: 'Participación', filas: f }],
+    'bitumix_participacion_' + r.mes + '.xlsx');
 });
 
 // =================== CANCELACIONES ===================
@@ -650,21 +931,30 @@ function renderCancel(r) {
 }
 
 $('btn-export-cancel').addEventListener('click', () => {
-  if (!window._cancelData) return alert('Primero carga el reporte');
-  let csv = 'Fecha,RUT,Nombre,Area,Motivo\n';
-  window._cancelData.cancelaciones.forEach(x => {
-    csv += x.fecha + ',"' + x.rut + '","' + x.nombre + '","' + (x.area || '') + '","' + x.motivo + '"\n';
+  const r = window._cancelData;
+  if (!r) return alert('Primero carga el reporte');
+
+  const f = [['Fecha', 'RUT', 'Nombre', 'Área', 'Motivo']];
+  r.cancelaciones.forEach(x => {
+    f.push([fmtFecha(x.fecha), x.rut, x.nombre, x.area || '', x.motivo]);
   });
-  descargarCSV(csv, 'bitumix_cancelaciones_' + window._cancelData.mes + '.csv');
+
+  exportarExcel([{ nombre: 'Cancelaciones', filas: f }],
+    'bitumix_cancelaciones_' + r.mes + '.xlsx');
 });
 
 // =================== UTILIDADES ===================
 
 async function apiCall(payload) {
-  const r = await fetch(API_URL, {
+  const compacto = JSON.stringify(payload);
+  let url = API_URL;
+  if (compacto.length < 6000) {
+    url += (API_URL.indexOf('?') > -1 ? '&' : '?') + 'p=' + encodeURIComponent(compacto);
+  }
+  const r = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload),
+    body: compacto,
     redirect: 'follow'
   });
   const texto = await r.text();
@@ -676,13 +966,39 @@ async function apiCall(payload) {
   }
 }
 
-function descargarCSV(contenido, nombre) {
-  const bom = '\uFEFF';
-  const blob = new Blob([bom + contenido], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = nombre; a.click();
-  URL.revokeObjectURL(url);
+/**
+ * Genera un archivo .xlsx real (no CSV renombrado).
+ * hojas = [{ nombre: 'Detalle', filas: [[...], [...]] }, ...]
+ */
+function exportarExcel(hojas, nombreArchivo) {
+  if (typeof XLSX === 'undefined') {
+    alert('No se pudo cargar el generador de Excel. Revisa tu conexión y recarga la página.');
+    return;
+  }
+
+  const libro = XLSX.utils.book_new();
+
+  hojas.forEach(function (h) {
+    const hoja = XLSX.utils.aoa_to_sheet(h.filas);
+
+    // Ancho de columnas según el contenido más largo de cada una
+    const anchos = [];
+    h.filas.forEach(function (fila) {
+      fila.forEach(function (celda, i) {
+        const largo = String(celda == null ? '' : celda).length;
+        if (!anchos[i] || largo > anchos[i]) anchos[i] = largo;
+      });
+    });
+    hoja['!cols'] = anchos.map(function (a) {
+      return { wch: Math.min(Math.max(a + 2, 9), 42) };
+    });
+
+    // Nombre de hoja: Excel no admite más de 31 caracteres ni : \ / ? * [ ]
+    const nombreHoja = String(h.nombre).replace(/[:\\\/\?\*\[\]]/g, '').substring(0, 31);
+    XLSX.utils.book_append_sheet(libro, hoja, nombreHoja);
+  });
+
+  XLSX.writeFile(libro, nombreArchivo);
 }
 </script>
 
