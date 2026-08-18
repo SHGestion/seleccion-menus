@@ -634,7 +634,7 @@ async function cargarTodo() {
     mostrarMsg('msg-app', 'Cargando menús...', 'info');
     // Sin filtro de mes: el backend devuelve la ventana móvil de días
     const [rMenus, rSel, rEstado] = await Promise.all([
-      apiCall({ accion: 'getMenus' }),
+      apiCall({ accion: 'getMenus', rut: usuarioActual.rut }),
       apiCall({ accion: 'getSelecciones', rut: usuarioActual.rut }),
       apiCall({ accion: 'getEstadoEnvio', rut: usuarioActual.rut })
     ]);
@@ -981,6 +981,9 @@ $('btn-modal-confirmar').addEventListener('click', async () => {
       : 'Pedido enviado el ' + r.registradoEn + ' (sin email de confirmación)';
     if (r.cerradas > 0) {
       msg += '\nNo se incluyeron ' + r.cerradas + ' día(s) con plazo cerrado.';
+    }
+    if (r.finde > 0) {
+      msg += '\nNo se incluyeron ' + r.finde + ' día(s) de fin de semana: no estás autorizado.';
     }
     mostrarMsg('msg-app', msg, 'ok');
     window.scrollTo({ top: 0, behavior: 'smooth' });
