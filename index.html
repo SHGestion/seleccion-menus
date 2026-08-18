@@ -402,7 +402,7 @@
 <div id="modal-confirmar" class="modal-overlay hidden" style="display:none;">
   <div class="modal">
     <h3 id="modal-titulo">¿Confirmas envío del pedido?</h3>
-    <p id="modal-intro">Estás a punto de enviar tu selección de menús para <b id="modal-mes"></b>.</p>
+    <p id="modal-intro">Estás a punto de enviar tu selección de <b id="modal-mes"></b>.</p>
     <div class="info-box">
       <p><b>Días con Menú:</b> <span id="modal-menu"></span></p>
       <p><b>Días con Hipocalórico:</b> <span id="modal-hipo"></span></p>
@@ -541,9 +541,8 @@ $('btn-login').addEventListener('click', async () => {
 });
 
 $('btn-logout').addEventListener('click', () => {
-  sessionStorage.removeItem('bitumix_user');
-  sessionStorage.removeItem('bitumix_pin');
-  usuarioActual = null; pinSesion = ''; equipoCache = null;
+  limpiarSesion();
+  equipoCache = null;
   adicLocales = {}; adicHistorial = [];
   $('pantalla-app').classList.add('hidden');
   $('pantalla-login').classList.remove('hidden');
@@ -558,16 +557,29 @@ $('pin').addEventListener('keypress', (e) => {
   if (e.key === 'Enter' && !$('btn-login').disabled) $('btn-login').click();
 });
 
+function limpiarSesion() {
+  sessionStorage.removeItem('bitumix_user');
+  sessionStorage.removeItem('bitumix_pin');
+  usuarioActual = null;
+  pinSesion = '';
+}
+
 window.addEventListener('load', () => {
   cargarNombres();
   const s = sessionStorage.getItem('bitumix_user');
   const p = sessionStorage.getItem('bitumix_pin');
-  if (s) {
-    try {
-      usuarioActual = JSON.parse(s);
-      pinSesion = p || '';
-      entrarApp();
-    } catch (e) { sessionStorage.removeItem('bitumix_user'); }
+
+  // Exigimos ambos. Una sesión a medias (por ejemplo, creada por una versión
+  // anterior que no guardaba el PIN) deja al supervisor sin poder autenticar
+  // sus acciones, así que es preferible pedir login de nuevo.
+  if (!s || !p) { limpiarSesion(); return; }
+
+  try {
+    usuarioActual = JSON.parse(s);
+    pinSesion = p;
+    entrarApp();
+  } catch (e) {
+    limpiarSesion();
   }
 });
 
@@ -620,11 +632,11 @@ function cambiarVista(vista) {
 async function cargarTodo() {
   try {
     mostrarMsg('msg-app', 'Cargando menús...', 'info');
-    const mesActual = mesLocal();
+    // Sin filtro de mes: el backend devuelve la ventana móvil de días
     const [rMenus, rSel, rEstado] = await Promise.all([
-      apiCall({ accion: 'getMenus', mes: mesActual }),
+      apiCall({ accion: 'getMenus' }),
       apiCall({ accion: 'getSelecciones', rut: usuarioActual.rut }),
-      apiCall({ accion: 'getEstadoEnvio', rut: usuarioActual.rut, mes: mesActual })
+      apiCall({ accion: 'getEstadoEnvio', rut: usuarioActual.rut })
     ]);
 
     menusCache = rMenus.ok ? (rMenus.dias || []) : [];
@@ -667,9 +679,25 @@ function diasCerradosSinEnviar() {
 }
 
 function renderMesHeader() {
-  const ahora = new Date();
-  const nombreMes = MESES[ahora.getMonth()];
-  const anio = ahora.getFullYear();
+  // Con ventana móvil el encabezado ya no es un mes fijo: se describe el
+  // rango real de días publicados, que puede cruzar el cambio de mes.
+  let titulo = 'Sin días publicados';
+  if (menusCache.length > 0) {
+    const primero = menusCache[0].fecha;
+    const ultimo = menusCache[menusCache.length - 1].fecha;
+    const p1 = primero.split('-'), p2 = ultimo.split('-');
+    const mes1 = MESES[parseInt(p1[1], 10) - 1];
+    const mes2 = MESES[parseInt(p2[1], 10) - 1];
+
+    if (primero === ultimo) {
+      titulo = p1[2] + ' de ' + mes1;
+    } else if (p1[1] === p2[1] && p1[0] === p2[0]) {
+      titulo = p1[2] + ' al ' + p2[2] + ' de ' + mes1;
+    } else {
+      titulo = p1[2] + ' ' + mes1.substring(0, 3) + ' al ' +
+        p2[2] + ' ' + mes2.substring(0, 3);
+    }
+  }
 
   let subInfo = 'Elige una opción por cada día y envía cuando termines.';
   if (menusCache.length > 0 && diasNuevosDisponibles().length === 0 && fechasEnviadas.size > 0) {
@@ -681,8 +709,8 @@ function renderMesHeader() {
 
   $('mes-header').innerHTML =
     '<div class="mes-header">' +
-    '<div class="titulo">Menús del mes</div>' +
-    '<div class="mes">' + nombreMes + ' ' + anio + '</div>' +
+    '<div class="titulo">Menús disponibles</div>' +
+    '<div class="mes">' + titulo + '</div>' +
     '<div class="subinfo">' + subInfo + '</div>' +
     '</div>';
 }
@@ -896,8 +924,18 @@ $('btn-enviar').addEventListener('click', () => {
     else if (s.alternativa === 'AUSENTE') ausente++;
   }
 
-  const ahora = new Date();
-  $('modal-mes').textContent = MESES[ahora.getMonth()] + ' ' + ahora.getFullYear();
+  // El modal describe los días que se están enviando, no el mes en curso:
+  // un lote puede cruzar el cambio de mes.
+  const fechasLote = Object.keys(seleccionesLocales).sort();
+  let descripcion = fechasLote.length + ' día' + (fechasLote.length === 1 ? '' : 's');
+  if (fechasLote.length > 0) {
+    const a = fechasLote[0].split('-');
+    const b = fechasLote[fechasLote.length - 1].split('-');
+    descripcion += fechasLote.length === 1
+      ? ' (' + a[2] + '/' + a[1] + ')'
+      : ' (' + a[2] + '/' + a[1] + ' al ' + b[2] + '/' + b[1] + ')';
+  }
+  $('modal-mes').textContent = descripcion;
   $('modal-menu').textContent = menu;
   $('modal-hipo').textContent = hipo;
   $('modal-ausente').textContent = ausente;
@@ -918,14 +956,14 @@ $('btn-modal-confirmar').addEventListener('click', async () => {
   try {
     const selecciones = [];
     for (const fecha in seleccionesLocales) {
-      const s = seleccionesLocales[fecha];
-      selecciones.push({ fecha, alternativa: s.alternativa, descripcion: s.descripcion });
+      // Sin descripción: el backend la completa desde MenusDisponibles.
+      // Así el payload cabe holgado en la query string de respaldo.
+      selecciones.push({ fecha, alternativa: seleccionesLocales[fecha].alternativa });
     }
 
     const r = await apiCall({
       accion: 'enviarPedidoMensual',
       rut: usuarioActual.rut,
-      mes: mesLocal(),
       selecciones: selecciones
     });
 
@@ -958,13 +996,18 @@ $('btn-modal-confirmar').addEventListener('click', async () => {
 // =================== VISTA: EQUIPO ===================
 
 async function cargarEquipo() {
+  if (!pinSesion) {
+    $('equipo-lista').innerHTML =
+      '<div class="mensaje error">Tu sesión expiró. Presiona SALIR y vuelve a ingresar con tu PIN.</div>';
+    $('equipo-subtitulo').textContent = '';
+    return;
+  }
   $('equipo-lista').innerHTML = '<p style="color:#6B7280;padding:16px 0;">Cargando equipo...</p>';
   try {
     const r = await apiCall({
       accion: 'getEquipo',
       supervisorRut: usuarioActual.rut,
       supervisorPin: pinSesion,
-      mes: mesLocal()
     });
     if (!r.ok) {
       $('equipo-lista').innerHTML = '<div class="mensaje error">' + escapar(r.error) + '</div>';
@@ -1078,18 +1121,13 @@ $('btn-me-guardar').addEventListener('click', async () => {
   try {
     const selecciones = [];
     for (const fecha in meSeleccion) {
-      selecciones.push({
-        fecha: fecha,
-        alternativa: meSeleccion[fecha].alternativa,
-        descripcion: meSeleccion[fecha].descripcion
-      });
+      selecciones.push({ fecha: fecha, alternativa: meSeleccion[fecha].alternativa });
     }
     const r = await apiCall({
       accion: 'enviarPedidoPorSupervisor',
       supervisorRut: usuarioActual.rut,
       supervisorPin: pinSesion,
       rutObjetivo: mePersona.rut,
-      mes: mesLocal(),
       selecciones: selecciones
     });
 
@@ -1116,12 +1154,12 @@ $('btn-me-guardar').addEventListener('click', async () => {
 // =================== VISTA: ADICIONALES ===================
 
 async function cargarAdicionales() {
+  if (!pinSesion) return;
   try {
     const r = await apiCall({
       accion: 'getAdicionales',
       supervisorRut: usuarioActual.rut,
       supervisorPin: pinSesion,
-      mes: mesLocal()
     });
     adicHistorial = (r && r.ok) ? (r.adicionales || []) : [];
     if (vistaActual === 'adicionales') renderAdicionales();
@@ -1257,10 +1295,21 @@ function mostrarMsg(id, texto, tipo) {
 function limpiarMsg(id) { $(id).innerHTML = ''; }
 
 async function apiCall(payload) {
-  const r = await fetch(API_URL, {
+  // El payload viaja dos veces a propósito: en el cuerpo y en la query string.
+  // Apps Script responde con una redirección, y algunos navegadores
+  // (Samsung Internet, proxies, modo ahorro de datos) la siguen convirtiendo
+  // el POST en GET, con lo que el cuerpo se pierde. La copia en la URL
+  // sobrevive siempre. El backend usa el cuerpo si llegó, si no la query.
+  const compacto = JSON.stringify(payload);
+  let url = API_URL;
+  if (compacto.length < 6000) {
+    url += (API_URL.indexOf('?') > -1 ? '&' : '?') + 'p=' + encodeURIComponent(compacto);
+  }
+
+  const r = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload),
+    body: compacto,
     redirect: 'follow'
   });
   const texto = await r.text();
