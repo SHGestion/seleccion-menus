@@ -280,10 +280,19 @@ function esc(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
+function badgeRol(rol) {
+  if (rol === 'supervisor') return '<span class="badge badge-sup">Supervisor</span>';
+  if (rol === 'coordinador') return '<span class="badge badge-sup">Coordinador</span>';
+  return '—';
+}
+
 function badgeOrigen(origen) {
   const o = String(origen || 'usuario');
-  if (o.indexOf('supervisor') === 0) {
-    const quien = o.split(':')[1] || 'supervisor';
+  if (o === 'automatico') {
+    return '<span class="badge badge-HIPO">Automático</span>';
+  }
+  if (o.indexOf('supervisor:') === 0 || o.indexOf('coordinador:') === 0) {
+    const quien = o.split(':')[1] || 'gestor';
     return '<span class="badge badge-sup">' + esc(quien) + '</span>';
   }
   return '<span class="badge badge-usr">Usuario</span>';
@@ -564,7 +573,8 @@ function renderSemanal(r) {
         'letter-spacing:0.5px;padding:8px 10px;">' + esc(p.frente || 'Sin frente') + '</td></tr>';
     }
     html += '<tr><td><b>' + esc(p.nombre) + '</b>' +
-      (p.rol === 'supervisor' ? ' <span class="badge badge-sup">Sup</span>' : '') + '</td>' +
+      (p.rol === 'supervisor' ? ' <span class="badge badge-sup">Sup</span>' :
+       p.rol === 'coordinador' ? ' <span class="badge badge-sup">Coord</span>' : '') + '</td>' +
       '<td style="font-size:0.8rem;color:#6B7280;">' + esc(p.frente) + '</td>';
     r.dias.forEach(function (d) {
       html += '<td style="text-align:center;">' + etiquetaAlt(p.detalle[d.fecha]) + '</td>';
@@ -853,19 +863,19 @@ function renderPart(r) {
     '<div class="stat verde"><span class="stat-num">' + completos + '</span><span class="stat-label">Pidieron todos los días</span></div>' +
     '<div class="stat rojo"><span class="stat-num">' + sinPedir + '</span><span class="stat-label">Sin pedir aún</span></div>' +
     '<div class="stat"><span class="stat-num">' + promedio + '%</span><span class="stat-label">Participación promedio</span></div>' +
-    '<div class="stat gris"><span class="stat-num">' + pctSup + '%</span><span class="stat-label">Cargado por supervisor</span></div>' +
+    '<div class="stat gris"><span class="stat-num">' + pctSup + '%</span><span class="stat-label">Cargado por gestor</span></div>' +
     '</div>' +
-    '<p class="nota">Si el porcentaje cargado por supervisor sube, la app se está usando como planilla manual: conviene reforzar la difusión interna.</p>';
+    '<p class="nota">Si el porcentaje cargado por supervisores o coordinadores sube, la app se está usando como planilla manual: conviene reforzar la difusión interna.</p>';
 
   let html = '<h3>Detalle por usuario (' + r.totalDias + ' días publicados)</h3><table><thead><tr>' +
-    '<th>Nombre</th><th>Área</th><th>Frente</th><th>Rol</th><th>Pedidos</th><th>Por supervisor</th><th style="width:180px;">Avance</th>' +
+    '<th>Nombre</th><th>Área</th><th>Frente</th><th>Rol</th><th>Pedidos</th><th>Por gestor</th><th style="width:180px;">Avance</th>' +
     '</tr></thead><tbody>';
   d.forEach(x => {
     html += '<tr>' +
       '<td><b>' + esc(x.nombre) + '</b></td>' +
       '<td>' + esc(x.area) + '</td>' +
       '<td>' + esc(x.frente || '—') + '</td>' +
-      '<td>' + (x.rol === 'supervisor' ? '<span class="badge badge-sup">Supervisor</span>' : '—') + '</td>' +
+      '<td>' + badgeRol(x.rol) + '</td>' +
       '<td>' + x.elegidos + '/' + r.totalDias + '</td>' +
       '<td>' + (x.porSupervisor > 0 ? '<b style="color:#B45309;">' + x.porSupervisor + '</b>' : '—') + '</td>' +
       '<td><div style="display:flex; align-items:center; gap:8px;">' +
@@ -882,7 +892,7 @@ $('btn-export-part').addEventListener('click', () => {
   if (!r) return alert('Primero carga el reporte');
 
   const f = [['RUT', 'Nombre', 'Área', 'Frente', 'Rol', 'Email',
-    'Pedidos', 'Por supervisor', 'Faltantes', '% participación']];
+    'Pedidos', 'Por gestor', 'Faltantes', '% participación']];
   r.detalle.forEach(x => {
     f.push([x.rut, x.nombre, x.area || '', x.frente || '', x.rol, x.email || '',
       x.elegidos, x.porSupervisor || 0, x.faltantes, x.porcentaje / 100]);

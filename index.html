@@ -469,6 +469,21 @@ function formatFecha(fechaStr) {
 function esSupervisor() {
   return usuarioActual && usuarioActual.rol === 'supervisor';
 }
+function esAutomatico() {
+  return usuarioActual && !!usuarioActual.automatico;
+}
+function esCoordinador() {
+  return usuarioActual && usuarioActual.rol === 'coordinador';
+}
+/** Puede gestionar pedidos de su equipo: supervisor o coordinador. */
+function esGestor() {
+  return esSupervisor() || esCoordinador();
+}
+function etiquetaRol() {
+  if (esSupervisor()) return 'Supervisor';
+  if (esCoordinador()) return 'Coordinador';
+  return '';
+}
 function escapar(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -588,14 +603,19 @@ async function entrarApp() {
   $('pantalla-app').classList.remove('hidden');
 
   let info = usuarioActual.nombre + ' · ' + (usuarioActual.area || '');
+  const rotulo = etiquetaRol();
   $('user-info').innerHTML = escapar(info) +
-    (esSupervisor() ? ' <span class="badge-supervisor">Supervisor</span>' : '');
+    (rotulo ? ' <span class="badge-supervisor">' + rotulo + '</span>' : '');
 
-  if (esSupervisor()) {
+  // Las pestañas aparecen para quien gestiona equipo. "Visitas" es solo
+  // para supervisores: los coordinadores no registran adicionales.
+  if (esGestor()) {
     $('tabs-sup').classList.remove('hidden');
   } else {
     $('tabs-sup').classList.add('hidden');
   }
+  const tabVisitas = document.querySelector('.tab-sup[data-vista="adicionales"]');
+  if (tabVisitas) tabVisitas.classList.toggle('hidden', !esSupervisor());
 
   cambiarVista('mia');
   await cargarTodo();
@@ -608,6 +628,9 @@ document.querySelectorAll('.tab-sup').forEach(tab => {
 });
 
 function cambiarVista(vista) {
+  // Un coordinador no tiene acceso a adicionales; si llegara ahí por
+  // cualquier vía, se le devuelve a su propia selección.
+  if (vista === 'adicionales' && !esSupervisor()) vista = 'mia';
   vistaActual = vista;
   document.querySelectorAll('.tab-sup').forEach(t => {
     t.classList.toggle('activo', t.dataset.vista === vista);
@@ -717,6 +740,21 @@ function renderMesHeader() {
 
 function renderAvisoCompleto() {
   const cont = $('aviso-cont');
+
+  // Puestos con menú permanente: no eligen, se les asigna automáticamente
+  if (esAutomatico()) {
+    const etiqueta = usuarioActual.automatico === 'HIPO' ? 'Hipocalórico' : 'Menú';
+    cont.innerHTML =
+      '<div class="aviso-completo">' +
+      '<div class="check">&#10003;</div>' +
+      '<div class="titulo">Tu almuerzo está asegurado</div>' +
+      '<div class="sub">Por tu turno tienes <b>' + etiqueta + '</b> asignado todos los días, ' +
+      'sin necesidad de pedirlo. Abajo puedes ver el detalle.<br>' +
+      'Si algún día no vas a estar, avisa al Contacto administrativo.</div>' +
+      '</div>';
+    return;
+  }
+
   const nuevos = diasNuevosDisponibles();
   if (menusCache.length > 0 && nuevos.length === 0 && fechasEnviadas.size > 0) {
     cont.innerHTML =
@@ -842,6 +880,15 @@ function renderDias() {
       return;
     }
 
+    if (esAutomatico()) {
+      contDia.innerHTML =
+        '<p style="color:#6B7280;font-size:0.88rem;line-height:1.5;">' +
+        'Este día todavía no se ha registrado. Se asignará automáticamente. ' +
+        'Si hay algún problema, escribe a ventas@shgestion.cl.</p>';
+      cont.appendChild(card);
+      return;
+    }
+
     const opciones = [
       { codigo: 'MENU', label: 'Menú', descripcion: dia.menu_principal, tipoClase: 'tipo-menu' },
       { codigo: 'HIPO', label: 'Hipocalórico', descripcion: dia.hipocalorico, tipoClase: 'tipo-hipo' },
@@ -871,6 +918,7 @@ function renderDias() {
 function renderBarraEnvio() {
   const barra = $('barra-envio');
   if (vistaActual !== 'mia') { barra.classList.add('hidden'); return; }
+  if (esAutomatico()) { barra.classList.add('hidden'); return; }
 
   const nuevos = diasNuevosDisponibles();
   if (menusCache.length === 0 || nuevos.length === 0) {
