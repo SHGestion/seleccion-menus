@@ -444,6 +444,7 @@ let vistaActual = 'mia';
 let equipoCache = null;
 let adicLocales = {};       // { fecha: { menu, hipo, referencia } }
 let adicHistorial = [];
+let fechaInicioServicio = '';
 let meSeleccion = {};       // selección temporal del modal de equipo
 let mePersona = null;
 
@@ -663,6 +664,7 @@ async function cargarTodo() {
     ]);
 
     menusCache = rMenus.ok ? (rMenus.dias || []) : [];
+    fechaInicioServicio = (rMenus.ok && rMenus.fechaInicio) ? rMenus.fechaInicio : '';
     seleccionesGuardadas = (rSel && rSel.ok) ? (rSel.selecciones || {}) : {};
 
     fechasEnviadas = new Set();
@@ -730,11 +732,19 @@ function renderMesHeader() {
       ' enviados. Completa los nuevos para enviar.';
   }
 
+  let notaInicio = '';
+  if (fechaInicioServicio) {
+    const p = fechaInicioServicio.split('-');
+    notaInicio = '<div class="subinfo" style="color:#FFCD11;margin-top:6px;">' +
+      'Tu servicio comienza el ' + p[2] + '/' + p[1] + '.</div>';
+  }
+
   $('mes-header').innerHTML =
     '<div class="mes-header">' +
     '<div class="titulo">Menús disponibles</div>' +
     '<div class="mes">' + titulo + '</div>' +
     '<div class="subinfo">' + subInfo + '</div>' +
+    notaInicio +
     '</div>';
 }
 
