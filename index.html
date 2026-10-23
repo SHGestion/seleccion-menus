@@ -35,6 +35,9 @@
   .divider-yellow { height: 4px; background: #FFCD11; width: 60px; margin: 14px 0; border-radius: 2px; }
 
   label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.9rem; color: #1A1A1A; }
+  .ayuda-campo {
+    font-size: 0.78rem; color: #6B7280; margin: -8px 0 14px 0; line-height: 1.45;
+  }
   input[type="text"], input[type="password"], input[type="number"], select {
     width: 100%; padding: 12px; border: 1.5px solid #D1D5DB;
     border-radius: 8px; font-size: 1rem; margin-bottom: 14px; background: #fff;
@@ -42,15 +45,6 @@
   }
   input:focus, select:focus { outline: none; border-color: #000; box-shadow: 0 0 0 3px rgba(255,205,17,0.3); }
 
-  #nombre-select, .select-equipo {
-    appearance: none; -webkit-appearance: none; -moz-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 36px;
-    cursor: pointer;
-  }
-  #nombre-select:disabled { background-color: #F3F4F6; cursor: wait; }
 
   button {
     background: #FFCD11; color: #000; border: 2px solid #FFCD11;
@@ -102,6 +96,21 @@
   .opcion.seleccionada.tipo-hipo { border-color: #16A34A; background: #F0FDF4; box-shadow: 0 0 0 3px rgba(22,163,74,0.15); }
   .opcion.seleccionada.tipo-ausente { border-color: #6B7280; background: #FAFAFA; box-shadow: 0 0 0 3px rgba(107,114,128,0.15); }
   .opcion.bloqueado { cursor: default; opacity: 0.9; }
+
+  /* Día con plazo vencido: se ven los platos, pero no se pueden elegir */
+  .aviso-cerrado {
+    color: #6B7280; font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px;
+  }
+  .opcion.cerrada {
+    cursor: default; align-items: center;
+    background: #F9FAFB; border-color: #E5E7EB;
+  }
+  .opcion.cerrada:hover { border-color: #E5E7EB; background: #F9FAFB; }
+  .opcion.cerrada .opcion-desc { color: #4A4A4A; }
+  .btn-pedir {
+    width: auto; flex-shrink: 0; margin-left: 10px;
+    padding: 10px 18px; font-size: 0.72rem;
+  }
   .opcion-radio {
     width: 22px; height: 22px; border: 2px solid #D1D5DB; border-radius: 50%;
     margin-right: 12px; flex-shrink: 0; position: relative; margin-top: 2px; background: #fff;
@@ -311,10 +320,12 @@
     <h1 style="margin-top: 8px;">Selección de menús</h1>
     <p class="subtitle">Selecciona tu nombre e ingresa tu PIN de 4 dígitos.</p>
 
-    <label for="nombre-select">Nombre</label>
-    <select id="nombre-select" disabled>
-      <option value="">Cargando nombres...</option>
-    </select>
+    <label for="rut">RUT</label>
+    <input type="text" id="rut" placeholder="12.345.678-9"
+           autocomplete="username" maxlength="12" autocapitalize="characters"
+           spellcheck="false">
+    <p class="ayuda-campo">Puedes escribirlo con o sin puntos. Incluye el
+       dígito verificador.</p>
 
     <label for="pin">PIN</label>
     <input type="password" id="pin" placeholder="Tu PIN de 4 dígitos" autocomplete="current-password" maxlength="10" inputmode="numeric">
@@ -432,6 +443,9 @@
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbzjbdUoHmtMx7uLA_UA1N9GKICFND4YcJO4HUpuJnPx0g9YWuILgCCwMRg1a3Tcfb85bg/exec';
 
+/** Número al que llegan los pedidos fuera de plazo. Sin +, sin espacios. */
+const WA_CONTACTO = '56976696998';
+
 let usuarioActual = null;
 let pinSesion = '';
 let menusCache = [];
@@ -493,44 +507,52 @@ function escapar(s) {
 
 // =================== LOGIN ===================
 
-async function cargarNombres() {
-  try {
-    const r = await apiCall({ accion: 'getNombresActivos' });
-    const select = $('nombre-select');
-    select.innerHTML = '';
-    if (r.ok && r.usuarios && r.usuarios.length > 0) {
-      const ph = document.createElement('option');
-      ph.value = ''; ph.textContent = '— Selecciona tu nombre —';
-      ph.disabled = true; ph.selected = true;
-      select.appendChild(ph);
-      r.usuarios.forEach(u => {
-        const opt = document.createElement('option');
-        opt.value = u.rut; opt.textContent = u.nombre;
-        select.appendChild(opt);
-      });
-      select.disabled = false;
-      validarLogin();
-    } else {
-      select.innerHTML = '<option value="">No hay usuarios disponibles</option>';
-    }
-  } catch (e) {
-    $('nombre-select').innerHTML = '<option value="">Error al cargar</option>';
-    mostrarMsg('msg-login', 'No se pudieron cargar los nombres. Recarga la página.', 'error');
+/**
+ * Da formato al RUT mientras se escribe: 12.345.678-9
+ * Se aceptan solo dígitos y la K final.
+ */
+function formatearRut(valor) {
+  let v = String(valor).toUpperCase().replace(/[^0-9K]/g, '');
+  if (v.length === 0) return '';
+  // La K solo tiene sentido como dígito verificador
+  v = v.slice(0, -1).replace(/K/g, '') + v.slice(-1);
+  if (v.length === 1) return v;
+
+  const dv = v.slice(-1);
+  const cuerpo = v.slice(0, -1);
+  let out = '';
+  for (let i = 0; i < cuerpo.length; i++) {
+    const restantes = cuerpo.length - i;
+    out += cuerpo[i];
+    if (restantes > 1 && (restantes - 1) % 3 === 0) out += '.';
   }
+  return out + '-' + dv;
 }
 
 function validarLogin() {
-  $('btn-login').disabled = !($('nombre-select').value && $('pin').value.trim());
+  const rut = $('rut').value.replace(/[^0-9K]/gi, '');
+  $('btn-login').disabled = !(rut.length >= 7 && $('pin').value.trim());
 }
 
-$('nombre-select').addEventListener('change', validarLogin);
+$('rut').addEventListener('input', (e) => {
+  const cursorAlFinal = e.target.selectionStart === e.target.value.length;
+  const formateado = formatearRut(e.target.value);
+  e.target.value = formateado;
+  if (cursorAlFinal) e.target.setSelectionRange(formateado.length, formateado.length);
+  validarLogin();
+});
+
 $('pin').addEventListener('input', validarLogin);
 
+$('rut').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') $('pin').focus();
+});
+
 $('btn-login').addEventListener('click', async () => {
-  const rut = $('nombre-select').value;
+  const rut = $('rut').value.trim();
   const pin = $('pin').value.trim();
   if (!rut || !pin) {
-    mostrarMsg('msg-login', 'Selecciona tu nombre e ingresa tu PIN', 'error');
+    mostrarMsg('msg-login', 'Ingresa tu RUT y tu PIN', 'error');
     return;
   }
   $('btn-login').disabled = true;
@@ -564,8 +586,7 @@ $('btn-logout').addEventListener('click', () => {
   $('pantalla-login').classList.remove('hidden');
   $('barra-envio').classList.add('hidden');
   $('pin').value = '';
-  const select = $('nombre-select');
-  if (select.options.length > 0) select.selectedIndex = 0;
+  $('rut').value = '';
   validarLogin();
 });
 
@@ -581,7 +602,6 @@ function limpiarSesion() {
 }
 
 window.addEventListener('load', () => {
-  cargarNombres();
   const s = sessionStorage.getItem('bitumix_user');
   const p = sessionStorage.getItem('bitumix_pin');
 
@@ -882,10 +902,49 @@ function renderDias() {
     }
 
     if (cerrado) {
-      contDia.innerHTML =
-        '<p style="color:#6B7280;font-size:0.88rem;line-height:1.5;">' +
-        'El plazo para este día cerró el <strong>' + escapar(dia.corte || '') + '</strong>. ' +
-        'Si necesitas una excepción, escribe a ventas@shgestion.cl.</p>';
+      // Aunque el día esté cerrado se muestran las preparaciones: así quien
+      // se pasó del plazo sabe qué había y puede pedirlo por WhatsApp ya
+      // decidido, en vez de escribir preguntando cuál era el menú.
+      const platos = [
+        { codigo: 'MENU', label: 'Menú', descripcion: dia.menu_principal },
+        { codigo: 'HIPO', label: 'Hipocalórico', descripcion: dia.hipocalorico }
+      ].filter(function (o) { return o.descripcion; });
+
+      const aunAlcanza = dia.fecha >= fechaLocal();
+
+      let html = '<p class="aviso-cerrado">El plazo cerró el <strong>' +
+        escapar(dia.corte || '') + '</strong>.' +
+        (aunAlcanza
+          ? ' Si todavía quieres almorzar este día, pídelo y lo coordinamos según disponibilidad.'
+          : '') + '</p>';
+
+      if (platos.length === 0) {
+        html += '<p class="opcion-desc-ausente">No hay menú publicado para este día.</p>';
+      }
+
+      platos.forEach(function (o) {
+        html +=
+          '<div class="opcion cerrada">' +
+          '<div class="opcion-info">' +
+          '<span class="opcion-tag opcion-' + o.codigo + '">' + o.label + '</span>' +
+          '<div class="opcion-desc">' + escapar(o.descripcion) + '</div>' +
+          '</div>' +
+          (aunAlcanza
+            ? '<button class="btn-pedir"' +
+              ' data-fecha="' + dia.fecha + '"' +
+              ' data-dia="' + escapar(dia.diaSemana) + '"' +
+              ' data-label="' + escapar(o.label) + '"' +
+              ' data-desc="' + escapar(o.descripcion) + '">Pedir</button>'
+            : '') +
+          '</div>';
+      });
+
+      contDia.innerHTML = html;
+
+      contDia.querySelectorAll('.btn-pedir').forEach(function (b) {
+        b.addEventListener('click', function () { pedirFueraDePlazo(b.dataset); });
+      });
+
       cont.appendChild(card);
       return;
     }
@@ -956,6 +1015,23 @@ function renderBarraEnvio() {
   }
 
   $('btn-enviar').disabled = faltan > 0;
+}
+
+/**
+ * Abre WhatsApp con el pedido fuera de plazo ya redactado: quién es, qué día
+ * y qué preparación quiere. Así el mensaje llega resuelto y no hay que ir a
+ * buscar cuál era el menú de ese día.
+ */
+function pedirFueraDePlazo(d) {
+  const p = String(d.fecha).split('-');
+  const texto =
+    'Hola, soy ' + usuarioActual.nombre + '.\n\n' +
+    'Se me pasó el plazo del ' + d.dia + ' ' + p[2] + '/' + p[1] + '. ' +
+    '¿Me pueden anotar con ' + d.label + '?\n' +
+    d.desc;
+
+  window.open('https://wa.me/' + WA_CONTACTO + '?text=' +
+    encodeURIComponent(texto), '_blank');
 }
 
 function elegirLocal(fecha, opt) {
