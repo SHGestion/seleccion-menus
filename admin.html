@@ -71,6 +71,27 @@
   .badge-usr { background: #F3F4F6; color: #4A4A4A; }
 
   .hidden { display: none; }
+  .badge-conteo {
+    display: inline-block; background: #DC2626; color: #fff;
+    border-radius: 10px; padding: 1px 7px; font-size: 0.7rem;
+    font-weight: 800; margin-left: 6px; vertical-align: middle;
+  }
+  select {
+    width: 100%; padding: 10px; border: 1.5px solid #D1D5DB;
+    border-radius: 8px; font-size: 1rem; margin-bottom: 12px;
+    background: #fff; font-family: inherit; cursor: pointer;
+  }
+  .caja-manual {
+    background: #FFFEF5; border: 1px solid #FFCD11; border-radius: 10px;
+    padding: 16px 18px 4px; margin-bottom: 16px;
+  }
+  .fila-resuelta td { opacity: 0.6; }
+  .acciones-exc { display: flex; gap: 6px; }
+  .acciones-exc button { margin: 0; padding: 7px 14px; font-size: 0.75rem; }
+  .btn-rechazar {
+    background: #fff; color: #991B1B; border-color: #FCA5A5;
+  }
+  .btn-rechazar:hover { background: #FEE2E2; border-color: #DC2626; }
   .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
   .stat {
     background: #FAFAFA; padding: 16px; border-radius: 8px; text-align: center;
@@ -144,6 +165,7 @@
       </div>
       <div class="tabs">
         <div class="tab activo" data-tab="diario">Producción diaria</div>
+        <div class="tab hidden" data-tab="excepciones">Pedidos fuera de plazo <span id="badge-pendientes" class="badge-conteo hidden">0</span></div>
         <div class="tab" data-tab="semanal">Producción semanal</div>
         <div class="tab" data-tab="envios">Envíos</div>
         <div class="tab" data-tab="adicionales">Adicionales</div>
@@ -165,6 +187,53 @@
         <div id="diario-stats"></div>
         <div id="diario-adicionales"></div>
         <div id="diario-detalle"></div>
+      </div>
+
+      <!-- PEDIDOS FUERA DE PLAZO -->
+      <div id="tab-excepciones" class="tab-content hidden">
+        <div class="toolbar">
+          <div style="max-width:220px;">
+            <label>Mostrar</label>
+            <select id="exc-estado">
+              <option value="PENDIENTE">Pendientes</option>
+              <option value="APROBADA">Aprobadas</option>
+              <option value="RECHAZADA">Rechazadas</option>
+              <option value="TODAS">Todas</option>
+            </select>
+          </div>
+          <button id="btn-exc">Actualizar</button>
+          <button class="oscuro" id="btn-exc-manual">Cargar pedido a mano</button>
+        </div>
+        <p class="nota" style="margin-bottom:12px;">
+          Solicitudes de quienes se pasaron del plazo. Al aprobar, el pedido se
+          registra solo y aparece en producción; no hay que digitarlo.
+        </p>
+        <div id="exc-manual" class="caja-manual hidden">
+          <h3 style="margin-top:0;">Cargar un pedido a mano</h3>
+          <div class="toolbar">
+            <div>
+              <label>Persona</label>
+              <select id="man-rut"><option value="">Cargando…</option></select>
+            </div>
+            <div style="max-width:190px;">
+              <label>Día del almuerzo</label>
+              <input type="date" id="man-fecha">
+            </div>
+            <div style="max-width:190px;">
+              <label>Alternativa</label>
+              <select id="man-alt">
+                <option value="MENU">Menú</option>
+                <option value="HIPO">Hipocalórico</option>
+                <option value="AUSENTE">No estará</option>
+              </select>
+            </div>
+            <button id="btn-man-guardar">Cargar</button>
+            <button class="gris" id="btn-man-cancelar">Cancelar</button>
+          </div>
+        </div>
+
+        <div id="exc-msg"></div>
+        <div id="exc-tabla"></div>
       </div>
 
       <!-- PRODUCCIÓN SEMANAL -->
@@ -258,6 +327,7 @@
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbzjbdUoHmtMx7uLA_UA1N9GKICFND4YcJO4HUpuJnPx0g9YWuILgCCwMRg1a3Tcfb85bg/exec';
 let TOKEN = '';
+let ES_DUENO = false;
 
 const $ = (id) => document.getElementById(id);
 
@@ -315,11 +385,7 @@ $('btn-entrar').addEventListener('click', async () => {
   // Validamos contra el backend antes de mostrar el panel. Si no, cualquier
   // texto abre la interfaz y el error recién aparece al pedir un reporte.
   try {
-    const prueba = await apiCall({
-      accion: 'reporteEnvios',
-      admin_token: t,
-      mes: mesLocalHoy()
-    });
+    const prueba = await apiCall({ accion: 'verificarAcceso', admin_token: t });
 
     if (!prueba.ok) {
       sessionStorage.removeItem('bitumix_admin_token');
@@ -343,6 +409,15 @@ $('btn-entrar').addEventListener('click', async () => {
     $('mes-envios').value = mesStr;
     $('mes-adic').value = mesStr;
     fijarSemana(new Date());
+
+    // Las solicitudes fuera de plazo son información nuestra: el token de
+    // cliente no ve esa pestaña ni puede consultarla, porque el backend
+    // también la restringe.
+    ES_DUENO = (prueba.nivel === 'dueno');
+    document.querySelector('.tab[data-tab="excepciones"]')
+      .classList.toggle('hidden', !ES_DUENO);
+
+    if (ES_DUENO) cargarExcepciones();
   } catch (e) {
     $('msg-login').innerHTML =
       '<div class="mensaje error">No se pudo conectar con el servidor. Revisa tu conexión e intenta de nuevo.</div>';
@@ -362,6 +437,8 @@ $('btn-salir').addEventListener('click', () => {
   $('app-admin').classList.add('hidden');
   $('login-admin').classList.remove('hidden');
   $('token').value = '';
+  ES_DUENO = false;
+  document.querySelector('.tab[data-tab="excepciones"]').classList.add('hidden');
 });
 
 window.addEventListener('load', () => {
@@ -476,6 +553,186 @@ $('btn-export-diario').addEventListener('click', () => {
 
   exportarExcel(hojas, 'bitumix_produccion_' + r.fecha + '.xlsx');
 });
+
+// =================== PEDIDOS FUERA DE PLAZO ===================
+
+$('btn-exc').addEventListener('click', cargarExcepciones);
+$('exc-estado').addEventListener('change', cargarExcepciones);
+
+async function cargarExcepciones() {
+  const r = await apiCall({
+    accion: 'getSolicitudes',
+    admin_token: TOKEN,
+    estado: $('exc-estado').value
+  });
+  if (!r.ok) { mostrarExcMsg(r.error, 'error'); return; }
+  renderExcepciones(r);
+}
+
+function actualizarBadge(n) {
+  const b = $('badge-pendientes');
+  b.textContent = n;
+  b.classList.toggle('hidden', !n);
+}
+
+function renderExcepciones(r) {
+  actualizarBadge(r.pendientes);
+
+  const etq = { MENU: 'Menú', HIPO: 'Hipocalórico', AUSENTE: 'No estará' };
+  let html = '';
+
+  if (r.solicitudes.length === 0) {
+    html = '<p style="color:#6B7280;text-align:center;padding:24px;">' +
+      (r.estado === 'PENDIENTE'
+        ? 'No hay solicitudes pendientes.'
+        : 'Sin registros para este filtro.') + '</p>';
+  } else {
+    html = '<table><thead><tr>' +
+      '<th>Día a consumir</th><th>Nombre</th><th>Frente</th>' +
+      '<th>Pide</th><th>Solicitado</th><th>Estado</th><th></th>' +
+      '</tr></thead><tbody>';
+
+    r.solicitudes.forEach(function (x) {
+      const pendiente = x.estado === 'PENDIENTE';
+      html += '<tr' + (pendiente ? '' : ' class="fila-resuelta"') + '>' +
+        '<td><b>' + fmtFecha(x.fecha) + '</b><br>' +
+        '<span style="font-size:0.78rem;color:#6B7280;">' + esc(x.diaSemana) +
+        (x.yaPaso ? ' · ya pasó' : '') + '</span></td>' +
+        '<td><b>' + esc(x.nombre) + '</b></td>' +
+        '<td style="font-size:0.82rem;">' + esc(x.frente || '—') + '</td>' +
+        '<td><span class="badge badge-' + x.alternativa + '">' +
+        (etq[x.alternativa] || x.alternativa) + '</span><br>' +
+        '<span style="font-size:0.8rem;color:#4A4A4A;">' + esc(x.descripcion || '') + '</span></td>' +
+        '<td style="font-size:0.78rem;color:#6B7280;">' + esc(x.timestamp) + '</td>' +
+        '<td>' + badgeEstadoExc(x) + '</td>' +
+        '<td>' + (pendiente
+          ? '<div class="acciones-exc">' +
+            '<button data-id="' + esc(x.id) + '" data-acc="aprobar">Aprobar</button>' +
+            '<button class="btn-rechazar" data-id="' + esc(x.id) + '" data-acc="rechazar">Rechazar</button>' +
+            '</div>'
+          : '') + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  }
+
+  $('exc-tabla').innerHTML = html;
+
+  $('exc-tabla').querySelectorAll('button[data-acc]').forEach(function (b) {
+    b.addEventListener('click', function () { resolver(b, b.dataset.id, b.dataset.acc); });
+  });
+}
+
+function badgeEstadoExc(x) {
+  if (x.estado === 'PENDIENTE') return '<span class="badge badge-MENU">Pendiente</span>';
+  if (x.estado === 'APROBADA') {
+    return '<span class="badge badge-ACTIVO">Aprobada</span>' +
+      (x.resueltoPor ? '<br><span style="font-size:0.72rem;color:#6B7280;">' +
+        esc(x.resueltoPor) + '</span>' : '');
+  }
+  return '<span class="badge badge-CANCELADO">Rechazada</span>';
+}
+
+async function resolver(boton, id, resolucion) {
+  const fila = boton.closest('tr');
+  fila.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+  boton.textContent = '...';
+
+  try {
+    const r = await apiCall({
+      accion: 'resolverSolicitud',
+      admin_token: TOKEN,
+      id: id,
+      resolucion: resolucion,
+      resueltoPor: 'Administración'
+    });
+
+    if (!r.ok) {
+      mostrarExcMsg(r.error, 'error');
+      fila.querySelectorAll('button').forEach(function (b) { b.disabled = false; });
+      boton.textContent = resolucion === 'aprobar' ? 'Aprobar' : 'Rechazar';
+      return;
+    }
+
+    mostrarExcMsg(r.mensaje, 'info');
+    cargarExcepciones();
+  } catch (e) {
+    mostrarExcMsg('Error de conexión: ' + e.message, 'error');
+    fila.querySelectorAll('button').forEach(function (b) { b.disabled = false; });
+  }
+}
+
+// --- alta manual, para pedidos que llegan por otro canal ---
+
+let nombresCargados = false;
+
+$('btn-exc-manual').addEventListener('click', async () => {
+  const caja = $('exc-manual');
+  const abriendo = caja.classList.contains('hidden');
+  caja.classList.toggle('hidden');
+  if (!abriendo) return;
+
+  $('man-fecha').value = fechaLocalHoy();
+
+  if (!nombresCargados) {
+    const r = await apiCall({ accion: 'getNombresActivos' });
+    const sel = $('man-rut');
+    sel.innerHTML = '<option value="">— Selecciona —</option>';
+    if (r.ok && r.usuarios) {
+      r.usuarios.forEach(function (u) {
+        const o = document.createElement('option');
+        o.value = u.rut; o.textContent = u.nombre;
+        sel.appendChild(o);
+      });
+      nombresCargados = true;
+    }
+  }
+});
+
+$('btn-man-cancelar').addEventListener('click', () => {
+  $('exc-manual').classList.add('hidden');
+});
+
+$('btn-man-guardar').addEventListener('click', async () => {
+  const rut = $('man-rut').value;
+  const fecha = $('man-fecha').value;
+  const alt = $('man-alt').value;
+
+  if (!rut || !fecha) {
+    mostrarExcMsg('Selecciona la persona y el día.', 'error');
+    return;
+  }
+
+  const btn = $('btn-man-guardar');
+  btn.disabled = true;
+  btn.textContent = 'Cargando...';
+
+  try {
+    const r = await apiCall({
+      accion: 'crearSeleccionManual',
+      admin_token: TOKEN,
+      rut: rut,
+      fecha: fecha,
+      alternativa: alt,
+      resueltoPor: 'Administración'
+    });
+
+    if (!r.ok) { mostrarExcMsg(r.error, 'error'); return; }
+
+    $('exc-manual').classList.add('hidden');
+    mostrarExcMsg('Pedido cargado para ' + r.nombre + '.', 'info');
+    cargarExcepciones();
+  } catch (e) {
+    mostrarExcMsg('Error de conexión: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Cargar';
+  }
+});
+
+function mostrarExcMsg(texto, tipo) {
+  $('exc-msg').innerHTML = '<div class="mensaje ' + tipo + '">' + esc(texto) + '</div>';
+  setTimeout(function () { $('exc-msg').innerHTML = ''; }, 6000);
+}
 
 // =================== PRODUCCIÓN SEMANAL ===================
 

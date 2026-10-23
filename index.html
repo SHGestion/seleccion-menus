@@ -113,10 +113,16 @@
   }
   .opcion.cerrada:hover { border-color: #E5E7EB; background: #F9FAFB; }
   .opcion.cerrada .opcion-desc { color: #4A4A4A; }
+  /* Es un <a>, no un <button>: no hereda los estilos de botón */
   .btn-pedir {
-    width: auto; flex-shrink: 0; margin-left: 10px;
-    padding: 10px 18px; font-size: 0.72rem;
+    display: inline-block; flex-shrink: 0; margin-left: 10px;
+    background: #FFCD11; color: #000; border: 2px solid #FFCD11;
+    padding: 10px 18px; border-radius: 8px;
+    font-size: 0.72rem; font-weight: 800; letter-spacing: 0.3px;
+    text-transform: uppercase; text-decoration: none; white-space: nowrap;
+    cursor: pointer; transition: all 0.15s;
   }
+  .btn-pedir:hover { background: #E6B800; border-color: #E6B800; }
   .opcion-radio {
     width: 22px; height: 22px; border: 2px solid #D1D5DB; border-radius: 50%;
     margin-right: 12px; flex-shrink: 0; position: relative; margin-top: 2px; background: #fff;
@@ -932,19 +938,22 @@ function renderDias() {
           '<div class="opcion-desc">' + escapar(o.descripcion) + '</div>' +
           '</div>' +
           (aunAlcanza
-            ? '<button class="btn-pedir"' +
+            ? '<a class="btn-pedir" target="_blank" rel="noopener"' +
+              ' href="' + enlaceWhatsApp(dia, o) + '"' +
               ' data-fecha="' + dia.fecha + '"' +
-              ' data-dia="' + escapar(dia.diaSemana) + '"' +
-              ' data-label="' + escapar(o.label) + '"' +
-              ' data-desc="' + escapar(o.descripcion) + '">Pedir</button>'
+              ' data-alt="' + o.codigo + '">Pedir</a>'
             : '') +
           '</div>';
       });
 
       contDia.innerHTML = html;
 
-      contDia.querySelectorAll('.btn-pedir').forEach(function (b) {
-        b.addEventListener('click', function () { pedirFueraDePlazo(b.dataset); });
+      // Es un enlace real para que el navegador no bloquee la ventana de
+      // WhatsApp; el registro de la solicitud viaja en paralelo.
+      contDia.querySelectorAll('.btn-pedir').forEach(function (a) {
+        a.addEventListener('click', function () {
+          registrarSolicitud(a.dataset.fecha, a.dataset.alt);
+        });
       });
 
       cont.appendChild(card);
@@ -1020,20 +1029,33 @@ function renderBarraEnvio() {
 }
 
 /**
- * Abre WhatsApp con el pedido fuera de plazo ya redactado: quién es, qué día
- * y qué preparación quiere. Así el mensaje llega resuelto y no hay que ir a
- * buscar cuál era el menú de ese día.
+ * Arma el enlace de WhatsApp con el pedido fuera de plazo ya redactado:
+ * quién es, qué día y qué preparación quiere. El mensaje llega resuelto y
+ * no hay que ir a buscar cuál era el menú de ese día.
  */
-function pedirFueraDePlazo(d) {
-  const p = String(d.fecha).split('-');
+function enlaceWhatsApp(dia, opcion) {
+  const p = String(dia.fecha).split('-');
   const texto =
     'Hola, soy ' + usuarioActual.nombre + '.\n\n' +
-    'Se me pasó el plazo del ' + d.dia + ' ' + p[2] + '/' + p[1] + '. ' +
-    '¿Me pueden anotar con ' + d.label + '?\n' +
-    d.desc;
+    'Se me pasó el plazo del ' + dia.diaSemana + ' ' + p[2] + '/' + p[1] + '. ' +
+    '¿Me pueden anotar con ' + opcion.label + '?\n' +
+    opcion.descripcion;
 
-  window.open('https://wa.me/' + WA_CONTACTO + '?text=' +
-    encodeURIComponent(texto), '_blank');
+  return 'https://wa.me/' + WA_CONTACTO + '?text=' + encodeURIComponent(texto);
+}
+
+/**
+ * Deja la solicitud registrada como PENDIENTE para que administración la
+ * apruebe desde el panel con un clic, en vez de digitarla a mano.
+ * Si falla, no se avisa: el WhatsApp ya salió y ese es el canal que vale.
+ */
+function registrarSolicitud(fecha, alternativa) {
+  apiCall({
+    accion: 'registrarSolicitud',
+    rut: usuarioActual.rut,
+    fecha: fecha,
+    alternativa: alternativa
+  }).catch(function (e) { console.error('No se registró la solicitud:', e); });
 }
 
 function elegirLocal(fecha, opt) {
