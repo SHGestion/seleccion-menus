@@ -35,9 +35,15 @@
   .divider-yellow { height: 4px; background: #FFCD11; width: 60px; margin: 14px 0; border-radius: 2px; }
 
   label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.9rem; color: #1A1A1A; }
-  .ayuda-campo {
-    font-size: 0.78rem; color: #6B7280; margin: -8px 0 14px 0; line-height: 1.45;
+  #nombre-select, .select-equipo {
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
   }
+  #nombre-select:disabled { background-color: #F3F4F6; cursor: wait; }
   input[type="text"], input[type="password"], input[type="number"], select {
     width: 100%; padding: 12px; border: 1.5px solid #D1D5DB;
     border-radius: 8px; font-size: 1rem; margin-bottom: 14px; background: #fff;
@@ -320,12 +326,10 @@
     <h1 style="margin-top: 8px;">Selección de menús</h1>
     <p class="subtitle">Selecciona tu nombre e ingresa tu PIN de 4 dígitos.</p>
 
-    <label for="rut">RUT</label>
-    <input type="text" id="rut" placeholder="12.345.678-9"
-           autocomplete="username" maxlength="12" autocapitalize="characters"
-           spellcheck="false">
-    <p class="ayuda-campo">Puedes escribirlo con o sin puntos. Incluye el
-       dígito verificador.</p>
+    <label for="nombre-select">Nombre</label>
+    <select id="nombre-select" disabled>
+      <option value="">Cargando nombres...</option>
+    </select>
 
     <label for="pin">PIN</label>
     <input type="password" id="pin" placeholder="Tu PIN de 4 dígitos" autocomplete="current-password" maxlength="10" inputmode="numeric">
@@ -511,48 +515,44 @@ function escapar(s) {
  * Da formato al RUT mientras se escribe: 12.345.678-9
  * Se aceptan solo dígitos y la K final.
  */
-function formatearRut(valor) {
-  let v = String(valor).toUpperCase().replace(/[^0-9K]/g, '');
-  if (v.length === 0) return '';
-  // La K solo tiene sentido como dígito verificador
-  v = v.slice(0, -1).replace(/K/g, '') + v.slice(-1);
-  if (v.length === 1) return v;
-
-  const dv = v.slice(-1);
-  const cuerpo = v.slice(0, -1);
-  let out = '';
-  for (let i = 0; i < cuerpo.length; i++) {
-    const restantes = cuerpo.length - i;
-    out += cuerpo[i];
-    if (restantes > 1 && (restantes - 1) % 3 === 0) out += '.';
+async function cargarNombres() {
+  try {
+    const r = await apiCall({ accion: 'getNombresActivos' });
+    const select = $('nombre-select');
+    select.innerHTML = '';
+    if (r.ok && r.usuarios && r.usuarios.length > 0) {
+      const ph = document.createElement('option');
+      ph.value = ''; ph.textContent = '— Selecciona tu nombre —';
+      ph.disabled = true; ph.selected = true;
+      select.appendChild(ph);
+      r.usuarios.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.rut; opt.textContent = u.nombre;
+        select.appendChild(opt);
+      });
+      select.disabled = false;
+      validarLogin();
+    } else {
+      select.innerHTML = '<option value="">No hay usuarios disponibles</option>';
+    }
+  } catch (e) {
+    $('nombre-select').innerHTML = '<option value="">Error al cargar</option>';
+    mostrarMsg('msg-login', 'No se pudieron cargar los nombres. Recarga la página.', 'error');
   }
-  return out + '-' + dv;
 }
 
 function validarLogin() {
-  const rut = $('rut').value.replace(/[^0-9K]/gi, '');
-  $('btn-login').disabled = !(rut.length >= 7 && $('pin').value.trim());
+  $('btn-login').disabled = !($('nombre-select').value && $('pin').value.trim());
 }
 
-$('rut').addEventListener('input', (e) => {
-  const cursorAlFinal = e.target.selectionStart === e.target.value.length;
-  const formateado = formatearRut(e.target.value);
-  e.target.value = formateado;
-  if (cursorAlFinal) e.target.setSelectionRange(formateado.length, formateado.length);
-  validarLogin();
-});
-
+$('nombre-select').addEventListener('change', validarLogin);
 $('pin').addEventListener('input', validarLogin);
 
-$('rut').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') $('pin').focus();
-});
-
 $('btn-login').addEventListener('click', async () => {
-  const rut = $('rut').value.trim();
+  const rut = $('nombre-select').value;
   const pin = $('pin').value.trim();
   if (!rut || !pin) {
-    mostrarMsg('msg-login', 'Ingresa tu RUT y tu PIN', 'error');
+    mostrarMsg('msg-login', 'Selecciona tu nombre e ingresa tu PIN', 'error');
     return;
   }
   $('btn-login').disabled = true;
@@ -586,7 +586,8 @@ $('btn-logout').addEventListener('click', () => {
   $('pantalla-login').classList.remove('hidden');
   $('barra-envio').classList.add('hidden');
   $('pin').value = '';
-  $('rut').value = '';
+  const select = $('nombre-select');
+  if (select.options.length > 0) select.selectedIndex = 0;
   validarLogin();
 });
 
@@ -602,6 +603,7 @@ function limpiarSesion() {
 }
 
 window.addEventListener('load', () => {
+  cargarNombres();
   const s = sessionStorage.getItem('bitumix_user');
   const p = sessionStorage.getItem('bitumix_pin');
 
