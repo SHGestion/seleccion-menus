@@ -78,6 +78,17 @@
   }
   /* Gana sobre el display:inline-block de arriba, que anulaba a .hidden */
   .badge-conteo.hidden { display: none; }
+
+  /* Distingue de un vistazo en qué panel estás */
+  .app-admin-dueno .header-bar { border-bottom-color: #FFCD11; }
+  .app-admin-cliente .header-bar { border-bottom-color: #D1D5DB; }
+  .sello {
+    display: inline-block; padding: 3px 10px; border-radius: 5px;
+    font-size: 0.65rem; font-weight: 800; letter-spacing: 1px;
+    text-transform: uppercase; margin-left: 10px; vertical-align: 2px;
+  }
+  .sello-dueno { background: #1A1A1A; color: #FFCD11; }
+  .sello-cliente { background: #E5E7EB; color: #4A4A4A; }
   select {
     width: 100%; padding: 10px; border: 1.5px solid #D1D5DB;
     border-radius: 8px; font-size: 1rem; margin-bottom: 12px;
@@ -160,7 +171,7 @@
           <div class="brand-badge">B</div>
           <div>
             <div class="brand-name">Bitumix Austral</div>
-            <div class="subtitle" style="margin: 0;">Panel administrativo</div>
+            <div class="subtitle" style="margin: 0;" id="rotulo-panel">Panel</div>
           </div>
         </div>
         <button class="gris" id="btn-salir">Salir</button>
@@ -419,6 +430,8 @@ $('btn-entrar').addEventListener('click', async () => {
     document.querySelector('.tab[data-tab="excepciones"]')
       .classList.toggle('hidden', !ES_DUENO);
 
+    rotularPanel();
+
     if (ES_DUENO) cargarExcepciones();
   } catch (e) {
     $('msg-login').innerHTML =
@@ -433,6 +446,21 @@ $('token').addEventListener('keypress', (e) => {
   if (e.key === 'Enter') $('btn-entrar').click();
 });
 
+/** Deja claro en qué panel estás: el de SH Gestión o el del cliente. */
+function rotularPanel() {
+  const app = $('app-admin');
+  app.classList.toggle('app-admin-dueno', ES_DUENO);
+  app.classList.toggle('app-admin-cliente', !ES_DUENO);
+
+  $('rotulo-panel').innerHTML = ES_DUENO
+    ? 'Panel de administración <span class="sello sello-dueno">SH Gestión</span>'
+    : 'Panel de reportes <span class="sello sello-cliente">Cliente</span>';
+
+  document.title = ES_DUENO
+    ? 'Admin · Bitumix Austral'
+    : 'Reportes · Bitumix Austral';
+}
+
 $('btn-salir').addEventListener('click', () => {
   sessionStorage.removeItem('bitumix_admin_token');
   TOKEN = '';
@@ -441,6 +469,8 @@ $('btn-salir').addEventListener('click', () => {
   $('token').value = '';
   ES_DUENO = false;
   document.querySelector('.tab[data-tab="excepciones"]').classList.add('hidden');
+  $('app-admin').classList.remove('app-admin-dueno', 'app-admin-cliente');
+  document.title = 'Bitumix Austral — Panel';
 });
 
 window.addEventListener('load', () => {
