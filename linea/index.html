@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<title>Línea de Servicio SH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* Layout: una columna de trabajo — cabecera fija con saldos por preparación, luego buscador y lista táctil de comensales */
+:root{
+  --bg:#eef2f1; --surface:#ffffff; --sunk:#e2e8e6; --fg:#13211f; --muted:#5b6b68; --line:#cfd9d6;
+  --accent:#0e5c55; --accent-fg:#ffffff; --ok:#1f7a3a; --ok-bg:#e1f2e5; --warn:#b5560b; --bad:#b3261e; --bad-bg:#fbe5e3;
+  --m1:#2458a6; --m2:#0e7a6c; --m3:#a2461c; --m4:#7a3d8f; --m5:#806b00;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1514; --surface:#15201f; --sunk:#1c2a28; --fg:#e4eeec; --muted:#93a6a2; --line:#2a3b39;
+  --accent:#4fbfb2; --accent-fg:#06201d; --ok:#5fcf7f; --ok-bg:#14301e; --warn:#f0a35e; --bad:#ff8a80; --bad-bg:#3a1714;
+  --m1:#7fa8ec; --m2:#4fc7b4; --m3:#f09a6b; --m4:#c792dc; --m5:#d9c25a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1514; --surface:#15201f; --sunk:#1c2a28; --fg:#e4eeec; --muted:#93a6a2; --line:#2a3b39;
+  --accent:#4fbfb2; --accent-fg:#06201d; --ok:#5fcf7f; --ok-bg:#14301e; --warn:#f0a35e; --bad:#ff8a80; --bad-bg:#3a1714;
+  --m1:#7fa8ec; --m2:#4fc7b4; --m3:#f09a6b; --m4:#c792dc; --m5:#d9c25a; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{color-scheme:light}
+body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.4}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px;display:flex;flex-direction:column;gap:14px}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.brand{display:flex;flex-direction:column;min-width:0}
+.brand small{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.brand h1{margin:0;font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1.05;text-wrap:balance}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);padding:10px 14px;border-radius:8px;font-weight:600;min-height:44px}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+select.btn{padding-right:10px}
+.sync{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.dot.on{background:var(--ok)} .dot.off{background:var(--warn)}
+
+.meta{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px}
+.meta b{color:var(--fg);font-weight:600}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 16px;font-weight:600;min-height:40px}
+.tab[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+.board{position:sticky;top:0;z-index:5;background:var(--bg);padding-block:8px;border-bottom:1px solid var(--line);box-shadow:0 6px 8px -6px rgba(0,0,0,.15);display:flex;flex-direction:column;gap:8px}
+.saldos{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.saldo{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;border-top:5px solid var(--mc)}
+.saldo .name{font-family:var(--f-display);font-weight:600;font-size:17px;letter-spacing:.04em;text-transform:uppercase;color:var(--mc)}
+.saldo .big{font-family:var(--f-display);font-weight:700;font-size:38px;line-height:.95;font-variant-numeric:tabular-nums}
+.saldo .big span{font-size:15px;font-weight:600;color:var(--muted);letter-spacing:.06em;margin-left:4px;text-transform:uppercase}
+.saldo .sub{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.saldo.neg .big{color:var(--bad)}
+.saldo.zero .big{color:var(--ok)}
+.bar{height:6px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--mc)}
+.totals{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.totals b{color:var(--fg)}
+
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search{flex:1 1 260px;min-width:0;position:relative}
+.search input{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:var(--surface);font-size:18px;min-height:50px}
+.search input:focus{border-color:var(--accent);outline:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:14px;font-weight:600;min-height:38px}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;padding:6px 2px;min-height:38px}
+.toggle input{width:20px;height:20px;accent-color:var(--accent)}
+
+.list{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--mc);border-radius:10px;padding:10px 10px 10px 14px}
+.row .who{min-width:0;display:flex;flex-direction:column;gap:2px}
+.row .nm{font-weight:600;font-size:18px;line-height:1.2;overflow-wrap:anywhere}
+.row .info{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--muted);align-items:center}
+.rut{font-family:var(--f-mono);font-size:12.5px}
+.mtag{font-family:var(--f-display);font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--mc);font-size:15px}
+.give{background:var(--accent);color:var(--accent-fg);border:0;border-radius:10px;padding:0 18px;min-height:54px;min-width:120px;font-family:var(--f-display);font-weight:700;font-size:20px;letter-spacing:.04em;text-transform:uppercase}
+.row.done{background:var(--ok-bg);border-color:transparent}
+.row.done .nm{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.doneBox{display:flex;align-items:center;gap:8px}
+.check{font-family:var(--f-display);font-weight:700;color:var(--ok);font-size:18px;white-space:nowrap}
+.undo{background:transparent;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;font-weight:600;min-height:40px;color:var(--muted)}
+.undo.arm{background:var(--bad);color:#fff;border-color:var(--bad)}
+.alt{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.alt button{border:1px solid var(--mc);color:var(--mc);background:transparent;border-radius:8px;padding:6px 10px;font-weight:600;font-size:13px;min-height:40px}
+
+h2.sec{font-family:var(--f-display);font-weight:600;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:12px 0 0}
+details.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+details.box summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center}
+details.box[open] summary{margin-bottom:10px}
+.extraForm{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.extraForm input{flex:1 1 200px;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);min-height:44px}
+
+.empty{background:var(--surface);border:2px dashed var(--line);border-radius:12px;padding:28px 20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.empty h3{margin:0;font-family:var(--f-display);font-size:26px}
+.empty p{margin:0;color:var(--muted);max-width:52ch}
+.none{color:var(--muted);padding:14px;text-align:center}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:12px 18px;border-radius:10px;font-weight:600;z-index:20;max-width:calc(100% - 32px)}
+.err{background:var(--bad-bg);color:var(--bad);border-radius:8px;padding:10px 12px;font-size:14px}
+@media (max-width:520px){
+  .brand h1{font-size:25px}
+  .saldo .big{font-size:36px}
+  .row{grid-template-columns:1fr}
+  .give{width:100%}
+  .doneBox,.alt{justify-content:space-between}
+}
+@media (prefers-reduced-motion:no-preference){.row{transition:background .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <small>SH Gestión · Control de entrega</small>
+      <h1 id="titulo">Línea de servicio</h1>
+    </div>
+    <div class="actions">
+      <select id="selDia" class="btn" aria-label="Día" hidden></select>
+      <input id="file" type="file" accept=".xlsx,.xls,.csv" hidden>
+      <button id="btnCargar" class="btn primary" type="button" hidden>Subir selección del día</button>
+      <button id="btnExport" class="btn" type="button" hidden data-admin>Descargar registro</button>
+      <span class="sync"><span id="syncDot" class="dot"></span><span id="syncTxt">Conectando…</span></span>
+    </div>
+  </header>
+
+  <div id="msg" class="err" hidden></div>
+
+  <section id="vacio" class="empty">
+    <h3>Sin selección cargada</h3>
+    <p id="vacioTxt">Cargando la lista del día…</p>
+    <button id="vacioBtn" class="btn primary" type="button" hidden onclick="document.getElementById('file').click()">Elegir archivo .xlsx</button>
+  </section>
+
+  <main id="app" hidden style="display:flex;flex-direction:column;gap:12px">
+    <div class="meta" id="meta"></div>
+    <div class="tabs" id="tabsServ"></div>
+    <div class="board">
+      <div class="saldos" id="saldos"></div>
+      <div class="totals" id="totals"></div>
+      <div class="tools">
+        <div class="search"><input id="q" type="search" placeholder="Buscar por nombre o RUT…" autocomplete="off" aria-label="Buscar comensal"></div>
+        <label class="toggle"><input id="ocultar" type="checkbox"> Ocultar entregados</label>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="list" id="lista"></div>
+
+    <h2 class="sec" id="tNo" hidden>Marcaron “No Estaré”</h2>
+    <div class="list" id="listaNo"></div>
+
+    <h2 class="sec">Raciones sin reserva</h2>
+    <details class="box" id="boxExtra">
+      <summary>Registrar ración a persona fuera de la lista</summary>
+      <div class="extraForm">
+        <input id="exNom" type="text" placeholder="Nombre (opcional)" aria-label="Nombre de la persona">
+        <div class="alt" id="exBtns"></div>
+      </div>
+    </details>
+    <div class="list" id="listaExtra"></div>
+  </main>
+</div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const MC = ['--m1','--m2','--m3','--m4','--m5'];
+const S = { db:null, dias:[], diaSel:null, dia:null, entregas:{}, serv:null, filtro:null, unsubDia:null, unsubEnt:null, local:false };
+let armUndo=null, toastT=null;
+
+function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,2200)}
+function err(t){const m=$('msg');m.textContent=t||'';m.hidden=!t}
+function sync(state,txt){$('syncDot').className='dot '+state;$('syncTxt').textContent=txt}
+const norm = s => String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+const isNo = m => norm(m).startsWith('no estar');
+const keyOf = s => String(s).replace(/[^A-Za-z0-9_\-]/g,'_');
+const fmtFecha = f => { const [y,m,d]=f.split('-'); const dt=new Date(+y,+m-1,+d);
+  return dt.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'}); };
+const hora = t => new Date(t).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+const hoyISO = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+
+/* ---------- Lectura del Excel ---------- */
+function toISO(v){
+  if(v==null||v==='') return null;
+  if(typeof v==='number'){const p=XLSX.SSF.parse_date_code(v);return p.y+'-'+String(p.m).padStart(2,'0')+'-'+String(p.d).padStart(2,'0')}
+  const s=String(v).trim(); let m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
+  if(m) return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m) return m[0];
+  return null;
+}
+function parseLibro(buf, nombreArchivo){
+  const wb=XLSX.read(buf,{type:'array'});
+  for(const sn of wb.SheetNames){
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:null});
+    let h=-1, generado='';
+    for(let i=0;i<Math.min(rows.length,40);i++){
+      const r=rows[i].map(norm);
+      const g=rows[i].find(c=>typeof c==='string'&&/fecha generaci/i.test(c)); if(g) generado=g.replace(/^.*?:\s*/,'');
+      if(r.includes('run')&&r.includes('nombre')){h=i;break}
+    }
+    if(h<0) continue;
+    const H=rows[h].map(norm), ix=n=>H.findIndex(x=>x===n||x.startsWith(n));
+    const c={id:ix('id'),run:ix('run'),nom:ix('nombre'),fec:ix('fecha'),ser:ix('servicio'),men:ix('menu')};
+    if(c.men<0) throw new Error('No encontré la columna “Menú” en el archivo.');
+    const porDia={};
+    for(const r of rows.slice(h+1)){
+      if(!r||!r[c.nom]) continue;
+      const fecha=toISO(r[c.fec])||hoyISO();
+      const p={id:String(r[c.id]??r[c.run]??r[c.nom]),run:String(r[c.run]??''),nombre:String(r[c.nom]).trim(),
+               servicio:String(r[c.ser]??'Servicio').trim()||'Servicio',menu:String(r[c.men]??'').trim().toUpperCase()};
+      (porDia[fecha] ||= []).push(p);
+    }
+    const out=Object.entries(porDia).map(([fecha,personas])=>({fecha,personas,archivo:nombreArchivo,generado,cargado:new Date().toISOString()}));
+    if(out.length) return out;
+  }
+  throw new Error('El archivo no tiene una tabla con columnas RUN y Nombre. Sube el “Resumen de favoritos” del sistema de menús.');
+}
+
+$('btnCargar').onclick=()=>$('file').click();
+$('file').onchange=async e=>{
+  const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  err('');
+  try{
+    const dias=parseLibro(await f.arrayBuffer(), f.name);
+    sync('off','Guardando…'); await run('guardarDias', CLAVE, dias);
+    const n=dias.reduce((a,d)=>a+d.personas.length,0);
+    toast(`Cargado: ${n} registros · ${dias.length} día(s)`); sync('on','Sincronizado');
+    abrirDia(dias.map(d=>d.fecha).includes(hoyISO())?hoyISO():dias[0].fecha);
+  }catch(ex){err(ex.message||'No pude leer el archivo.')}
+};
+
+/* ---------- Servidor (Google Apps Script) ---------- */
+// ▼▼ Pega aquí la URL de tu Apps Script (termina en /exec) ▼▼
+const API_URL = '';
+// ▲▲
+const CLAVE = new URLSearchParams(location.search).get('admin') || '';
+const ADMIN = !!CLAVE;
+async function run(fn,...args){
+  if(fn==='getEstado'){
+    const r=await fetch(API_URL+'?api=estado&fecha='+encodeURIComponent(args[0]||'')+'&_='+Date.now());
+    return r.json();
+  }
+  const body = fn==='setEntrega' ? {accion:'entrega',fecha:args[0],clave:args[1],v:args[2]} : {accion:'subir',admin:args[0],dias:args[1]};
+  const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});
+  const j=await r.json(); if(!j.ok) throw new Error(j.error||'Error del servidor');
+  return fn==='setEntrega' ? j.entregas : true;
+}
+let pendientes=0;
+async function guardarDia(d){ await run('guardarDias', CLAVE, [d]); }
+async function setEntrega(k,v){
+  pendientes++;
+  try{ const e=await run('setEntrega',S.diaSel,k,v); pendientes--; if(!pendientes){S.entregas=e;render();} sync('on','Sincronizado'); }
+  catch(ex){ pendientes--; throw ex; }
+}
+function aplicarEstado(r){
+  S.dias=(r.fechas||[]).map(f=>({fecha:f}));
+  S.dia=r.dia; if(r.dia) S.diaSel=r.dia.fecha;
+  if(!pendientes) S.entregas=r.entregas||{};
+  render(); sync('on','Sincronizado');
+}
+async function abrirDia(fecha){
+  S.diaSel=fecha; S.serv=null; S.filtro=null;
+  try{ aplicarEstado(await run('getEstado',fecha)); }catch(e){ sync('off','Sin conexión'); }
+}
+async function refrescar(){
+  if(pendientes||document.hidden) return;
+  try{ const r=await run('getEstado',S.diaSel||null); if(!pendientes) aplicarEstado(r); }catch(e){ sync('off','Sin conexión'); }
+}
+
+/* ---------- Render ---------- */
+function menusDe(personas){ // orden estable: MENU I, MENU II, ... luego el resto
+  const set=[...new Set(personas.filter(p=>!isNo(p.menu)).map(p=>p.menu))];
+  return set.sort((a,b)=>{const r=x=>({'MENU I':1,'MENU II':2,'MENU III':3,'MENU IV':4})[x]||9;return r(a)-r(b)||a.localeCompare(b)});
+}
+function colorDe(menus,m){const i=menus.indexOf(m);return `var(${MC[(i<0?4:i)%MC.length]})`}
+
+function render(){
+  // selector de días
+  const sel=$('selDia');
+  const fechas=[...new Set([...S.dias.map(d=>d.fecha), ...(S.diaSel?[S.diaSel]:[])])].sort().reverse();
+  sel.hidden=fechas.length<2;
+  sel.innerHTML=fechas.map(f=>`<option value="${f}"${f===S.diaSel?' selected':''}>${fmtFecha(f)}</option>`).join('');
+
+  const d=S.dia;
+  $('vacio').hidden=!!d; $('app').hidden=!d; $('btnExport').hidden=!d||!ADMIN; $('btnCargar').hidden=!ADMIN;
+  if(!d){ $('vacioTxt').textContent = ADMIN ? 'Sube el Excel “Resumen de favoritos” del día. La lista aparecerá al instante en todos los equipos de la línea.' : (S.cargando ? 'Cargando la lista del día…' : 'Todavía no se ha subido la selección del día. Se mostrará aquí automáticamente cuando esté cargada.'); $('vacioBtn').hidden=!ADMIN; }
+  if(!d){$('titulo').textContent='Línea de servicio';return}
+
+  const servicios=[...new Set(d.personas.map(p=>p.servicio))];
+  if(!servicios.includes(S.serv)) S.serv=servicios[0];
+  $('titulo').textContent=fmtFecha(d.fecha).replace(/^./,c=>c.toUpperCase());
+  $('meta').innerHTML=`<span>Archivo: <b>${esc(d.archivo||'—')}</b></span><span>Generado: <b>${esc(d.generado||'—')}</b></span><span>Subido: <b>${new Date(d.cargado).toLocaleString('es-CL',{dateStyle:'short',timeStyle:'short'})}</b></span>`;
+
+  const tabs=$('tabsServ'); tabs.hidden=servicios.length<2;
+  tabs.innerHTML=servicios.map(s=>`<button class="tab" type="button" aria-pressed="${s===S.serv}" data-s="${esc(s)}">${esc(s)}</button>`).join('');
+  tabs.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.serv=b.dataset.s;S.filtro=null;render()});
+
+  const pers=d.personas.filter(p=>p.servicio===S.serv);
+  const menus=menusDe(pers);
+  const entS=Object.entries(S.entregas).filter(([k,v])=>v.servicio===S.serv);
+  const ekey=p=>keyOf(S.serv+'_'+p.id);
+
+  // saldos
+  const tot={res:0,ent:0};
+  const menusAll=[...new Set([...menus,...entS.map(([k,v])=>v.menu)])];
+  $('saldos').innerHTML=menusAll.map(m=>{
+    const res=pers.filter(p=>p.menu===m).length;
+    const ent=entS.filter(([k,v])=>v.menu===m).length;
+    const sal=res-ent; tot.res+=res; tot.ent+=ent;
+    const pct=res?Math.min(100,ent/res*100):100;
+    return `<div class="saldo ${sal<0?'neg':sal===0?'zero':''}" style="--mc:${colorDe(menusAll,m)}">
+      <div class="name">${esc(m)}</div>
+      <div class="big">${sal}<span>${sal<0?'sobre':'quedan'}</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="sub">${ent} entregados de ${res} reservados</div></div>`;
+  }).join('');
+  const noEst=pers.filter(p=>isNo(p.menu));
+  const extras=entS.filter(([k,v])=>v.extra).length;
+  $('totals').innerHTML=`<span>Total por servir: <b>${tot.res-tot.ent}</b></span><span>Entregados: <b>${tot.ent}</b> / ${tot.res}</span>${noEst.length?`<span>No estarán: <b>${noEst.length}</b></span>`:''}${extras?`<span>Fuera de lista: <b>${extras}</b></span>`:''}`;
+
+  // chips
+  $('chips').innerHTML=[`<button class="chip" type="button" aria-pressed="${!S.filtro}" data-m="">Todos</button>`,
+    ...menus.map(m=>`<button class="chip" type="button" aria-pressed="${S.filtro===m}" data-m="${esc(m)}">${esc(m)}</button>`)].join('');
+  $('chips').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.filtro=b.dataset.m||null;render()});
+
+  // lista principal
+  const q=norm($('q').value), qd=q.replace(/[^0-9k]/g,'');
+  const match=p=>!q||norm(p.nombre).includes(q)||(qd.length>=3&&norm(p.run).replace(/[^0-9k]/g,'').includes(qd));
+  const ocultar=$('ocultar').checked;
+  let lst=pers.filter(p=>!isNo(p.menu)&&(!S.filtro||p.menu===S.filtro)&&match(p));
+  if(ocultar) lst=lst.filter(p=>!S.entregas[ekey(p)]);
+  lst.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
+  $('lista').innerHTML=lst.length?lst.map(p=>filaHTML(p,S.entregas[ekey(p)],menusAll,ekey(p))).join(''):`<div class="none">${q?'Nadie coincide con la búsqueda.':'Todos entregados.'}</div>`;
+
+  // no estaré
+  const noL=noEst.filter(match).sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
+  $('tNo').hidden=!noL.length;
+  $('listaNo').innerHTML=noL.map(p=>{
+    const e=S.entregas[ekey(p)], k=ekey(p);
+    if(e) return filaHTML(p,e,menusAll,k);
+    return `<div class="row" style="--mc:var(--line)"><div class="who"><div class="nm">${esc(capi(p.nombre))}</div>
+      <div class="info"><span class="rut">${esc(p.run)}</span><span>No estaré · si llega, elige preparación:</span></div></div>
+      <div class="alt">${menus.map(m=>`<button type="button" style="--mc:${colorDe(menusAll,m)}" data-k="${k}" data-pid="${esc(p.id)}" data-m="${esc(m)}">${esc(m)}</button>`).join('')}</div></div>`;
+  }).join('');
+
+  // extras
+  $('exBtns').innerHTML=menus.map(m=>`<button type="button" style="--mc:${colorDe(menusAll,m)}" data-extra="${esc(m)}">+ ${esc(m)}</button>`).join('');
+  const exL=entS.filter(([k,v])=>v.extra).sort((a,b)=>b[1].t-a[1].t);
+  $('listaExtra').innerHTML=exL.map(([k,v])=>filaHTML({nombre:v.nombre||'Sin nombre',run:'Fuera de lista',menu:v.menu},v,menusAll,k)).join('');
+
+  bind();
+}
+function capi(s){return s===s.toUpperCase()?s.toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase()):s}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}
+function filaHTML(p,e,menus,k){
+  const m=e?e.menu:p.menu, c=colorDe(menus,m);
+  const cambio=e&&p.menu&&e.menu!==p.menu&&!isNo(p.menu)?` · reservó ${esc(p.menu)}`:'';
+  return `<div class="row${e?' done':''}" style="--mc:${c}">
+    <div class="who"><div class="nm">${esc(capi(p.nombre))}</div>
+      <div class="info"><span class="mtag">${esc(m)}</span><span class="rut">${esc(p.run)}</span>${cambio}</div></div>
+    ${e?`<div class="doneBox"><span class="check">✓ ${hora(e.t)}</span><button type="button" class="undo${armUndo===k?' arm':''}" data-undo="${k}">${armUndo===k?'¿Anular?':'Deshacer'}</button></div>`
+       :`<button type="button" class="give" data-k="${k}" data-pid="${esc(p.id)}">Entregar</button>`}
+  </div>`;
+}
+function bind(){
+  document.querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>entregar(b.dataset.pid,b.dataset.k,b.dataset.m));
+  document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.undo;
+    if(armUndo===k){armUndo=null;setEntrega(k,null).then(()=>toast('Entrega anulada')).catch(fallo)}
+    else{armUndo=k;render();setTimeout(()=>{if(armUndo===k){armUndo=null;render()}},4000)}
+  });
+  document.querySelectorAll('[data-extra]').forEach(b=>b.onclick=()=>{
+    const nom=$('exNom').value.trim(); const k='x_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    setEntrega(k,{servicio:S.serv,menu:b.dataset.extra,nombre:nom,run:'',id:'',t:Date.now(),extra:true})
+      .then(()=>{$('exNom').value='';toast(`${b.dataset.extra} entregado fuera de lista`)}).catch(fallo);
+  });
+}
+function entregar(pid,k,menuElegido){
+  const p=S.dia.personas.find(x=>x.id===pid&&x.servicio===S.serv); if(!p) return;
+  const v={id:p.id,run:p.run,nombre:p.nombre,servicio:p.servicio,menu:menuElegido||p.menu,t:Date.now(),extra:false};
+  S.entregas={...S.entregas,[k]:v}; render(); toast('✓ Entregado: '+capi(p.nombre)+' · '+v.menu);
+  if($('q').value){ $('q').value=''; render(); $('q').focus(); }
+  setEntrega(k,v).catch(fallo);
+}
+function fallo(e){
+  err('No se guardó el último cambio. Revisa la conexión e intenta de nuevo.'); setTimeout(()=>err(''),6000);
+  if(S.diaSel) abrirDia(S.diaSel);
+}
+
+$('q').oninput=()=>render();
+$('ocultar').onchange=()=>{try{localStorage.setItem('sh_ocultar',$('ocultar').checked?'1':'')}catch(e){};render()};
+try{$('ocultar').checked=!!localStorage.getItem('sh_ocultar')}catch(e){}
+$('selDia').onchange=e=>abrirDia(e.target.value);
+const LS={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}};
+
+/* ---------- Exportar registro ---------- */
+$('btnExport').onclick=async()=>{
+  const d=S.dia; if(!d) return;
+  const filas=[];
+  for(const p of d.personas){
+    const e=S.entregas[keyOf(p.servicio+'_'+p.id)];
+    filas.push({Fecha:d.fecha,Servicio:p.servicio,RUN:p.run,Nombre:p.nombre,'Menú reservado':p.menu,'Menú entregado':e?e.menu:'',Estado:e?'Entregado':(isNo(p.menu)?'No estaré':'No retiró'),Hora:e?hora(e.t):''});
+  }
+  Object.values(S.entregas).filter(v=>v.extra).forEach(v=>filas.push({Fecha:d.fecha,Servicio:v.servicio,RUN:'',Nombre:v.nombre||'Sin nombre','Menú reservado':'Sin reserva','Menú entregado':v.menu,Estado:'Fuera de lista',Hora:hora(v.t)}));
+  const resumen=[];
+  for(const s of [...new Set(d.personas.map(p=>p.servicio))]){
+    const ps=d.personas.filter(p=>p.servicio===s), ents=Object.values(S.entregas).filter(v=>v.servicio===s);
+    for(const m of [...new Set([...menusDe(ps),...ents.map(v=>v.menu)])]){
+      const r=ps.filter(p=>p.menu===m).length, e=ents.filter(v=>v.menu===m).length;
+      resumen.push({Servicio:s,'Preparación':m,Reservados:r,Entregados:e,Saldo:r-e});
+    }
+  }
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(resumen),'Saldos');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(filas),'Detalle');
+  const data=XLSX.write(wb,{type:'array',bookType:'xlsx'});
+  const blob=new Blob([data],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob), aEl=document.createElement('a');
+  aEl.href=url; aEl.download=`Entregas_${d.fecha}.xlsx`; document.body.appendChild(aEl); aEl.click(); aEl.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000); toast('Registro descargado');
+};
+
+/* ---------- Arranque ---------- */
+(async function init(){
+  S.cargando=true; render(); sync('off','Conectando…');
+  try{ const r=await run('getEstado',null); S.cargando=false; aplicarEstado(r); }
+  catch(e){ S.cargando=false; render(); sync('off','Sin conexión'); }
+  setInterval(refrescar, 8000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) refrescar(); });
+})();
+</script>
+
+</body>
+</html>
