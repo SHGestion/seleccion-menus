@@ -112,10 +112,35 @@ details.box[open] summary{margin-bottom:10px}
 .err{background:var(--bad-bg);color:var(--bad);border-radius:8px;padding:10px 12px;font-size:14px}
 @media (max-width:520px){
   .brand h1{font-size:25px}
-  .saldo .big{font-size:36px}
-  .row{grid-template-columns:1fr}
-  .give{width:100%}
-  .doneBox,.alt{justify-content:space-between}
+  .saldos{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .saldos:has(> :nth-child(4)){grid-template-columns:repeat(4,minmax(0,1fr))}
+  .saldo{padding:6px 8px;gap:2px;border-top-width:4px;border-radius:8px}
+  .saldo .name{font-size:13px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .saldo .big{font-size:30px}
+  .saldo .big span{display:none}
+  .saldo .bar{height:4px}
+  .saldo .sub{font-size:11.5px;line-height:1.2}
+  .totals{font-size:12.5px;gap:2px 10px}
+  .board{gap:6px;padding-block:6px}
+  .tools{flex-wrap:nowrap;gap:8px}
+  .search{flex:1 1 auto}
+  .search input{font-size:16px;min-height:44px;padding:8px 12px}
+  .toggle{font-size:12.5px;line-height:1.1;gap:6px;max-width:92px}
+  .toggle input{width:18px;height:18px;flex:none}
+  .row{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:7px 8px 7px 10px;border-left-width:5px}
+  .row .nm{font-size:15.5px}
+  .row .info{font-size:12px;gap:2px 8px}
+  .mtag{font-size:13px}
+  .rut{font-size:11.5px}
+  .give{min-width:0;min-height:44px;padding:0 14px;font-size:17px}
+  .doneBox{flex-direction:column;align-items:flex-end;gap:2px}
+  .check{font-size:15px}
+  .undo{min-height:30px;padding:4px 8px;font-size:12px}
+  .list{gap:5px}
+  .meta{display:none}
+  .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .chip{flex:none;min-height:34px;padding:5px 11px;font-size:13px}
+  .wrap{gap:10px;padding-block:8px 40px}
 }
 @media (prefers-reduced-motion:no-preference){.row{transition:background .15s}}
 </style>
@@ -324,7 +349,7 @@ function render(){
       <div class="name">${esc(m)}</div>
       <div class="big">${sal}<span>${sal<0?'sobre':'quedan'}</span></div>
       <div class="bar"><i style="width:${pct}%"></i></div>
-      <div class="sub">${ent} entregados de ${res} reservados</div></div>`;
+      <div class="sub">${innerWidth<=520?`${ent} de ${res} entreg.`:`${ent} entregados de ${res} reservados`}</div></div>`;
   }).join('');
   const noEst=pers.filter(p=>isNo(p.menu));
   const extras=entS.filter(([k,v])=>v.extra).length;
